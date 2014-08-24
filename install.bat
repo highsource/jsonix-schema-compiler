@@ -10,7 +10,7 @@ pause
 
 echo Performing a full clean build.
 pause
-call mvn clean install -DperformRelease -Ptests,demos,samples
+call mvn clean install -DperformRelease -Ptests
 echo Full clean build completed.
 pause
 

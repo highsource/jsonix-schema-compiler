@@ -53,18 +53,6 @@
 	</modules>
 	<profiles>
 		<profile>
-			<id>demos</id>
-			<modules>
-				<module>demos</module>
-			</modules>
-		</profile>
-		<profile>
-			<id>samples</id>
-			<modules>
-				<module>samples</module>
-			</modules>
-		</profile>
-		<profile>
 			<id>tests</id>
 			<modules>
 				<module>tests</module>
@@ -82,7 +70,7 @@
 	</mailingLists>
 	<properties> 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> 
-		<jsonix.version>2.0.11-SNAPSHOT</jsonix.version>
+		<jsonix.version>2.0.1</jsonix.version>
 		<jaxb2-basics.version>0.7.0</jaxb2-basics.version>
 		<js-codemodel.version>1.1</js-codemodel.version>
 		<jaxb-ri.version>2.1.13</jaxb-ri.version>
@@ -108,11 +96,6 @@
 				<version>${project.version}</version>
 			</dependency>
 			<!-- JSonix -->
-			<dependency>
-				<groupId>org.hisrc.jsonix</groupId>
-				<artifactId>jsonix</artifactId>
-				<version>${jsonix.version}</version>
-			</dependency>
 			<dependency>
 				<groupId>org.hisrc.jsonix</groupId>
 				<artifactId>jsonix-scripts</artifactId>
@@ -313,19 +296,9 @@ and JavaScript object structures.</license.description>
 					</executions>
 				</plugin>
 				<plugin>
-					<groupId>net.alchim31.maven</groupId>
-					<artifactId>yuicompressor-maven-plugin</artifactId>
-					<version>1.1</version>
-				</plugin>
-				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-shade-plugin</artifactId>
 					<version>1.4</version>
-				</plugin>
-				<plugin>
-					<groupId>net.disy.legato</groupId>
-					<artifactId>legato-maven-plugin</artifactId>
-					<version>1.2</version>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
@@ -380,32 +353,6 @@ and JavaScript object structures.</license.description>
 										<versionRange>[0.8.1-SNAPSHOT,)</versionRange>
 										<goals>
 											<goal>generate</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>net.disy.legato</groupId>
-										<artifactId>legato-maven-plugin</artifactId>
-										<versionRange>[1.2,)</versionRange>
-										<goals>
-											<goal>concatenate</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>net.alchim31.maven</groupId>
-										<artifactId>yuicompressor-maven-plugin</artifactId>
-										<versionRange>[1.1,)</versionRange>
-										<goals>
-											<goal>compress</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>

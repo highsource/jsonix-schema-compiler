@@ -57,7 +57,6 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MValuePropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MWildcard;
 import org.jvnet.jaxb2_commons.xml.bind.model.MWrappable;
 import org.jvnet.jaxb2_commons.xml.bind.model.util.DefaultTypeInfoVisitor;
-import org.jvnet.jaxb2_commons.xmlschema.XmlSchemaConstants;
 
 final class PropertyInfoVisitor<T, C extends T> implements
 		MPropertyInfoVisitor<T, C, JSObjectLiteral> {

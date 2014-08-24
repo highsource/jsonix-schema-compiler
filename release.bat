@@ -10,16 +10,16 @@ pause
 
 echo Performing a full clean build.
 pause
-call mvn clean install -DperformRelease -Ptests,demos,samples
+call mvn clean install -DperformRelease -Ptests
 echo Full clean build completed.
 pause
 
 echo Setting new version to %1.
 pause
-call mvn versions:set -Ptests,demos,samples -DnewVersion=%1
+call mvn versions:set -Ptests -DnewVersion=%1
 echo Version was set to %1.
 pause
-call mvn versions:commit -Ptests,demos,samples
+call mvn versions:commit -Ptests
 echo Version %1 committed.
 pause
 
@@ -31,7 +31,7 @@ pause
 
 echo Performing a full clean build.
 pause
-call mvn clean install -Ptests,demos,samples -DperformRelease
+call mvn clean install -Ptests -DperformRelease
 echo Full clean build completed.
 pause
 
@@ -56,16 +56,16 @@ pause
 
 echo Performing full clean deploy.
 pause
-call mvn -DperformRelease -Psonatype-oss-release,tests,demos,samples clean deploy
+call mvn -DperformRelease -Psonatype-oss-release,tests clean deploy
 echo Full clean deploy done.
 pause
 
 echo Setting new version to %2.
 pause
-call mvn versions:set -Ptests,demos,samples -DnewVersion=%2
+call mvn versions:set -Ptests -DnewVersion=%2
 echo Version was set to %2.
 pause
-call mvn versions:commit -Ptests,demos,samples
+call mvn versions:commit -Ptests
 echo Version %2 was committed.
 pause
 

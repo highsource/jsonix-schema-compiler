@@ -33,10 +33,10 @@
 
 package org.hisrc.jsonix.compiler;
 
-import java.util.Objects;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jscm.codemodel.JSCodeModel;
@@ -159,13 +159,14 @@ public class JsonixModule {
 		return createNameExpression(name, this.defaultAttributeNamespaceURI);
 	}
 
+	@SuppressWarnings("deprecation")
 	private JSMemberExpression createNameExpression(final QName name,
 			final String defaultNamespaceURI) {
 		final String draftNamespaceURI = name.getNamespaceURI();
 		final String namespaceURI = StringUtils.isEmpty(draftNamespaceURI) ? null
 				: draftNamespaceURI;
 
-		if (Objects.equals(defaultNamespaceURI, namespaceURI)) {
+		if (ObjectUtils.equals(defaultNamespaceURI, namespaceURI)) {
 			return this.codeModel.string(name.getLocalPart());
 		} else {
 

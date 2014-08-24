@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>jsonix-tests-zero</artifactId>
+	<artifactId>jsonix-schema-compiler-test-zero</artifactId>
 	<packaging>jar</packaging>
 	<name>Jsonix Tests [zero]</name>
 	<parent>
 		<groupId>org.hisrc.jsonix</groupId>
-		<artifactId>jsonix-tests</artifactId>
+		<artifactId>jsonix-schema-compiler-tests</artifactId>
 		<version>2.0.11-SNAPHSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
