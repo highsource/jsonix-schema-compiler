@@ -72,7 +72,15 @@ pause
 echo Performing a short clean build.
 pause
 call mvn clean install -DperformRelease
+echo Short clean build completed.
 pause
+
+echo Performing a full clean build.
+pause
+call mvn clean install -DperformRelease -Ptests
+echo Full clean build completed.
+pause
+
 
 echo Checking in version %2.
 pause
