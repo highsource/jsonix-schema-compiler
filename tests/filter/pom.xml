@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>jsonix-schema-compiler-test-zero</artifactId>
+	<artifactId>jsonix-schema-compiler-test-filter</artifactId>
 	<packaging>jar</packaging>
-	<name>Jsonix Schema Compiler Tests [filter]</name>
+	<name>Jsonix Schema Compiler Test [filter]</name>
 	<parent>
 		<groupId>org.hisrc.jsonix</groupId>
 		<artifactId>jsonix-schema-compiler-tests</artifactId>
@@ -10,6 +10,10 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<dependencies>
+		<dependency>
+			<groupId>org.jvnet.jaxb2_commons</groupId>
+			<artifactId>jaxb2-basics-runtime</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.hisrc.jsonix</groupId>
 			<artifactId>jsonix-scripts</artifactId>

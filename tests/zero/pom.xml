@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>jsonix-schema-compiler-test-zero</artifactId>
 	<packaging>jar</packaging>
-	<name>Jsonix Tests [zero]</name>
+	<name>Jsonix Schema Compiler Test [zero]</name>
 	<parent>
 		<groupId>org.hisrc.jsonix</groupId>
 		<artifactId>jsonix-schema-compiler-tests</artifactId>

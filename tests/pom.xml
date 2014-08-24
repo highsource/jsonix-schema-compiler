@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>jsonix-schema-compiler-tests</artifactId>
 	<packaging>pom</packaging>
-	<name>Jsonix Tests</name>
+	<name>Jsonix Schema Compiler Tests</name>
 	<parent>
 		<groupId>org.hisrc.jsonix</groupId>
 		<artifactId>jsonix-schema-compiler-project</artifactId>
@@ -10,6 +10,8 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<modules>
+		<module>filter</module>
+		<module>wps</module>
 		<module>zero</module>
 	</modules>
 	<build>
