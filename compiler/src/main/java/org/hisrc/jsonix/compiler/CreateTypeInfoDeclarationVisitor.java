@@ -44,6 +44,7 @@ import org.hisrc.jscm.codemodel.expression.JSAssignmentExpression;
 import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
 import org.jvnet.jaxb2_commons.xml.bind.model.MBuiltinLeafInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.MClassRef;
 import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MID;
 import org.jvnet.jaxb2_commons.xml.bind.model.MIDREF;
@@ -155,6 +156,11 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
 	}
 
 	public JSAssignmentExpression visitClassInfo(MClassInfo<T, C> info) {
+		return createTypeInfoDeclaration(info);
+	}
+	
+	@Override
+	public JSAssignmentExpression visitClassRef(MClassRef<T, C> info) {
 		return createTypeInfoDeclaration(info);
 	}
 
