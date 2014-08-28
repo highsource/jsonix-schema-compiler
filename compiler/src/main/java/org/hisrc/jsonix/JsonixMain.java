@@ -138,9 +138,11 @@ public class JsonixMain {
 
 		for (JsonixModule module : modules.values()) {
 			try {
-				writePrograms(options.targetDir, module.directory,
-						module.fileName, module.declarations,
-						module.exportDeclarations);
+				if (!module.isEmpty()) {
+					writePrograms(options.targetDir, module.directory,
+							module.fileName, module.declarations,
+							module.exportDeclarations);
+				}
 			} catch (IOException ioex) {
 				errorReceiver.error(new SAXParseException(MessageFormat.format(
 						"Could not create the code for the module [{0}].",

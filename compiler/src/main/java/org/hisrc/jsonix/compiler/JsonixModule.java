@@ -33,7 +33,6 @@
 
 package org.hisrc.jsonix.compiler;
 
-
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -101,13 +100,14 @@ public class JsonixModule {
 		}
 
 		this.spaceFactoryFunction = codeModel.function();
-		this.spaceFactoryVariable = this.declarations.var("_" + this.spaceName
-				+ "_factory", this.spaceFactoryFunction);
+		this.spaceFactoryVariable = this.declarations.var(this.spaceName
+				+ "_Module_Factory", this.spaceFactoryFunction);
 
 		this.space = this.spaceFactoryFunction.getBody().var(this.spaceName,
 				spaceBody);
 		this.spaceFactoryFunction.getBody()._return(
-				codeModel.object().append(this.spaceName, this.space.getVariable()));
+				codeModel.object().append(this.spaceName,
+						this.space.getVariable()));
 
 		final JSGlobalVariable define = this.codeModel.globalVariable("define");
 		final JSIfStatement ifDefine = this.exportDeclarations._if(define
@@ -139,7 +139,8 @@ public class JsonixModule {
 				._else()
 				.block()
 				.var(this.spaceName,
-						this.spaceFactoryVariable.getVariable().i().p(this.spaceName));
+						this.spaceFactoryVariable.getVariable().i()
+								.p(this.spaceName));
 
 		typeInfos = codeModel.array();
 		spaceBody.append("typeInfos", typeInfos);
@@ -190,5 +191,10 @@ public class JsonixModule {
 
 	public void registerElementInfo(JSObjectLiteral elementInfo) {
 		elementInfos.append(elementInfo);
+	}
+
+	public boolean isEmpty() {
+		return typeInfos.getElements().isEmpty()
+				&& elementInfos.getElements().isEmpty();
 	}
 }

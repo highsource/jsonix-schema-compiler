@@ -49,6 +49,8 @@ import org.hisrc.jscm.codemodel.impl.CodeModelImpl;
 import org.hisrc.jsonix.xjc.customizations.PackageMapping;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.MEnumConstantInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackaged;
@@ -148,6 +150,7 @@ public class JsonixCompiler<T, C extends T> {
 
 	public Map<String, JsonixModule> compile() {
 		compileClassInfos(model.getClassInfos());
+		compileEnumLeafInfos(model.getEnumLeafInfos());
 		compileElementInfos(model.getElementInfos());
 		return this.modules;
 
@@ -169,6 +172,15 @@ public class JsonixCompiler<T, C extends T> {
 		return classInfoMappings;
 	}
 
+	public JSArrayLiteral compileEnumLeafInfos(
+			Collection<MEnumLeafInfo<T, C>> enumLeafInfos) {
+		final JSArrayLiteral mappings = this.codeModel.array();
+		for (MEnumLeafInfo<T, C> enumLeafInfo : enumLeafInfos) {
+			mappings.append(compileEnumLeafInfo(enumLeafInfo));
+		}
+		return mappings;
+	}
+
 	public JSObjectLiteral compileClassInfo(MClassInfo<T, C> classInfo) {
 		final JsonixModule module = getModule(classInfo);
 		final JSObjectLiteral classInfoMapping = this.codeModel.object();
@@ -187,6 +199,22 @@ public class JsonixCompiler<T, C extends T> {
 		return classInfoMapping;
 	}
 
+	public JSObjectLiteral compileEnumLeafInfo(MEnumLeafInfo<T, C> enumLeafInfo) {
+		final JsonixModule module = getModule(enumLeafInfo);
+		final JSObjectLiteral mapping = this.codeModel.object();
+		mapping.append("type", this.codeModel.string("enumLeafInfo"));
+		mapping.append("localName", this.codeModel.string(enumLeafInfo
+				.getContainerLocalName(DEFAULT_SCOPED_NAME_DELIMITER)));
+
+		final MTypeInfo<T, C> baseTypeInfo = enumLeafInfo.getBaseTypeInfo();
+		if (baseTypeInfo != null) {
+			mapping.append("baseTypeInfo", getTypeInfoDeclaration(baseTypeInfo));
+		}
+		mapping.append("constants", compileEnumConstrantInfos(enumLeafInfo));
+		module.registerTypeInfo(mapping);
+		return mapping;
+	}
+
 	public JSArrayLiteral compilePropertyInfos(MClassInfo<T, C> classInfo) {
 		final JsonixModule module = getModule(classInfo);
 		final JSArrayLiteral propertyInfoMappings = this.codeModel.array();
@@ -197,6 +225,17 @@ public class JsonixCompiler<T, C extends T> {
 							module)));
 		}
 		return propertyInfoMappings;
+	}
+
+	private JSArrayLiteral compileEnumConstrantInfos(
+			MEnumLeafInfo<T, C> enumLeafInfo) {
+		final JSArrayLiteral mappings = this.codeModel.array();
+		for (MEnumConstantInfo<T, C> enumConstantInfo : enumLeafInfo
+				.getConstants()) {
+			mappings.append(this.codeModel.string(enumConstantInfo
+					.getLexicalValue()));
+		}
+		return mappings;
 	}
 
 	public JSArrayLiteral compileElementInfos(

@@ -138,10 +138,12 @@ public class JsonixPlugin extends Plugin {
 
 		for (JsonixModule module : modules.values()) {
 			try {
-				final JPackage _package = model.codeModel
-						._package(module.outputPackageName);
-				_package.addResourceFile(createTextFile(module.fileName,
-						module.declarations, module.exportDeclarations));
+				if (!module.isEmpty()) {
+					final JPackage _package = model.codeModel
+							._package(module.outputPackageName);
+					_package.addResourceFile(createTextFile(module.fileName,
+							module.declarations, module.exportDeclarations));
+				}
 			} catch (IOException ioex) {
 				errorHandler.error(new SAXParseException(MessageFormat.format(
 						"Could not create the code for the module [{0}].",
