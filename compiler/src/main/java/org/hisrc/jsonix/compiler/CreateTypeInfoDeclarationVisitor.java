@@ -148,10 +148,6 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
 	}
 
 	public JSAssignmentExpression visitEnumLeafInfo(MEnumLeafInfo<T, C> info) {
-		// TODO Enums not supported yet, see JSNX-???
-		// return null;
-		// return createTypeInfoDeclaration(info,
-		// this.code.$JsonixModelEnumLeafInfo);
 		return info.getBaseTypeInfo().acceptTypeInfoVisitor(this);
 	}
 

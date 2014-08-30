@@ -153,7 +153,6 @@ public class JsonixCompiler<T, C extends T> {
 		compileEnumLeafInfos(model.getEnumLeafInfos());
 		compileElementInfos(model.getElementInfos());
 		return this.modules;
-
 	}
 
 	public JSAssignmentExpression getTypeInfoDeclaration(
@@ -202,7 +201,7 @@ public class JsonixCompiler<T, C extends T> {
 	public JSObjectLiteral compileEnumLeafInfo(MEnumLeafInfo<T, C> enumLeafInfo) {
 		final JsonixModule module = getModule(enumLeafInfo);
 		final JSObjectLiteral mapping = this.codeModel.object();
-		mapping.append("type", this.codeModel.string("enumLeafInfo"));
+		mapping.append("type", this.codeModel.string("enumInfo"));
 		mapping.append("localName", this.codeModel.string(enumLeafInfo
 				.getContainerLocalName(DEFAULT_SCOPED_NAME_DELIMITER)));
 
@@ -210,7 +209,7 @@ public class JsonixCompiler<T, C extends T> {
 		if (baseTypeInfo != null) {
 			mapping.append("baseTypeInfo", getTypeInfoDeclaration(baseTypeInfo));
 		}
-		mapping.append("constants", compileEnumConstrantInfos(enumLeafInfo));
+		mapping.append("values", compileEnumConstrantInfos(enumLeafInfo));
 		module.registerTypeInfo(mapping);
 		return mapping;
 	}
