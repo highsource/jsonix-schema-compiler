@@ -70,7 +70,7 @@
 	</mailingLists>
 	<properties> 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> 
-		<jsonix-scripts.version>2.0.12-SNAPSHOT</jsonix-scripts.version>
+		<jsonix-scripts.version>2.0.13-SNAPSHOT</jsonix-scripts.version>
 		<jaxb2-basics.version>0.8.0</jaxb2-basics.version>
 		<js-codemodel.version>1.1</js-codemodel.version>
 		<jaxb-ri.version>2.1.13</jaxb-ri.version>
