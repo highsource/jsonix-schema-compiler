@@ -48,6 +48,7 @@ import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
 import org.hisrc.jscm.codemodel.impl.CodeModelImpl;
 import org.hisrc.jsonix.xjc.customizations.PackageMapping;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.MClassTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MEnumConstantInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
@@ -187,7 +188,7 @@ public class JsonixCompiler<T, C extends T> {
 		classInfoMapping.append("localName", this.codeModel.string(classInfo
 				.getContainerLocalName(DEFAULT_SCOPED_NAME_DELIMITER)));
 
-		final MClassInfo<T, C> baseTypeInfo = classInfo.getBaseTypeInfo();
+		final MClassTypeInfo<T, C> baseTypeInfo = classInfo.getBaseTypeInfo();
 		if (baseTypeInfo != null) {
 			classInfoMapping.append("baseTypeInfo",
 					getTypeInfoDeclaration(baseTypeInfo));
