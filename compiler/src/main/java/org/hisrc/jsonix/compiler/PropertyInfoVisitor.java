@@ -122,10 +122,10 @@ final class PropertyInfoVisitor<T, C extends T> implements
 
 	private void createWildcardOptions(MWildcard info, JSObjectLiteral options) {
 		if (info.isDomAllowed()) {
-			options.append("domAllowed", this.codeModel._boolean(true));
+			options.append("allowDom", this.codeModel._boolean(true));
 		}
 		if (info.isTypedObjectAllowed()) {
-			options.append("typedObjectAllowed", this.codeModel._boolean(true));
+			options.append("allowTypedObject", this.codeModel._boolean(true));
 		}
 	}
 
