@@ -66,20 +66,23 @@ final class PropertyInfoVisitor<T, C extends T> implements
 	private final JsonixCompiler<T, C> jsonixCompiler;
 	private final JSCodeModel codeModel;
 	private final JsonixModule module;
+	private final Naming naming;
 
 	public PropertyInfoVisitor(JsonixCompiler<T, C> jsonixCompiler,
+			Naming naming,
 			JSCodeModel codeModel, JsonixModule module) {
 		this.jsonixCompiler = jsonixCompiler;
+		this.naming = naming;
 		this.codeModel = codeModel;
 		this.module = module;
 	}
 
 	private void createPropertyInfoOptions(MPropertyInfo<T, C> propertyInfo,
 			JSObjectLiteral options) {
-		options.append("name",
+		options.append(naming.name(),
 				this.codeModel.string(propertyInfo.getPrivateName()));
 		if (propertyInfo.isCollection()) {
-			options.append("collection", this.codeModel._boolean(true));
+			options.append(naming.collection(), this.codeModel._boolean(true));
 		}
 	}
 
@@ -90,7 +93,7 @@ final class PropertyInfoVisitor<T, C extends T> implements
 		typeInfo.acceptTypeInfoVisitor(new DefaultTypeInfoVisitor<T, C, Void>() {
 			@Override
 			public Void visitTypeInfo(MTypeInfo<T, C> typeInfo) {
-				options.append("typeInfo",
+				options.append(naming.typeInfo(),
 						PropertyInfoVisitor.this.jsonixCompiler
 								.getTypeInfoDeclaration(typeInfo));
 				return null;
@@ -107,7 +110,7 @@ final class PropertyInfoVisitor<T, C extends T> implements
 	private void createWrappableOptions(MWrappable info, JSObjectLiteral options) {
 		final QName wrapperElementName = info.getWrapperElementName();
 		if (wrapperElementName != null) {
-			options.append("wrapperElementName",
+			options.append(naming.wrapperElementName(),
 					module.createElementNameExpression(wrapperElementName));
 		}
 	}
@@ -115,30 +118,30 @@ final class PropertyInfoVisitor<T, C extends T> implements
 	private void createElementTypeInfoOptions(MElementTypeInfo<T, C> info,
 			JSObjectLiteral options) {
 		final QName elementName = info.getElementName();
-		options.append("elementName",
+		options.append(naming.elementName(),
 				module.createElementNameExpression(elementName));
 		createTypedOptions(info, options);
 	}
 
 	private void createWildcardOptions(MWildcard info, JSObjectLiteral options) {
 		if (info.isDomAllowed()) {
-			options.append("allowDom", this.codeModel._boolean(true));
+			options.append(naming.allowDom(), this.codeModel._boolean(true));
 		}
 		if (info.isTypedObjectAllowed()) {
-			options.append("allowTypedObject", this.codeModel._boolean(true));
+			options.append(naming.allowTypedObject(), this.codeModel._boolean(true));
 		}
 	}
 
 	private void createMixableOptions(MMixable info, JSObjectLiteral options) {
 		if (info.isMixed()) {
-			options.append("mixed", this.codeModel._boolean(true));
+			options.append(naming.mixed(), this.codeModel._boolean(true));
 		}
 	}
 
 	public JSObjectLiteral visitElementPropertyInfo(
 			MElementPropertyInfo<T, C> info) {
 		JSObjectLiteral options = this.codeModel.object();
-		options.append("type", this.codeModel.string("element"));
+		options.append(naming.type(), this.codeModel.string(naming.element()));
 		createPropertyInfoOptions(info, options);
 		createWrappableOptions(info, options);
 		createElementTypeInfoOptions(info, options);
@@ -151,14 +154,14 @@ final class PropertyInfoVisitor<T, C extends T> implements
 		createPropertyInfoOptions(info, options);
 		createWrappableOptions(info, options);
 		createElementTypeInfosOptions(info, options);
-		options.append("type", this.codeModel.string("elements"));
+		options.append(naming.type(), this.codeModel.string(naming.elements()));
 		return options;
 	}
 
 	private void createElementTypeInfosOptions(MElementTypeInfos<T, C> info,
 			JSObjectLiteral options) {
 		final JSArrayLiteral elementTypeInfos = this.codeModel.array();
-		options.append("elementTypeInfos", elementTypeInfos);
+		options.append(naming.elementTypeInfos(), elementTypeInfos);
 		for (MElementTypeInfo<T, C> elementTypeInfo : info
 				.getElementTypeInfos()) {
 			final JSObjectLiteral elementTypeInfoOptions = this.codeModel
@@ -175,7 +178,7 @@ final class PropertyInfoVisitor<T, C extends T> implements
 		createPropertyInfoOptions(info, options);
 		createWildcardOptions(info, options);
 		createMixableOptions(info, options);
-		options.append("type", this.codeModel.string("anyElement"));
+		options.append(naming.type(), this.codeModel.string(naming.anyElement()));
 		return options;
 	}
 
@@ -184,9 +187,9 @@ final class PropertyInfoVisitor<T, C extends T> implements
 		JSObjectLiteral options = this.codeModel.object();
 		createPropertyInfoOptions(info, options);
 		createTypedOptions(info, options);
-		options.append("attributeName",
+		options.append(naming.attributeName(),
 				module.createAttributeNameExpression(info.getAttributeName()));
-		options.append("type", this.codeModel.string("attribute"));
+		options.append(naming.type(), this.codeModel.string(naming.attribute()));
 		return options;
 	}
 
@@ -194,7 +197,7 @@ final class PropertyInfoVisitor<T, C extends T> implements
 			MAnyAttributePropertyInfo<T, C> info) {
 		JSObjectLiteral options = this.codeModel.object();
 		createPropertyInfoOptions(info, options);
-		options.append("type", this.codeModel.string("anyAttribute"));
+		options.append(naming.type(), this.codeModel.string(naming.anyAttribute()));
 		return options;
 	}
 
@@ -202,7 +205,7 @@ final class PropertyInfoVisitor<T, C extends T> implements
 		JSObjectLiteral options = this.codeModel.object();
 		createPropertyInfoOptions(info, options);
 		createTypedOptions(info, options);
-		options.append("type", this.codeModel.string("value"));
+		options.append(naming.type(), this.codeModel.string(naming.value()));
 		return options;
 	}
 
@@ -214,7 +217,7 @@ final class PropertyInfoVisitor<T, C extends T> implements
 		createWrappableOptions(info, options);
 		createWildcardOptions(info, options);
 		createElementTypeInfoOptions(info, options);
-		options.append("type", this.codeModel.string("elementRef"));
+		options.append(naming.type(), this.codeModel.string(naming.elementRef()));
 		return options;
 	}
 
@@ -226,7 +229,7 @@ final class PropertyInfoVisitor<T, C extends T> implements
 		createWrappableOptions(info, options);
 		createWildcardOptions(info, options);
 		createElementTypeInfosOptions(info, options);
-		options.append("type", this.codeModel.string("elementRefs"));
+		options.append(naming.type(), this.codeModel.string(naming.elementRefs()));
 		return options;
 	}
 }

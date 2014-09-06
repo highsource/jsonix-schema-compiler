@@ -62,20 +62,23 @@ import org.jvnet.jaxb2_commons.xml.bind.model.util.PackageInfoQNameAnalyzer;
 public class JsonixCompiler<T, C extends T> {
 
 	public static final String DEFAULT_SCOPED_NAME_DELIMITER = ".";
-
+	
 	final JSCodeModel codeModel = new CodeModelImpl();
+	final Naming naming;
 
 	private final MModelInfo<T, C> model;
 	private final Map<String, PackageMapping> packageMappings;
 	private final Map<String, JsonixModule> modules;
 
 	public JsonixCompiler(final MModelInfo<T, C> model,
-			Map<String, PackageMapping> packageMappings) {
+			Map<String, PackageMapping> packageMappings, Naming naming) {
 		Validate.notNull(model);
 		Validate.notNull(packageMappings);
+		Validate.notNull(naming);
 		this.model = model;
 		this.packageMappings = new HashMap<String, PackageMapping>(
 				packageMappings);
+		this.naming = naming;
 		this.modules = new HashMap<String, JsonixModule>(packageMappings.size());
 	}
 
@@ -143,7 +146,7 @@ public class JsonixCompiler<T, C extends T> {
 
 			}
 
-			module = new JsonixModule(this.codeModel, packageMapping);
+			module = new JsonixModule(this.codeModel, this.naming, packageMapping);
 			this.modules.put(packageName, module);
 		}
 		return module;
@@ -160,7 +163,7 @@ public class JsonixCompiler<T, C extends T> {
 			MTypeInfo<T, C> typeInfo) {
 		return typeInfo
 				.acceptTypeInfoVisitor(new CreateTypeInfoDeclarationVisitor<T, C>(
-						this, this.codeModel));
+						this, this.codeModel, this.naming));
 	}
 
 	public JSArrayLiteral compileClassInfos(
@@ -184,16 +187,16 @@ public class JsonixCompiler<T, C extends T> {
 	public JSObjectLiteral compileClassInfo(MClassInfo<T, C> classInfo) {
 		final JsonixModule module = getModule(classInfo);
 		final JSObjectLiteral classInfoMapping = this.codeModel.object();
-		classInfoMapping.append("type", this.codeModel.string("classInfo"));
-		classInfoMapping.append("localName", this.codeModel.string(classInfo
+		classInfoMapping.append(naming.type(), this.codeModel.string(naming.classInfo()));
+		classInfoMapping.append(naming.localName(), this.codeModel.string(classInfo
 				.getContainerLocalName(DEFAULT_SCOPED_NAME_DELIMITER)));
 
 		final MClassTypeInfo<T, C> baseTypeInfo = classInfo.getBaseTypeInfo();
 		if (baseTypeInfo != null) {
-			classInfoMapping.append("baseTypeInfo",
+			classInfoMapping.append(naming.baseTypeInfo(),
 					getTypeInfoDeclaration(baseTypeInfo));
 		}
-		classInfoMapping.append("propertyInfos",
+		classInfoMapping.append(naming.propertyInfos(),
 				compilePropertyInfos(classInfo));
 		module.registerTypeInfo(classInfoMapping);
 		return classInfoMapping;
@@ -202,15 +205,15 @@ public class JsonixCompiler<T, C extends T> {
 	public JSObjectLiteral compileEnumLeafInfo(MEnumLeafInfo<T, C> enumLeafInfo) {
 		final JsonixModule module = getModule(enumLeafInfo);
 		final JSObjectLiteral mapping = this.codeModel.object();
-		mapping.append("type", this.codeModel.string("enumInfo"));
-		mapping.append("localName", this.codeModel.string(enumLeafInfo
+		mapping.append(naming.type(), this.codeModel.string(naming.enumInfo()));
+		mapping.append(naming.localName(), this.codeModel.string(enumLeafInfo
 				.getContainerLocalName(DEFAULT_SCOPED_NAME_DELIMITER)));
 
 		final MTypeInfo<T, C> baseTypeInfo = enumLeafInfo.getBaseTypeInfo();
 		if (baseTypeInfo != null) {
-			mapping.append("baseTypeInfo", getTypeInfoDeclaration(baseTypeInfo));
+			mapping.append(naming.baseTypeInfo(), getTypeInfoDeclaration(baseTypeInfo));
 		}
-		mapping.append("values", compileEnumConstrantInfos(enumLeafInfo));
+		mapping.append(naming.values(), compileEnumConstrantInfos(enumLeafInfo));
 		module.registerTypeInfo(mapping);
 		return mapping;
 	}
@@ -221,7 +224,10 @@ public class JsonixCompiler<T, C extends T> {
 		for (MPropertyInfo<T, C> propertyInfo : classInfo.getProperties()) {
 			propertyInfoMappings.append(propertyInfo
 					.acceptPropertyInfoVisitor(new PropertyInfoVisitor<T, C>(
-							JsonixCompiler.this, JsonixCompiler.this.codeModel,
+							JsonixCompiler.this, 
+							JsonixCompiler.this.naming,
+							JsonixCompiler.this.codeModel,
+							
 							module)));
 		}
 		return propertyInfoMappings;
@@ -257,18 +263,18 @@ public class JsonixCompiler<T, C extends T> {
 		module.registerElementInfo(value);
 		JSAssignmentExpression typeInfoDeclaration = getTypeInfoDeclaration(typeInfo);
 		QName elementName = elementInfo.getElementName();
-		value.append("elementName",
+		value.append(naming.elementName(),
 				module.createElementNameExpression(elementName));
 		// TODO
 		if (typeInfoDeclaration != null) {
-			value.append("typeInfo", typeInfoDeclaration);
+			value.append(naming.typeInfo(), typeInfoDeclaration);
 		}
 
 		if (scope != null) {
-			value.append("scope", getTypeInfoDeclaration(scope));
+			value.append(naming.scope(), getTypeInfoDeclaration(scope));
 		}
 		if (substitutionHead != null) {
-			value.append("substitutionHead",
+			value.append(naming.substitutionHead(),
 					module.createElementNameExpression(substitutionHead));
 		}
 		return value;

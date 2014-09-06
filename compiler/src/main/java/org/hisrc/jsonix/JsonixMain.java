@@ -48,8 +48,11 @@ import javax.xml.bind.JAXBException;
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jscm.codemodel.JSProgram;
 import org.hisrc.jscm.codemodel.writer.CodeWriter;
+import org.hisrc.jsonix.compiler.CompactNaming;
 import org.hisrc.jsonix.compiler.JsonixCompiler;
 import org.hisrc.jsonix.compiler.JsonixModule;
+import org.hisrc.jsonix.compiler.Naming;
+import org.hisrc.jsonix.compiler.StandardNaming;
 import org.hisrc.jsonix.xjc.customizations.JsonixCustomizationsConstants;
 import org.hisrc.jsonix.xjc.customizations.PackageMapping;
 import org.hisrc.jsonix.xjc.plugin.JsonixPlugin;
@@ -82,21 +85,31 @@ public class JsonixMain {
 		if (!arguments.contains(JsonixPlugin.OPTION)) {
 			arguments.add(JsonixPlugin.OPTION);
 		}
+
+		final Naming naming;
+		if (arguments.contains(JsonixPlugin.OPTION_COMPACT)) {
+			naming = new CompactNaming();
+		} else {
+			naming = new StandardNaming();
+		}
 		// Driver.main(arguments.toArray(new String[arguments.size()]));
 
 		Options options = new Options();
 
 		options.parseArguments(arguments.toArray(new String[arguments.size()]));
 
-		final JsonixMain main = new JsonixMain(options);
+		final JsonixMain main = new JsonixMain(options, naming);
 		main.execute();
 	}
 
 	private final Options options;
+	private final Naming naming;
 
-	public JsonixMain(Options options) {
+	public JsonixMain(Options options, Naming naming) {
 		Validate.notNull(options);
+		Validate.notNull(naming);
 		this.options = options;
+		this.naming = naming;
 	}
 
 	private void execute() {
@@ -133,7 +146,7 @@ public class JsonixMain {
 				.createModel();
 
 		final JsonixCompiler<NType, NClass> compiler = new JsonixCompiler<NType, NClass>(
-				mModel, packageMappings);
+				mModel, packageMappings, naming);
 		final Map<String, JsonixModule> modules = compiler.compile();
 
 		for (JsonixModule module : modules.values()) {

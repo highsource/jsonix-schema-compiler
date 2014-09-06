@@ -58,6 +58,10 @@ import org.jvnet.jaxb2_commons.xmlschema.XmlSchemaConstants;
 final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
 		MTypeInfoVisitor<T, C, JSAssignmentExpression> {
 
+	private static final String IDREFS_TYPE_INFO_NAME = "IDREFS";
+	private static final String IDREF_TYPE_INFO_NAME = "IDREF";
+	private static final String ID_TYPE_INFO_NAME = "ID";
+	
 	private static Map<QName, String> XSD_TYPE_MAPPING = new HashMap<QName, String>();
 	{
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ANYTYPE, "AnyType");
@@ -128,18 +132,22 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
 
 	private final JsonixCompiler<T, C> jsonixCompiler;
 	private final JSCodeModel codeModel;
+	private final Naming naming;
 
 	CreateTypeInfoDeclarationVisitor(JsonixCompiler<T, C> jsonixCompiler,
-			JSCodeModel codeModel) {
+			JSCodeModel codeModel, Naming naming) {
 		Validate.notNull(jsonixCompiler);
 		Validate.notNull(codeModel);
+		Validate.notNull(naming);
 		this.jsonixCompiler = jsonixCompiler;
 		this.codeModel = codeModel;
+		this.naming = naming;
 	}
 
 	private JSAssignmentExpression createTypeInfoDeclaration(
 			MPackagedTypeInfo<T, C> info) {
 		final JsonixModule module = this.jsonixCompiler.getModule(info);
+		// TODO "^"
 		return this.codeModel
 				.string(module.spaceName
 						+ "."
@@ -162,8 +170,8 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
 
 	public JSAssignmentExpression visitList(MList<T, C> info) {
 		final JSObjectLiteral list = this.codeModel.object();
-		list.append("type", this.codeModel.string("list"));
-		list.append("typeInfo",
+		list.append(naming.type(), this.codeModel.string(naming.list()));
+		list.append(naming.typeInfo(),
 				info.getItemTypeInfo().acceptTypeInfoVisitor(this));
 		return list;
 	}
@@ -185,16 +193,16 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
 
 	@Override
 	public JSAssignmentExpression visitID(MID<T, C> info) {
-		return this.codeModel.string("ID");
+		return this.codeModel.string(ID_TYPE_INFO_NAME);
 	}
 
 	@Override
 	public JSAssignmentExpression visitIDREF(MIDREF<T, C> info) {
-		return this.codeModel.string("IDREF");
+		return this.codeModel.string(IDREF_TYPE_INFO_NAME);
 	}
 
 	@Override
 	public JSAssignmentExpression visitIDREFS(MIDREFS<T, C> info) {
-		return this.codeModel.string("IDREFS");
+		return this.codeModel.string(IDREFS_TYPE_INFO_NAME);
 	}
 }

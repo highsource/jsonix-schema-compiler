@@ -46,8 +46,11 @@ import javax.xml.bind.JAXBException;
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jscm.codemodel.JSProgram;
 import org.hisrc.jscm.codemodel.writer.CodeWriter;
+import org.hisrc.jsonix.compiler.CompactNaming;
 import org.hisrc.jsonix.compiler.JsonixCompiler;
 import org.hisrc.jsonix.compiler.JsonixModule;
+import org.hisrc.jsonix.compiler.Naming;
+import org.hisrc.jsonix.compiler.StandardNaming;
 import org.hisrc.jsonix.xjc.customizations.JsonixCustomizationsConstants;
 import org.hisrc.jsonix.xjc.customizations.PackageMapping;
 import org.jvnet.jaxb2_commons.util.CustomizationUtils;
@@ -72,6 +75,17 @@ public class JsonixPlugin extends Plugin {
 
 	public static final String OPTION_NAME = "Xjsonix";
 	public static final String OPTION = "-" + OPTION_NAME;
+	public static final String OPTION_COMPACT = OPTION + "-compact";
+
+	private Naming naming = new StandardNaming();
+
+	public Naming getNaming() {
+		return naming;
+	}
+
+	public void setNaming(Naming naming) {
+		this.naming = naming;
+	}
 
 	@Override
 	public String getOptionName() {
@@ -81,6 +95,17 @@ public class JsonixPlugin extends Plugin {
 	@Override
 	public String getUsage() {
 		return "TBD";
+	}
+
+	@Override
+	public int parseArgument(Options opt, String[] args, int i)
+			throws BadCommandLineException, IOException {
+		if (OPTION_COMPACT.equals(args[i])) {
+			setNaming(new CompactNaming());
+			return 1;
+		} else {
+			return super.parseArgument(opt, args, i);
+		}
 	}
 
 	@Override
@@ -133,7 +158,7 @@ public class JsonixPlugin extends Plugin {
 				.createModel();
 
 		final JsonixCompiler<NType, NClass> compiler = new JsonixCompiler<NType, NClass>(
-				mModel, packageMappings);
+				mModel, packageMappings, getNaming());
 		final Map<String, JsonixModule> modules = compiler.compile();
 
 		for (JsonixModule module : modules.values()) {

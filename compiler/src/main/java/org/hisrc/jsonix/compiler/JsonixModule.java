@@ -67,12 +67,14 @@ public class JsonixModule {
 	private JSArrayLiteral typeInfos;
 	private JSArrayLiteral elementInfos;
 	private Function spaceFactoryFunction;
+	private Naming naming;
 
-	public JsonixModule(JSCodeModel codeModel, PackageMapping packageMapping) {
+	public JsonixModule(JSCodeModel codeModel, Naming naming, PackageMapping packageMapping) {
 		Validate.notEmpty(packageMapping.getSpaceName());
 		Validate.notNull(packageMapping.getDirectory());
 		Validate.notEmpty(packageMapping.getFileName());
 		this.codeModel = codeModel;
+		this.naming = naming;
 		this.declarations = codeModel.program();
 		this.exportDeclarations = codeModel.program();
 
@@ -83,7 +85,7 @@ public class JsonixModule {
 		this.fileName = packageMapping.getFileName();
 		final JSObjectLiteral spaceBody = codeModel.object();
 
-		spaceBody.append("name", codeModel.string(this.spaceName));
+		spaceBody.append(naming.name(), codeModel.string(this.spaceName));
 
 		this.defaultElementNamespaceURI = packageMapping
 				.getDefaultElementNamespaceURI();
