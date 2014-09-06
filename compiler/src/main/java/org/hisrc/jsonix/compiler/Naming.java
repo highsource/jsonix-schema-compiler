@@ -45,5 +45,14 @@ public interface Naming {
 	String attribute();
 	String anyAttribute();
 	String value();
+	
+	String namespaceURI();
+	String prefix();
+	String localPart();
+	String defaultElementNamespaceURI();
+	String defaultAttributeNamespaceURI();
+	
+	String elementInfos();
+	String typeInfos();
 
 }

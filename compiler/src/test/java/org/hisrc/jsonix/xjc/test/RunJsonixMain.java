@@ -51,7 +51,7 @@ public class RunJsonixMain {
 		URL binding = getClass().getResource("/ows/1.1.0/binding.xjb");
 		final String[] arguments = new String[] { "-xmlschema",
 				schema.toExternalForm(), "-b", binding.toExternalForm(), "-d",
-				"target/generated-sources/xjc"
+				"target/generated-sources/xjc", "-Xjsonix-compact"
 
 		};
 

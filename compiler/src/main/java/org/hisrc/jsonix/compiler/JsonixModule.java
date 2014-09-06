@@ -90,14 +90,16 @@ public class JsonixModule {
 		this.defaultElementNamespaceURI = packageMapping
 				.getDefaultElementNamespaceURI();
 		if (this.defaultElementNamespaceURI != null) {
-			spaceBody.append("defaultElementNamespaceURI",
+			spaceBody.append(
+					naming.defaultElementNamespaceURI(),
 					codeModel.string(this.defaultElementNamespaceURI));
 		}
 
 		this.defaultAttributeNamespaceURI = packageMapping
 				.getDefaultAttributeNamespaceURI();
 		if (this.defaultAttributeNamespaceURI != null) {
-			spaceBody.append("defaultAttributeNamespaceURI",
+			spaceBody.append(
+					naming.defaultAttributeNamespaceURI(),
 					codeModel.string(this.defaultAttributeNamespaceURI));
 		}
 
@@ -145,10 +147,10 @@ public class JsonixModule {
 								.p(this.spaceName));
 
 		typeInfos = codeModel.array();
-		spaceBody.append("typeInfos", typeInfos);
+		spaceBody.append(naming.typeInfos(), typeInfos);
 
 		elementInfos = codeModel.array();
-		spaceBody.append("elementInfos", elementInfos);
+		spaceBody.append(naming.elementInfos(), elementInfos);
 
 	}
 
@@ -175,11 +177,11 @@ public class JsonixModule {
 
 			final JSObjectLiteral nameExpression = this.codeModel.object();
 
-			nameExpression.append("localPart",
+			nameExpression.append(naming.localPart(),
 					this.codeModel.string(name.getLocalPart()));
 
 			if (!StringUtils.isEmpty(namespaceURI)) {
-				nameExpression.append("namespaceURI",
+				nameExpression.append(naming.namespaceURI(),
 						this.codeModel.string(namespaceURI));
 
 			}
