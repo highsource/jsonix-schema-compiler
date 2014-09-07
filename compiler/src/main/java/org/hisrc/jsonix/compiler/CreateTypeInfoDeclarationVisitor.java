@@ -61,7 +61,7 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
 	private static final String IDREFS_TYPE_INFO_NAME = "IDREFS";
 	private static final String IDREF_TYPE_INFO_NAME = "IDREF";
 	private static final String ID_TYPE_INFO_NAME = "ID";
-	
+
 	private static Map<QName, String> XSD_TYPE_MAPPING = new HashMap<QName, String>();
 	{
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ANYTYPE, "AnyType");
@@ -162,7 +162,7 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
 	public JSAssignmentExpression visitClassInfo(MClassInfo<T, C> info) {
 		return createTypeInfoDeclaration(info);
 	}
-	
+
 	@Override
 	public JSAssignmentExpression visitClassRef(MClassRef<T, C> info) {
 		return createTypeInfoDeclaration(info);
@@ -171,8 +171,13 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
 	public JSAssignmentExpression visitList(MList<T, C> info) {
 		final JSObjectLiteral list = this.codeModel.object();
 		list.append(naming.type(), this.codeModel.string(naming.list()));
-		list.append(naming.typeInfo(),
-				info.getItemTypeInfo().acceptTypeInfoVisitor(this));
+		final JSAssignmentExpression typeInfoDeclaration = info
+				.getItemTypeInfo().acceptTypeInfoVisitor(this);
+		if (!typeInfoDeclaration
+				.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor(
+						"String"))) {
+			list.append(naming.typeInfo(), typeInfoDeclaration);
+		}
 		return list;
 	}
 

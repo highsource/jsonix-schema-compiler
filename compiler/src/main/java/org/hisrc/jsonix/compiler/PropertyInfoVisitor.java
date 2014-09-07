@@ -37,6 +37,7 @@ import javax.xml.namespace.QName;
 
 import org.hisrc.jscm.codemodel.JSCodeModel;
 import org.hisrc.jscm.codemodel.expression.JSArrayLiteral;
+import org.hisrc.jscm.codemodel.expression.JSAssignmentExpression;
 import org.hisrc.jscm.codemodel.expression.JSMemberExpression;
 import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
 import org.jvnet.jaxb2_commons.xml.bind.model.MAnyAttributePropertyInfo;
@@ -93,9 +94,13 @@ final class PropertyInfoVisitor<T, C extends T> implements
 		typeInfo.acceptTypeInfoVisitor(new DefaultTypeInfoVisitor<T, C, Void>() {
 			@Override
 			public Void visitTypeInfo(MTypeInfo<T, C> typeInfo) {
-				options.append(naming.typeInfo(),
-						PropertyInfoVisitor.this.jsonixCompiler
-								.getTypeInfoDeclaration(typeInfo));
+				final JSAssignmentExpression typeInfoDeclaration = PropertyInfoVisitor.this.jsonixCompiler
+						.getTypeInfoDeclaration(typeInfo);
+				if (!typeInfoDeclaration
+						.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor(
+								"String"))) {
+					options.append(naming.typeInfo(), typeInfoDeclaration);
+				}
 				return null;
 			}
 
