@@ -89,7 +89,7 @@ public class JsonixModule {
 
 		this.defaultElementNamespaceURI = packageMapping
 				.getDefaultElementNamespaceURI();
-		if (this.defaultElementNamespaceURI != null) {
+		if (!StringUtils.isEmpty(this.defaultElementNamespaceURI)) {
 			spaceBody.append(
 					naming.defaultElementNamespaceURI(),
 					codeModel.string(this.defaultElementNamespaceURI));
@@ -97,7 +97,7 @@ public class JsonixModule {
 
 		this.defaultAttributeNamespaceURI = packageMapping
 				.getDefaultAttributeNamespaceURI();
-		if (this.defaultAttributeNamespaceURI != null) {
+		if (!StringUtils.isEmpty(this.defaultAttributeNamespaceURI)) {
 			spaceBody.append(
 					naming.defaultAttributeNamespaceURI(),
 					codeModel.string(this.defaultAttributeNamespaceURI));
