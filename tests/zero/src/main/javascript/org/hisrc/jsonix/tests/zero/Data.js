@@ -148,5 +148,11 @@ org_hisrc_jsonix_tests_zero.Data = {
 				day : 6
 			}) ]
 		}
+	},
+	'simpleTypes-0.xml' : {
+		name : new Jsonix.XML.QName('simpleTypes'),
+		value : {
+			qName : new Jsonix.XML.QName('urn:a', 'aq', 'a')
+		}
 	}
 };

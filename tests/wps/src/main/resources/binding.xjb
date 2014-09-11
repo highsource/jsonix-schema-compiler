@@ -21,28 +21,8 @@
 
 		<jsonix:packageMapping
 			packageName="net.opengis.wps.v_1_0_0"
-			spaceName="WPS_V_1_0_0"
-			directory="WPS_V_1_0_0"/>
+			spaceName="WPS_V_1_0_0"/>
 
-	</jaxb:bindings>
-	<jaxb:bindings schemaLocation="wps/1.0.0/wpsExecute_request.xsd" 
-		node="/xs:schema">
-		<jaxb:bindings node="xs:complexType[@name='ComplexDataType']">
-			<wildcard:lax/>
-
-			<ci:code>
-    public List&lt;Object> getContent() {
-	return getAny();
-    }
-
-    public void setContent(List&lt;Object> value) {
-	setAny(value);
-    }
-			</ci:code>
-		</jaxb:bindings>
-		<jaxb:bindings node="xs:complexType[@name='ComplexDataType']">
-			<jaxb:property name="Content"/>
-		</jaxb:bindings>
 	</jaxb:bindings>
 
 	<jaxb:bindings schemaLocation="ows/1.1.0/owsAll.xsd" 
@@ -53,22 +33,8 @@
 
 		<jsonix:packageMapping
 			packageName="net.opengis.ows.v_1_1_0"
-			spaceName="OWS_V_1_0_0"
-			directory="OWS_V_1_0_0"/>
+			spaceName="OWS_V_1_0_0"/>
 
-	</jaxb:bindings>
-
-	<jaxb:bindings schemaLocation="ows/1.1.0/owsCommon.xsd" 
-		node="/xs:schema">
-		<!--jaxb:bindings node="xs:element[@name='AbstractMetaData']">
-			<xjc:dom/>
-		</jaxb:bindings-->
-	</jaxb:bindings>
-	<jaxb:bindings schemaLocation="ows/1.1.0/owsOperationsMetadata.xsd" 
-		node="/xs:schema">
-		<!--jaxb:bindings node="xs:element[@name='ExtendedCapabilities']">
-			<xjc:dom/>
-		</jaxb:bindings-->
 	</jaxb:bindings>
 
 </jaxb:bindings>

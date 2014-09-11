@@ -70,6 +70,7 @@
 					<extension>true</extension>
 					<args>
 						<arg>-Xjsonix</arg>
+						<arg>-Xjsonix-compact</arg>
 					</args>
 					<plugins>
 						<plugin>
