@@ -109,7 +109,6 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
 		// XSD_TYPE_MAPPING.put(XmlSchemaConstants.ANYURI, "AnyURI");
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ANYURI, "String");
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.QNAME, "QName");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.QNAME, "String");
 		// XSD_TYPE_MAPPING.put(XmlSchemaConstants.NOTATION, "Notation");
 		// XSD_TYPE_MAPPING.put(XmlSchemaConstants.DURATION, "Duration");
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.DURATION, "String");
