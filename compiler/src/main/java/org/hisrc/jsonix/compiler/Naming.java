@@ -2,6 +2,15 @@ package org.hisrc.jsonix.compiler;
 
 public interface Naming {
 	
+	String name();
+
+	String defaultElementNamespaceURI();
+	String defaultAttributeNamespaceURI();
+
+	String elementInfos();
+	String typeInfos();
+
+	
 	String type();
 	//
 	String typeInfo();
@@ -27,7 +36,6 @@ public interface Naming {
 	String substitutionHead();
 	
 	// propertyInfo properties
-	String name();
 	String collection();
 	String wrapperElementName();
 	String allowDom();
@@ -49,10 +57,6 @@ public interface Naming {
 	String namespaceURI();
 	String prefix();
 	String localPart();
-	String defaultElementNamespaceURI();
-	String defaultAttributeNamespaceURI();
 	
-	String elementInfos();
-	String typeInfos();
 
 }

@@ -175,7 +175,7 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
 		if (!typeInfoDeclaration
 				.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor(
 						"String"))) {
-			list.append(naming.typeInfo(), typeInfoDeclaration);
+			list.append(naming.baseTypeInfo(), typeInfoDeclaration);
 		}
 		return list;
 	}
