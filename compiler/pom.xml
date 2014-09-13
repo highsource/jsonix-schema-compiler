@@ -19,6 +19,10 @@
 			<artifactId>jaxb2-basics-tools</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.jgrapht</groupId>
+			<artifactId>jgrapht-core</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-impl</artifactId>
 			<scope>provided</scope>

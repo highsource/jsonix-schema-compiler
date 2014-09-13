@@ -35,8 +35,10 @@ package org.hisrc.jsonix.xjc.customizations;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "packageMapping")
+@XmlType
 public class PackageMapping {
 
 	private String packageName;

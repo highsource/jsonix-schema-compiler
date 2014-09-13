@@ -37,11 +37,13 @@ import java.io.File;
 import java.net.URL;
 
 import org.hisrc.jsonix.JsonixMain;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class RunJsonixMain {
 
 	@Test
+	@Ignore
 	public void compilesOWS_V_1_1_0() throws Exception {
 
 		// Khm...
@@ -51,6 +53,26 @@ public class RunJsonixMain {
 		URL binding = getClass().getResource("/ows/1.1.0/binding.xjb");
 		final String[] arguments = new String[] { "-xmlschema",
 				schema.toExternalForm(), "-b", binding.toExternalForm(), "-d",
+				"target/generated-sources/xjc", "-Xjsonix-compact"
+
+		};
+
+		JsonixMain.main(arguments);
+	}
+
+	@Test
+	public void compilesFilter_V_1_1_0() throws Exception {
+
+		// Khm...
+		new File("target/generated-sources/xjc").mkdirs();
+
+		URL filter = getClass().getResource("/ogc/filter/1.1.0/filterAll.xsd");
+		URL gml = getClass().getResource("/ogc/gml/3.1.1/base/gmlBase.xsd");
+		URL xlink = getClass().getResource("/w3c/1999/xlink.xsd");
+		URL binding = getClass().getResource("/filter-1.1.0-binding.xjb");
+		final String[] arguments = new String[] { "-xmlschema",
+				filter.toExternalForm(), gml.toExternalForm(),
+				xlink.toExternalForm(), "-b", binding.toExternalForm(), "-d",
 				"target/generated-sources/xjc", "-Xjsonix-compact"
 
 		};

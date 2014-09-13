@@ -1,29 +1,28 @@
-		<jsonix:output fileName="${module.name}.js"/>
-		<jsonix:output fileName="${module.name}.compact.js" compact="true"/>
+<jsonix:config xmlns:jsonix="http://jsonix.highsource.org/customizations">
 
-		<!-- package mapping produces a module -->
+	<jsonix:output fileName="${module.name}.js" />
+	<jsonix:output fileName="${module.name}.compact.js"
+		compact="true" />
 		
-		<jsonix:module name="WPS_V_1_0_0"/>
+	<jsonix:mapping name="WPS_V_1_0_0" package="net.opengis.wps.v_1_0_0" />
 
-		<jsonix:module name="WPS_V_1_0_0">
-			<jsonix:space name="WPS_V_1_0_0" package="net.opengis.wps.v_1_0_0"/>
-		</jsonix:module>
-
-		<!-- Module may contain several spaces -->
-		<jsonix:module name="WPS_V_1_0_0_OWS_V_1_0_0">
-			<!-- Name defaults to the name of the base space -->
-			<jsonix:space name="WPS_V_1_0_0_OWS" base="OWS_V_1_0_0">
-				<!-- If include is present it says "include just that, nothing else" -->
-				<!-- You can further reduce the inclusion with jsonix:exclude -->
-				<jsonix:include>
-					<!-- All the elements statically reachable/required by the source module -->
-					<jsonix:dependenciesOfSpace name="WPS_V_1_0_0"/>
-					<!-- root element -->
-					<jsonix:elementInfo name="wps:DescribeProcess" xmlns:wps="http://www.opengis.net/wps/1.0.0" scope="..."/>
-					<!-- specific type -->
-					<jsonix:typeInfo name="Execute"/>
-					<jsonix:propertyInfo name="ProcessBriefType.wsdl"/>
-				</jsonix:include>
-				<jsonix:exclude/>
-			</jsonix:space>
-		</jsonix:module>
+	<!-- Module may contain several spaces -->
+	<jsonix:mappings name="WPS_V_1_0_0_OWS_V_1_0_0">
+		<!-- Name defaults to the name of the base space -->
+		<jsonix:mapping name="WPS_V_1_0_0_OWS" package="net.opengis.ows.v_1_0_0">
+			<!-- If include is present it says "include just that, nothing else" -->
+			<!-- You can further reduce the inclusion with jsonix:exclude -->
+			<jsonix:includes>
+				<!-- All the elements statically reachable/required by the source module -->
+				<jsonix:dependenciesOfMapping name="WPS_V_1_0_0" />
+				<!-- root element -->
+				<jsonix:elementInfo name="wps:DescribeProcess"
+					xmlns:wps="http://www.opengis.net/wps/1.0.0" scope="..." />
+				<!-- specific type -->
+				<jsonix:typeInfo name="Execute" />
+				<jsonix:propertyInfo name="ProcessBriefType.wsdl" />
+			</jsonix:includes>
+			<jsonix:excludes />
+		</jsonix:mapping>
+	</jsonix:mappings>
+</jsonix:config>

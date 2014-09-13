@@ -46,6 +46,7 @@ import org.hisrc.jscm.codemodel.expression.JSArrayLiteral;
 import org.hisrc.jscm.codemodel.expression.JSAssignmentExpression;
 import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
 import org.hisrc.jscm.codemodel.impl.CodeModelImpl;
+import org.hisrc.jsonix.compiler.graph.ModelInfoGraphAnalyzer;
 import org.hisrc.jsonix.xjc.customizations.PackageMapping;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassTypeInfo;
@@ -69,6 +70,7 @@ public class JsonixCompiler<T, C extends T> {
 	private final MModelInfo<T, C> model;
 	private final Map<String, PackageMapping> packageMappings;
 	private final Map<String, JsonixModule> modules;
+	private final ModelInfoGraphAnalyzer<T, C> analyzer;
 
 	public JsonixCompiler(final MModelInfo<T, C> model,
 			Map<String, PackageMapping> packageMappings, Naming naming) {
@@ -80,6 +82,7 @@ public class JsonixCompiler<T, C extends T> {
 				packageMappings);
 		this.naming = naming;
 		this.modules = new HashMap<String, JsonixModule>(packageMappings.size());
+		this.analyzer = new ModelInfoGraphAnalyzer<T, C>(model);
 	}
 
 	JsonixModule getModule(final MPackaged packaged) {
