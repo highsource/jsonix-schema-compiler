@@ -34,20 +34,23 @@
 package org.hisrc.jsonix.compiler;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jscm.codemodel.JSCodeModel;
 import org.hisrc.jscm.codemodel.expression.JSArrayLiteral;
 import org.hisrc.jscm.codemodel.expression.JSAssignmentExpression;
 import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
 import org.hisrc.jscm.codemodel.impl.CodeModelImpl;
-import org.hisrc.jsonix.compiler.graph.ModelInfoGraphAnalyzer;
-import org.hisrc.jsonix.xjc.customizations.PackageMapping;
+import org.hisrc.jsonix.compilation.Mapping;
+import org.hisrc.jsonix.compilation.Module;
+import org.hisrc.jsonix.compilation.Modules;
+import org.hisrc.jsonix.compilation.Output;
+import org.hisrc.jsonix.compiler.log.Log;
+import org.hisrc.jsonix.compiler.log.SystemLog;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
@@ -58,186 +61,212 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackaged;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.util.PackageInfoQNameAnalyzer;
 
 public class JsonixCompiler<T, C extends T> {
 
+	public Log log = new SystemLog();
 	public static final String DEFAULT_SCOPED_NAME_DELIMITER = ".";
 
-	final JSCodeModel codeModel = new CodeModelImpl();
-	final Naming naming;
+	private final JSCodeModel codeModel = new CodeModelImpl();
 
 	private final MModelInfo<T, C> model;
-	private final Map<String, PackageMapping> packageMappings;
-	private final Map<String, JsonixModule> modules;
-	private final ModelInfoGraphAnalyzer<T, C> analyzer;
 
-	public JsonixCompiler(final MModelInfo<T, C> model,
-			Map<String, PackageMapping> packageMappings, Naming naming) {
+	private final Modules modules;
+
+	public JsonixCompiler(final MModelInfo<T, C> model, Modules modules) {
 		Validate.notNull(model);
-		Validate.notNull(packageMappings);
-		Validate.notNull(naming);
+		Validate.notNull(modules);
 		this.model = model;
-		this.packageMappings = new HashMap<String, PackageMapping>(
-				packageMappings);
-		this.naming = naming;
-		this.modules = new HashMap<String, JsonixModule>(packageMappings.size());
-		this.analyzer = new ModelInfoGraphAnalyzer<T, C>(model);
+		this.modules = modules;
 	}
 
-	JsonixModule getModule(final MPackaged packaged) {
-		final MPackageInfo packageInfo = packaged.getPackageInfo();
-		return getModule(packageInfo);
+	public String getSpaceName(final MPackaged packaged) {
+		return modules.getMappingName(packaged.getPackageInfo()
+				.getPackageName());
 	}
 
-	private JsonixModule getModule(final MPackageInfo packageInfo) {
-		String packageName = packageInfo.getPackageName();
-		final boolean blankPackage;
-		if (StringUtils.isBlank(packageName)) {
-			packageName = "";
-			blankPackage = true;
-		} else {
-			blankPackage = false;
+	// private JsonixModule getModule(final MPackageInfo packageInfo) {
+	// String packageName = packageInfo.getPackageName();
+	// final boolean blankPackage;
+	// if (StringUtils.isBlank(packageName)) {
+	// packageName = "";
+	// blankPackage = true;
+	// } else {
+	// blankPackage = false;
+	// }
+	// JsonixModule module = this.defaultModules.get(packageName);
+	// if (module == null) {
+	// final PackageInfoQNameAnalyzer<T, C> analyzer = new
+	// PackageInfoQNameAnalyzer<T, C>(
+	// this.model);
+	//
+	// final String defaultElementNamespaceURI = analyzer
+	// .getMostUsedElementNamespaceURI(packageInfo);
+	// final String defaultAttributeNamespaceURI = analyzer
+	// .getMostUsedAttributeNamespaceURI(packageInfo);
+	//
+	// Mapping packageMapping = packageMappings.get(packageName);
+	//
+	// if (packageMapping == null) {
+	//
+	// packageMapping = new Mapping();
+	// packageMapping.setPackage(packageName);
+	// packageMappings.put(packageName, packageMapping);
+	// }
+	//
+	// if (StringUtils.isBlank(packageMapping
+	// .getDefaultElementNamespaceURI())) {
+	// packageMapping
+	// .setDefaultElementNamespaceURI(defaultElementNamespaceURI);
+	// }
+	//
+	// if (StringUtils.isBlank(packageMapping
+	// .getDefaultAttributeNamespaceURI())) {
+	// packageMapping
+	// .setDefaultAttributeNamespaceURI(defaultAttributeNamespaceURI);
+	// }
+	//
+	// if (StringUtils.isBlank(packageMapping.getSpaceName())) {
+	// packageMapping.setSpaceName(blankPackage ? "generated"
+	// : packageName.replace('.', '_'));
+	// }
+	// if (packageMapping.getOutputPackageName() == null) {
+	// packageMapping.setOutputPackageName("");
+	// }
+	//
+	// if (packageMapping.getDirectory() == null) {
+	// packageMapping.setDirectory((blankPackage ? "" : packageMapping
+	// .getOutputPackageName().replace('.', '/')));
+	// }
+	//
+	// if (packageMapping.getFileName() == null) {
+	// packageMapping.setFileName(packageMapping.getSpaceName()
+	// + ".js");
+	//
+	// }
+	//
+	// module = new JsonixModule(this.codeModel, this.naming,
+	// packageMapping);
+	// this.defaultModules.put(packageName, module);
+	// }
+	// return module;
+	// }
+
+	public Iterable<JsonixModule> compile() {
+
+		// for (String packageName : this.analyzer.getPackageNames()) {
+		// this.log.debug(MessageFormat.format(
+		// "Compiling space for package [{0}].", packageName));
+		// final SpaceBuilder spaceBuilder = this.analyzer
+		// .createSpaceBuilder(packageName);
+		//
+		// }
+
+		final List<JsonixModule> compiledMappings = new LinkedList<JsonixModule>();
+
+		for (Module module : modules.getModules()) {
+			for (final Output output : module.getOutputs()) {
+				for (Mapping mapping : module.getMappings()) {
+					final MPackageInfo packageInfo = mapping.getPackageInfo();
+					final JsonixModule m = new JsonixModule(this.codeModel,
+							mapping, output);
+					compileClassInfos(m, packageInfo, model.getClassInfos());
+					compileEnumLeafInfos(m, packageInfo,
+							model.getEnumLeafInfos());
+					compileElementInfos(m, packageInfo, model.getElementInfos());
+					compiledMappings.add(m);
+				}
+			}
 		}
-		JsonixModule module = this.modules.get(packageName);
-		if (module == null) {
-			final PackageInfoQNameAnalyzer<T, C> analyzer = new PackageInfoQNameAnalyzer<T, C>(
-					this.model);
-
-			final String defaultElementNamespaceURI = analyzer
-					.getMostUsedElementNamespaceURI(packageInfo);
-			final String defaultAttributeNamespaceURI = analyzer
-					.getMostUsedAttributeNamespaceURI(packageInfo);
-
-			PackageMapping packageMapping = packageMappings.get(packageName);
-
-			if (packageMapping == null) {
-
-				packageMapping = new PackageMapping();
-				packageMapping.setPackageName(packageName);
-				packageMappings.put(packageName, packageMapping);
-			}
-
-			if (StringUtils.isBlank(packageMapping
-					.getDefaultElementNamespaceURI())) {
-				packageMapping
-						.setDefaultElementNamespaceURI(defaultElementNamespaceURI);
-			}
-
-			if (StringUtils.isBlank(packageMapping
-					.getDefaultAttributeNamespaceURI())) {
-				packageMapping
-						.setDefaultAttributeNamespaceURI(defaultAttributeNamespaceURI);
-			}
-
-			if (StringUtils.isBlank(packageMapping.getSpaceName())) {
-				packageMapping.setSpaceName(blankPackage ? "generated"
-						: packageName.replace('.', '_'));
-			}
-			if (packageMapping.getOutputPackageName() == null) {
-				packageMapping.setOutputPackageName("");
-			}
-
-			if (packageMapping.getDirectory() == null) {
-				packageMapping.setDirectory((blankPackage ? "" : packageMapping
-						.getOutputPackageName().replace('.', '/')));
-			}
-
-			if (packageMapping.getFileName() == null) {
-				packageMapping.setFileName(packageMapping.getSpaceName()
-						+ ".js");
-
-			}
-
-			module = new JsonixModule(this.codeModel, this.naming,
-					packageMapping);
-			this.modules.put(packageName, module);
-		}
-		return module;
+		return compiledMappings;
 	}
 
-	public Map<String, JsonixModule> compile() {
-		compileClassInfos(model.getClassInfos());
-		compileEnumLeafInfos(model.getEnumLeafInfos());
-		compileElementInfos(model.getElementInfos());
-		return this.modules;
-	}
-
-	public JSAssignmentExpression getTypeInfoDeclaration(
+	public JSAssignmentExpression getTypeInfoDeclaration(JsonixModule module,
 			MTypeInfo<T, C> typeInfo) {
 		return typeInfo
 				.acceptTypeInfoVisitor(new CreateTypeInfoDeclarationVisitor<T, C>(
-						this, this.codeModel, this.naming));
+						this, this.codeModel, module));
 	}
 
-	public JSArrayLiteral compileClassInfos(
-			Collection<MClassInfo<T, C>> classInfos) {
+	public JSArrayLiteral compileClassInfos(JsonixModule module,
+			MPackageInfo packageInfo, Collection<MClassInfo<T, C>> classInfos) {
 		final JSArrayLiteral classInfoMappings = this.codeModel.array();
 		for (MClassInfo<T, C> classInfo : classInfos) {
-			classInfoMappings.append(compileClassInfo(classInfo));
+			if (packageInfo == classInfo.getPackageInfo()) {
+				classInfoMappings.append(compileClassInfo(module, classInfo));
+			}
 		}
 		return classInfoMappings;
 	}
 
-	public JSArrayLiteral compileEnumLeafInfos(
+	public JSArrayLiteral compileEnumLeafInfos(JsonixModule module,
+			MPackageInfo packageInfo,
 			Collection<MEnumLeafInfo<T, C>> enumLeafInfos) {
 		final JSArrayLiteral mappings = this.codeModel.array();
 		for (MEnumLeafInfo<T, C> enumLeafInfo : enumLeafInfos) {
-			mappings.append(compileEnumLeafInfo(enumLeafInfo));
+			if (packageInfo == enumLeafInfo.getPackageInfo()) {
+				mappings.append(compileEnumLeafInfo(module, enumLeafInfo));
+			}
 		}
 		return mappings;
 	}
 
-	public JSObjectLiteral compileClassInfo(MClassInfo<T, C> classInfo) {
-		final JsonixModule module = getModule(classInfo);
+	public JSObjectLiteral compileClassInfo(JsonixModule module,
+			MClassInfo<T, C> classInfo) {
 		final JSObjectLiteral classInfoMapping = this.codeModel.object();
-		classInfoMapping.append(naming.localName(), this.codeModel
-				.string(classInfo
+		classInfoMapping.append(module.getOutput().getNaming().localName(),
+				this.codeModel.string(classInfo
 						.getContainerLocalName(DEFAULT_SCOPED_NAME_DELIMITER)));
 
 		final MClassTypeInfo<T, C> baseTypeInfo = classInfo.getBaseTypeInfo();
 		if (baseTypeInfo != null) {
-			classInfoMapping.append(naming.baseTypeInfo(),
-					getTypeInfoDeclaration(baseTypeInfo));
+			classInfoMapping.append(module.getOutput().getNaming()
+					.baseTypeInfo(),
+					getTypeInfoDeclaration(module, baseTypeInfo));
 		}
-		final JSArrayLiteral ps = compilePropertyInfos(classInfo);
+		final JSArrayLiteral ps = compilePropertyInfos(module, classInfo);
 		if (!ps.getElements().isEmpty()) {
-			classInfoMapping.append(naming.propertyInfos(), ps);
+			classInfoMapping.append(module.getOutput().getNaming()
+					.propertyInfos(), ps);
 		}
 		module.registerTypeInfo(classInfoMapping);
 		return classInfoMapping;
 	}
 
-	public JSObjectLiteral compileEnumLeafInfo(MEnumLeafInfo<T, C> enumLeafInfo) {
-		final JsonixModule module = getModule(enumLeafInfo);
+	public JSObjectLiteral compileEnumLeafInfo(JsonixModule module,
+			MEnumLeafInfo<T, C> enumLeafInfo) {
 		final JSObjectLiteral mapping = this.codeModel.object();
-		mapping.append(naming.type(), this.codeModel.string(naming.enumInfo()));
-		mapping.append(naming.localName(), this.codeModel.string(enumLeafInfo
-				.getContainerLocalName(DEFAULT_SCOPED_NAME_DELIMITER)));
+		mapping.append(module.getOutput().getNaming().type(), this.codeModel
+				.string(module.getOutput().getNaming().enumInfo()));
+		mapping.append(module.getOutput().getNaming().localName(),
+				this.codeModel.string(enumLeafInfo
+						.getContainerLocalName(DEFAULT_SCOPED_NAME_DELIMITER)));
 
 		final MTypeInfo<T, C> baseTypeInfo = enumLeafInfo.getBaseTypeInfo();
 		if (baseTypeInfo != null) {
-			final JSAssignmentExpression baseTypeInfoDeclaration = getTypeInfoDeclaration(baseTypeInfo);
+			final JSAssignmentExpression baseTypeInfoDeclaration = getTypeInfoDeclaration(
+					module, baseTypeInfo);
 			if (!baseTypeInfoDeclaration
 					.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor(
 							"String"))) {
-				mapping.append(naming.baseTypeInfo(), baseTypeInfoDeclaration);
+				mapping.append(module.getOutput().getNaming().baseTypeInfo(),
+						baseTypeInfoDeclaration);
 			}
 		}
-		mapping.append(naming.values(), compileEnumConstrantInfos(enumLeafInfo));
+		mapping.append(module.getOutput().getNaming().values(),
+				compileEnumConstrantInfos(enumLeafInfo));
 		module.registerTypeInfo(mapping);
 		return mapping;
 	}
 
-	public JSArrayLiteral compilePropertyInfos(MClassInfo<T, C> classInfo) {
-		final JsonixModule module = getModule(classInfo);
+	public JSArrayLiteral compilePropertyInfos(final JsonixModule module,
+			MClassInfo<T, C> classInfo) {
 		final JSArrayLiteral propertyInfoMappings = this.codeModel.array();
 		for (MPropertyInfo<T, C> propertyInfo : classInfo.getProperties()) {
 			propertyInfoMappings.append(propertyInfo
 					.acceptPropertyInfoVisitor(new PropertyInfoVisitor<T, C>(
-							JsonixCompiler.this, JsonixCompiler.this.naming,
+							JsonixCompiler.this,
 							JsonixCompiler.this.codeModel,
-
 							module)));
 		}
 		return propertyInfoMappings;
@@ -254,40 +283,48 @@ public class JsonixCompiler<T, C extends T> {
 		return mappings;
 	}
 
-	public JSArrayLiteral compileElementInfos(
+	public JSArrayLiteral compileElementInfos(JsonixModule module,
+			MPackageInfo packageInfo,
 			Collection<MElementInfo<T, C>> elementInfos) {
 		final JSArrayLiteral elementInfoMappings = this.codeModel.array();
 		for (MElementInfo<T, C> elementInfo : elementInfos) {
-			elementInfoMappings.append(compileElementInfo(elementInfo));
+			if (packageInfo == elementInfo.getPackageInfo()) {
+				// JsonixModule module = getModule(elementInfo);
+				elementInfoMappings.append(compileElementInfo(module,
+						elementInfo));
+			}
 		}
 		return elementInfoMappings;
 	}
 
-	public JSObjectLiteral compileElementInfo(MElementInfo<T, C> elementInfo) {
-		JsonixModule module = getModule(elementInfo);
+	public JSObjectLiteral compileElementInfo(JsonixModule module,
+			MElementInfo<T, C> elementInfo) {
 		MTypeInfo<T, C> typeInfo = elementInfo.getTypeInfo();
 		MTypeInfo<T, C> scope = elementInfo.getScope();
 		QName substitutionHead = elementInfo.getSubstitutionHead();
 
 		final JSObjectLiteral value = this.codeModel.object();
 		module.registerElementInfo(value);
-		JSAssignmentExpression typeInfoDeclaration = getTypeInfoDeclaration(typeInfo);
+		JSAssignmentExpression typeInfoDeclaration = getTypeInfoDeclaration(
+				module, typeInfo);
 		QName elementName = elementInfo.getElementName();
-		value.append(naming.elementName(),
+		value.append(module.getOutput().getNaming().elementName(),
 				module.createElementNameExpression(elementName));
 		if (typeInfoDeclaration != null) {
 			if (!typeInfoDeclaration
 					.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor(
 							"String"))) {
-				value.append(naming.typeInfo(), typeInfoDeclaration);
+				value.append(module.getOutput().getNaming().typeInfo(),
+						typeInfoDeclaration);
 			}
 		}
 
 		if (scope != null) {
-			value.append(naming.scope(), getTypeInfoDeclaration(scope));
+			value.append(module.getOutput().getNaming().scope(),
+					getTypeInfoDeclaration(module, scope));
 		}
 		if (substitutionHead != null) {
-			value.append(naming.substitutionHead(),
+			value.append(module.getOutput().getNaming().substitutionHead(),
 					module.createElementNameExpression(substitutionHead));
 		}
 		return value;

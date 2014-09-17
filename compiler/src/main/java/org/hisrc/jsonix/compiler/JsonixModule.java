@@ -47,13 +47,14 @@ import org.hisrc.jscm.codemodel.expression.JSMemberExpression;
 import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
 import org.hisrc.jscm.codemodel.statement.JSIfStatement;
 import org.hisrc.jscm.codemodel.statement.JSVariableStatement;
-import org.hisrc.jsonix.xjc.customizations.PackageMapping;
+import org.hisrc.jsonix.compilation.Mapping;
+import org.hisrc.jsonix.compilation.Output;
 
 public class JsonixModule {
 
 	private final JSCodeModel codeModel;
-	public final String outputPackageName;
-	public final String spaceName;
+	// public final String outputPackageName;
+	public final String mappingName;
 	public final JSProgram declarations;
 	public final JSProgram exportDeclarations;
 	private final JSVariableStatement spaceFactoryVariable;
@@ -62,55 +63,59 @@ public class JsonixModule {
 	private final String defaultElementNamespaceURI;
 	private final String defaultAttributeNamespaceURI;
 
-	public final String directory;
-	public final String fileName;
+	// public final String directory;
+	// public final String fileName;
 	private JSArrayLiteral typeInfos;
 	private JSArrayLiteral elementInfos;
 	private Function spaceFactoryFunction;
 	private Naming naming;
+	private Mapping mapping;
+	private Output output;
 
-	public JsonixModule(JSCodeModel codeModel, Naming naming, PackageMapping packageMapping) {
-		Validate.notEmpty(packageMapping.getSpaceName());
-		Validate.notNull(packageMapping.getDirectory());
-		Validate.notEmpty(packageMapping.getFileName());
+	public JsonixModule(JSCodeModel codeModel, Mapping mapping, Output output) {
+		Validate.notNull(codeModel);
+		Validate.notNull(mapping);
+		Validate.notNull(output);
 		this.codeModel = codeModel;
-		this.naming = naming;
+		this.mapping = mapping;
+		this.mappingName = mapping.getMappingName();
+		this.defaultElementNamespaceURI = mapping
+				.getDefaultElementNamespaceURI();
+		this.defaultAttributeNamespaceURI = mapping
+				.getDefaultAttributeNamespaceURI();
+
+		this.output = output;
+		this.naming = output.getNaming();
+
 		this.declarations = codeModel.program();
 		this.exportDeclarations = codeModel.program();
 
-		this.outputPackageName = packageMapping.getOutputPackageName();
-		this.spaceName = packageMapping.getSpaceName();
+		// this.outputPackageName = packageMapping.getOutputPackageName();
 
-		this.directory = packageMapping.getDirectory();
-		this.fileName = packageMapping.getFileName();
+		// this.directory = packageMapping.getDirectory();
+		// this.fileName = packageMapping.getFileName();
 		final JSObjectLiteral spaceBody = codeModel.object();
 
-		spaceBody.append(naming.name(), codeModel.string(this.spaceName));
+		spaceBody.append(naming.name(), codeModel.string(this.mappingName));
 
-		this.defaultElementNamespaceURI = packageMapping
-				.getDefaultElementNamespaceURI();
 		if (!StringUtils.isEmpty(this.defaultElementNamespaceURI)) {
-			spaceBody.append(
-					naming.defaultElementNamespaceURI(),
+			spaceBody.append(naming.defaultElementNamespaceURI(),
 					codeModel.string(this.defaultElementNamespaceURI));
 		}
 
-		this.defaultAttributeNamespaceURI = packageMapping
-				.getDefaultAttributeNamespaceURI();
 		if (!StringUtils.isEmpty(this.defaultAttributeNamespaceURI)) {
-			spaceBody.append(
-					naming.defaultAttributeNamespaceURI(),
+			spaceBody.append(naming.defaultAttributeNamespaceURI(),
 					codeModel.string(this.defaultAttributeNamespaceURI));
 		}
 
 		this.spaceFactoryFunction = codeModel.function();
-		this.spaceFactoryVariable = this.declarations.var(this.spaceName
+		this.spaceFactoryVariable = this.declarations.var(this.mappingName
 				+ "_Module_Factory", this.spaceFactoryFunction);
 
-		this.space = this.spaceFactoryFunction.getBody().var(this.spaceName,
+		this.space = this.spaceFactoryFunction.getBody().var(this.mappingName,
 				spaceBody);
 		this.spaceFactoryFunction.getBody()._return(
-				codeModel.object().append(this.spaceName,
+				codeModel.object().append(this.mappingName,
 						this.space.getVariable()));
 
 		final JSGlobalVariable define = this.codeModel.globalVariable("define");
@@ -135,23 +140,30 @@ public class JsonixModule {
 				.block()
 				.expression(
 						module.p("exports")
-								.p(this.spaceName)
+								.p(this.mappingName)
 								.assign(this.spaceFactoryVariable.getVariable()
-										.i().p(this.spaceName)));
+										.i().p(this.mappingName)));
 
 		ifModuleExports
 				._else()
 				.block()
-				.var(this.spaceName,
+				.var(this.mappingName,
 						this.spaceFactoryVariable.getVariable().i()
-								.p(this.spaceName));
+								.p(this.mappingName));
 
 		typeInfos = codeModel.array();
 		spaceBody.append(naming.typeInfos(), typeInfos);
 
 		elementInfos = codeModel.array();
 		spaceBody.append(naming.elementInfos(), elementInfos);
-
+	}
+	
+	public Mapping getMapping() {
+		return mapping;
+	}
+	
+	public Output getOutput() {
+		return output;
 	}
 
 	public JSMemberExpression createElementNameExpression(final QName name) {

@@ -3,6 +3,8 @@ package org.hisrc.jsonix.compiler.graph;
 import java.text.MessageFormat;
 
 import org.apache.commons.lang3.Validate;
+import org.hisrc.jsonix.compiler.log.Log;
+import org.hisrc.jsonix.compiler.log.SystemLog;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -16,7 +18,8 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 
 public class ModelInfoGraphBuilder<T, C> {
 
-	// private final Log log = LogFactory.getLog(getClass());
+	private final Log log = new SystemLog();
+
 	private final MModelInfo<T, C> modelInfo;
 
 	private final EdgeFactory<InfoVertex<T, C>, DependencyEdge> edgeFactory = new EdgeFactory<InfoVertex<T, C>, DependencyEdge>() {
@@ -88,8 +91,7 @@ public class ModelInfoGraphBuilder<T, C> {
 		Validate.notNull(vertex);
 		final boolean added = this.graph.addVertex(vertex);
 		if (added) {
-//			System.out.println(MessageFormat.format("Added ({0}).",
-//					vertex.toString()));
+			log.trace(MessageFormat.format("Added ({0}).", vertex.toString()));
 		}
 		return added;
 	}
@@ -101,9 +103,9 @@ public class ModelInfoGraphBuilder<T, C> {
 		final boolean added = this.graph.addEdge(source, target,
 				new DependencyEdge(DependencyType.HARD));
 		if (added) {
-//			System.out.println(MessageFormat.format(
-//					"Added hard dependency ({0})->({1}).", source.toString(),
-//					target.toString()));
+			log.trace(MessageFormat.format(
+					"Added hard dependency ({0})->({1}).", source.toString(),
+					target.toString()));
 		}
 		return added;
 	}
@@ -115,9 +117,9 @@ public class ModelInfoGraphBuilder<T, C> {
 		final boolean added = this.graph.addEdge(source, target,
 				new DependencyEdge(DependencyType.SOFT));
 		if (added) {
-//			System.out.println(MessageFormat.format(
-//					"Added soft dependency ({0})->({1}).", source.toString(),
-//					target.toString()));
+			log.trace(MessageFormat.format(
+					"Added soft dependency ({0})->({1}).", source.toString(),
+					target.toString()));
 		}
 		return added;
 	}

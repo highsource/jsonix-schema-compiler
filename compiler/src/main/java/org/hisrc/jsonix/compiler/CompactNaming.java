@@ -2,6 +2,8 @@ package org.hisrc.jsonix.compiler;
 
 public class CompactNaming implements Naming {
 
+	public static final Naming INSTANCE = new CompactNaming();
+
 	public static final String TYPE = "t";
 	public static final String TYPE_INFO = "ti";
 
@@ -42,6 +44,8 @@ public class CompactNaming implements Naming {
 	public static final String VALUE = "v";
 	public static final String ELEMENT_REF = "er";
 	public static final String ELEMENT_REFS = "ers";
+
+	public static final String NAMING_NAME = "compact";
 
 	public CompactNaming() {
 	}

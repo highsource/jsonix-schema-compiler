@@ -71,11 +71,11 @@ final class PropertyInfoVisitor<T, C extends T> implements
 	private final Naming naming;
 
 	public PropertyInfoVisitor(JsonixCompiler<T, C> jsonixCompiler,
-			Naming naming, JSCodeModel codeModel, JsonixModule module) {
+			JSCodeModel codeModel, JsonixModule module) {
 		this.jsonixCompiler = jsonixCompiler;
-		this.naming = naming;
 		this.codeModel = codeModel;
 		this.module = module;
+		this.naming = module.getOutput().getNaming();
 	}
 
 	private void createPropertyInfoOptions(MPropertyInfo<T, C> propertyInfo,
@@ -95,7 +95,7 @@ final class PropertyInfoVisitor<T, C extends T> implements
 			@Override
 			public Void visitTypeInfo(MTypeInfo<T, C> typeInfo) {
 				final JSAssignmentExpression typeInfoDeclaration = PropertyInfoVisitor.this.jsonixCompiler
-						.getTypeInfoDeclaration(typeInfo);
+						.getTypeInfoDeclaration(module, typeInfo);
 				if (!typeInfoDeclaration
 						.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor(
 								"String"))) {

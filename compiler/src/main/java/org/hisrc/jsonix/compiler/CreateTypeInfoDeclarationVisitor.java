@@ -132,25 +132,31 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
 	private final JsonixCompiler<T, C> jsonixCompiler;
 	private final JSCodeModel codeModel;
 	private final Naming naming;
+	private final JsonixModule module;
 
 	CreateTypeInfoDeclarationVisitor(JsonixCompiler<T, C> jsonixCompiler,
-			JSCodeModel codeModel, Naming naming) {
+			JSCodeModel codeModel, JsonixModule module) {
 		Validate.notNull(jsonixCompiler);
 		Validate.notNull(codeModel);
-		Validate.notNull(naming);
+		Validate.notNull(module);
 		this.jsonixCompiler = jsonixCompiler;
 		this.codeModel = codeModel;
-		this.naming = naming;
+		this.module = module;
+		this.naming = module.getOutput().getNaming();
 	}
 
 	private JSAssignmentExpression createTypeInfoDeclaration(
-			MPackagedTypeInfo<T, C> info) {
-		final JsonixModule module = this.jsonixCompiler.getModule(info);
-		// TODO "^"
-		return this.codeModel
-				.string(module.spaceName
-						+ "."
-						+ info.getContainerLocalName(JsonixCompiler.DEFAULT_SCOPED_NAME_DELIMITER));
+			String localSpaceName, MPackagedTypeInfo<T, C> info) {
+		final String typeInfoSpaceName = this.jsonixCompiler.getSpaceName(info);
+		if (typeInfoSpaceName == null) {
+			this.jsonixCompiler.getSpaceName(info);
+		}
+		final String spaceName = typeInfoSpaceName.equals(localSpaceName) ? ""
+				: typeInfoSpaceName;
+		final String typeInfoName = spaceName
+				+ "."
+				+ info.getContainerLocalName(JsonixCompiler.DEFAULT_SCOPED_NAME_DELIMITER);
+		return this.codeModel.string(typeInfoName);
 
 	}
 
@@ -159,12 +165,12 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
 	}
 
 	public JSAssignmentExpression visitClassInfo(MClassInfo<T, C> info) {
-		return createTypeInfoDeclaration(info);
+		return createTypeInfoDeclaration(module.mappingName, info);
 	}
 
 	@Override
 	public JSAssignmentExpression visitClassRef(MClassRef<T, C> info) {
-		return createTypeInfoDeclaration(info);
+		return createTypeInfoDeclaration(module.mappingName, info);
 	}
 
 	public JSAssignmentExpression visitList(MList<T, C> info) {

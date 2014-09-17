@@ -36,24 +36,22 @@ package org.hisrc.jsonix.xjc.plugin;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import javax.xml.bind.JAXBException;
 
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jscm.codemodel.JSProgram;
 import org.hisrc.jscm.codemodel.writer.CodeWriter;
+import org.hisrc.jsonix.compilation.Modules;
+import org.hisrc.jsonix.compilation.Output;
 import org.hisrc.jsonix.compiler.CompactNaming;
 import org.hisrc.jsonix.compiler.JsonixCompiler;
 import org.hisrc.jsonix.compiler.JsonixModule;
 import org.hisrc.jsonix.compiler.Naming;
 import org.hisrc.jsonix.compiler.StandardNaming;
-import org.hisrc.jsonix.xjc.customizations.JsonixCustomizationsConstants;
-import org.hisrc.jsonix.xjc.customizations.PackageMapping;
-import org.jvnet.jaxb2_commons.util.CustomizationUtils;
+import org.hisrc.jsonix.compiler.log.Log;
+import org.hisrc.jsonix.compiler.log.SystemLog;
+import org.hisrc.jsonix.configuration.ModulesConfiguration;
+import org.hisrc.jsonix.xjc.customizations.CustomizationHandler;
 import org.jvnet.jaxb2_commons.xjc.model.concrete.XJCCMInfoFactory;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 import org.xml.sax.ErrorHandler;
@@ -65,13 +63,16 @@ import com.sun.codemodel.fmt.JTextFile;
 import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
-import com.sun.tools.xjc.model.CPluginCustomization;
 import com.sun.tools.xjc.model.Model;
 import com.sun.tools.xjc.model.nav.NClass;
 import com.sun.tools.xjc.model.nav.NType;
 import com.sun.tools.xjc.outline.Outline;
 
 public class JsonixPlugin extends Plugin {
+
+	private final Log log = new SystemLog();
+	private final CustomizationHandler customizationHandler = new CustomizationHandler(
+			this.log);
 
 	public static final String OPTION_NAME = "Xjsonix";
 	public static final String OPTION = "-" + OPTION_NAME;
@@ -118,13 +119,13 @@ public class JsonixPlugin extends Plugin {
 
 	@Override
 	public List<String> getCustomizationURIs() {
-		return Arrays.asList(JsonixCustomizationsConstants.NAMESPACE_URI);
+		return this.customizationHandler.getCustomizationURIs();
 	}
 
 	@Override
 	public boolean isCustomizationTagName(String nsUri, String localName) {
-		return (JsonixCustomizationsConstants.NAMESPACE_URI.equals(nsUri) && JsonixCustomizationsConstants.PACKAGE_MAPPING_LOCAL_NAME
-				.equals(localName));
+		return this.customizationHandler.isCustomizationTagName(nsUri,
+				localName);
 	}
 
 	@Override
@@ -133,46 +134,33 @@ public class JsonixPlugin extends Plugin {
 
 		final Model model = outline.getModel();
 
-		Map<String, PackageMapping> packageMappings = new HashMap<String, PackageMapping>();
-		{
-			List<CPluginCustomization> customizations = CustomizationUtils
-					.findCustomizations(model,
-							JsonixCustomizationsConstants.PACKAGE_MAPPING_NAME);
+		final ModulesConfiguration modulesConfiguration = this.customizationHandler
+				.unmarshal(model);
 
-			for (CPluginCustomization customization : customizations) {
-				try {
-					final PackageMapping packageMapping = JsonixCustomizationsConstants
-							.unmarshalPackageMapping(customization.element);
-					// TODO check parameters
-					packageMappings.put(packageMapping.getPackageName(),
-							packageMapping);
-				} catch (JAXBException jaxbex) {
-					errorHandler.error(new SAXParseException(
-							"Could not unmarshal the customization element.",
-							customization.locator, jaxbex));
-				}
-			}
-		}
-
-		MModelInfo<NType, NClass> mModel = new XJCCMInfoFactory(model)
+		final MModelInfo<NType, NClass> mModel = new XJCCMInfoFactory(model)
 				.createModel();
 
-		final JsonixCompiler<NType, NClass> compiler = new JsonixCompiler<NType, NClass>(
-				mModel, packageMappings, getNaming());
-		final Map<String, JsonixModule> modules = compiler.compile();
+		final Modules modules = modulesConfiguration.build(mModel);
 
-		for (JsonixModule module : modules.values()) {
+		final JsonixCompiler<NType, NClass> compiler = new JsonixCompiler<NType, NClass>(
+				mModel, modules);
+
+		final Iterable<JsonixModule> compiledModules = compiler.compile();
+
+		for (JsonixModule compiledModule : compiledModules) {
 			try {
-				if (!module.isEmpty()) {
-					final JPackage _package = model.codeModel
-							._package(module.outputPackageName);
-					_package.addResourceFile(createTextFile(module.fileName,
-							module.declarations, module.exportDeclarations));
+				if (!compiledModule.isEmpty()) {
+					final Output output = compiledModule.getOutput();
+					final JPackage _package = model.codeModel._package(output
+							.getOutputPackageName());
+					_package.addResourceFile(createTextFile(
+							output.getFileName(), compiledModule.declarations,
+							compiledModule.exportDeclarations));
 				}
 			} catch (IOException ioex) {
 				errorHandler.error(new SAXParseException(MessageFormat.format(
 						"Could not create the code for the module [{0}].",
-						module.spaceName), null, ioex));
+						compiledModule.mappingName), null, ioex));
 			}
 
 		}

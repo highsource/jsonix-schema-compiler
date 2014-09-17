@@ -1,6 +1,8 @@
 package org.hisrc.jsonix.compiler;
 
 public class StandardNaming implements Naming {
+	
+	public static final Naming INSTANCE = new StandardNaming();
 
 	public static final String TYPE = "type"; // t
 	public static final String TYPE_INFO = "typeInfo"; // ti
@@ -37,6 +39,8 @@ public class StandardNaming implements Naming {
 	public static final String ELEMENT_REF = "elementRef";// rf
 	public static final String ELEMENT_REFS = "elementRefs";// rfs
 	public static final String COLLECTION = "collection";// col
+
+	public static final String NAMING_NAME = "standard";
 
 	public StandardNaming() {
 	}
