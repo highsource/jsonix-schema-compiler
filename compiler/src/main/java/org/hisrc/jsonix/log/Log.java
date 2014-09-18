@@ -1,4 +1,4 @@
-package org.hisrc.jsonix.compiler.log;
+package org.hisrc.jsonix.log;
 
 public interface Log {
 

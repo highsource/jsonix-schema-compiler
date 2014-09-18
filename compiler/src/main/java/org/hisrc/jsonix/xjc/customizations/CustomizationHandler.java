@@ -44,12 +44,12 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.lang3.Validate;
-import org.hisrc.jsonix.compiler.log.Log;
 import org.hisrc.jsonix.configuration.MappingConfiguration;
 import org.hisrc.jsonix.configuration.ModuleConfiguration;
 import org.hisrc.jsonix.configuration.ModulesConfiguration;
 import org.hisrc.jsonix.configuration.OutputConfiguration;
 import org.hisrc.jsonix.configuration.PackageMapping;
+import org.hisrc.jsonix.log.Log;
 import org.hisrc.jsonix.xml.sax.LocatorUtils;
 import org.jvnet.jaxb2_commons.util.CustomizationUtils;
 

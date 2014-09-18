@@ -3,8 +3,8 @@ package org.hisrc.jsonix.compiler.graph;
 import java.text.MessageFormat;
 
 import org.apache.commons.lang3.Validate;
-import org.hisrc.jsonix.compiler.log.Log;
-import org.hisrc.jsonix.compiler.log.SystemLog;
+import org.hisrc.jsonix.log.Log;
+import org.hisrc.jsonix.log.SystemLog;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.DefaultDirectedGraph;

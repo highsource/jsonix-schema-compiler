@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.Validate;
-import org.hisrc.jsonix.compiler.log.Log;
-import org.hisrc.jsonix.compiler.log.SystemLog;
+import org.hisrc.jsonix.log.Log;
+import org.hisrc.jsonix.log.SystemLog;
 
 public class Modules {
 
