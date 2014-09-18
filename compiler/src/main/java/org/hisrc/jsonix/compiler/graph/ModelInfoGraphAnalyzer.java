@@ -141,15 +141,5 @@ public class ModelInfoGraphAnalyzer<T, C> {
 
 		return connectedSet;
 	}
-
-	public SpaceBuilder createSpaceBuilder(String packageName) {
-		final PackageInfoVertex<T, C> packageInfoVertex = this.packageVertexMap
-				.get(packageName);
-		if (packageInfoVertex == null) {
-			throw new IllegalArgumentException("Package [" + packageName
-					+ "] does not exist.");
-		}
-
-		return new SpaceBuilder();
-	}
+	
 }
