@@ -10,9 +10,8 @@ import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.hisrc.jsonix.compilation.Mapping;
+import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.log.Log;
-import org.hisrc.jsonix.log.SystemLog;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.util.PackageInfoQNameAnalyzer;
@@ -22,8 +21,6 @@ import org.jvnet.jaxb2_commons.xml.bind.model.util.PackageInfoQNameAnalyzer;
 public class MappingConfiguration {
 
 	public static final String LOCAL_ELEMENT_NAME = "mapping";
-
-	private Log log = new SystemLog();
 
 	private String name;
 	private String _package;
@@ -71,7 +68,7 @@ public class MappingConfiguration {
 		this.defaultAttributeNamespaceURI = defaultAttributeNamespaceURI;
 	}
 
-	public <T, C> Mapping build(MModelInfo<T, C> model,
+	public <T, C> Mapping build(Log log, MModelInfo<T, C> model,
 			Map<String, MPackageInfo> packageInfos) {
 		Validate.notNull(model);
 		Validate.notNull(packageInfos);

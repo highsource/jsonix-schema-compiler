@@ -11,9 +11,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
-import org.hisrc.jsonix.compilation.Mapping;
-import org.hisrc.jsonix.compilation.Module;
-import org.hisrc.jsonix.compilation.Output;
+import org.hisrc.jsonix.definition.Mapping;
+import org.hisrc.jsonix.definition.Module;
+import org.hisrc.jsonix.definition.Output;
+import org.hisrc.jsonix.log.Log;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
 
@@ -64,12 +65,12 @@ public class ModuleConfiguration {
 		this.outputConfigurations = outputConfigurations;
 	}
 
-	public <T, C> Module build(MModelInfo<T, C> model,
+	public <T, C> Module build(Log log, MModelInfo<T, C> model,
 			Map<String, MPackageInfo> packageInfos) {
 		final List<Mapping> mappings = new ArrayList<Mapping>(
 				this.mappingConfigurations.size());
 		for (MappingConfiguration mappingConfiguration : this.mappingConfigurations) {
-			final Mapping mapping = mappingConfiguration.build(model,
+			final Mapping mapping = mappingConfiguration.build(log, model,
 					packageInfos);
 			if (mapping != null) {
 				mappings.add(mapping);

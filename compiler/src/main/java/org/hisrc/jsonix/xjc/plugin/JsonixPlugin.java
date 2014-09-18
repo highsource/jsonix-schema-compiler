@@ -39,21 +39,19 @@ import java.text.MessageFormat;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
-import org.hisrc.jscm.codemodel.JSCodeModel;
 import org.hisrc.jscm.codemodel.JSProgram;
-import org.hisrc.jscm.codemodel.impl.CodeModelImpl;
 import org.hisrc.jscm.codemodel.writer.CodeWriter;
-import org.hisrc.jsonix.compilation.Module;
-import org.hisrc.jsonix.compilation.Modules;
-import org.hisrc.jsonix.compilation.Output;
-import org.hisrc.jsonix.compiler.CompactNaming;
-import org.hisrc.jsonix.compiler.ModuleCompiler;
-import org.hisrc.jsonix.compiler.Naming;
-import org.hisrc.jsonix.compiler.StandardNaming;
+import org.hisrc.jsonix.compilation.ModulesCompiler;
+import org.hisrc.jsonix.compilation.ProgramWriter;
 import org.hisrc.jsonix.configuration.ModulesConfiguration;
+import org.hisrc.jsonix.configuration.ModulesConfigurationUnmarshaller;
+import org.hisrc.jsonix.definition.Module;
+import org.hisrc.jsonix.definition.Modules;
+import org.hisrc.jsonix.definition.Output;
 import org.hisrc.jsonix.log.Log;
 import org.hisrc.jsonix.log.SystemLog;
-import org.hisrc.jsonix.xjc.customizations.CustomizationHandler;
+import org.hisrc.jsonix.naming.CompactNaming;
+import org.hisrc.jsonix.naming.StandardNaming;
 import org.jvnet.jaxb2_commons.xjc.model.concrete.XJCCMInfoFactory;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 import org.xml.sax.ErrorHandler;
@@ -73,21 +71,21 @@ import com.sun.tools.xjc.outline.Outline;
 public class JsonixPlugin extends Plugin {
 
 	private final Log log = new SystemLog();
-	private final CustomizationHandler customizationHandler = new CustomizationHandler(
+	private final ModulesConfigurationUnmarshaller customizationHandler = new ModulesConfigurationUnmarshaller(
 			this.log);
 
 	public static final String OPTION_NAME = "Xjsonix";
 	public static final String OPTION = "-" + OPTION_NAME;
 	public static final String OPTION_COMPACT = OPTION + "-compact";
 
-	private Naming naming = new StandardNaming();
+	private String defaultNaming = StandardNaming.NAMING_NAME;
 
-	public Naming getNaming() {
-		return naming;
+	public String getDefaultNaming() {
+		return defaultNaming;
 	}
 
-	public void setNaming(Naming naming) {
-		this.naming = naming;
+	public void setDefaultNaming(String naming) {
+		this.defaultNaming = naming;
 	}
 
 	@Override
@@ -104,7 +102,7 @@ public class JsonixPlugin extends Plugin {
 	public int parseArgument(Options opt, String[] args, int i)
 			throws BadCommandLineException, IOException {
 		if (OPTION_COMPACT.equals(args[i])) {
-			setNaming(new CompactNaming());
+			setDefaultNaming(CompactNaming.NAMING_NAME);
 			return 1;
 		} else {
 			return super.parseArgument(opt, args, i);
@@ -131,43 +129,42 @@ public class JsonixPlugin extends Plugin {
 	}
 
 	@Override
-	public boolean run(Outline outline, Options opt, ErrorHandler errorHandler)
-			throws SAXException {
+	public boolean run(Outline outline, Options opt,
+			final ErrorHandler errorHandler) throws SAXException {
 
 		final Model model = outline.getModel();
 
 		final ModulesConfiguration modulesConfiguration = this.customizationHandler
-				.unmarshal(model);
+				.unmarshal(model, this.defaultNaming);
 
 		final MModelInfo<NType, NClass> mModel = new XJCCMInfoFactory(model)
 				.createModel();
 
-		final Modules modules = modulesConfiguration.build(mModel);
+		final Modules modules = modulesConfiguration.build(log, mModel);
+		final ModulesCompiler<NType, NClass> modulesCompiler = new ModulesCompiler<NType, NClass>(
+				modules);
+		modulesCompiler.compile(mModel, new ProgramWriter() {
 
-		final JSCodeModel codeModel = new CodeModelImpl();
-
-		for (Module module : modules.getModules()) {
-			for (Output output : module.getOutputs()) {
-				// TODO isEmpty
-				final ModuleCompiler<NType, NClass> moduleCompiler = new ModuleCompiler<NType, NClass>(
-						codeModel, modules, module, output);
-
-				final JSProgram program = moduleCompiler.compile(mModel);
-				final JPackage _package = model.codeModel._package(output
-						.getOutputPackageName());
+			@Override
+			public void writeProgram(Module module, JSProgram program,
+					Output output) {
 				try {
+					final JPackage _package = model.codeModel._package(output
+							.getOutputPackageName());
 					_package.addResourceFile(createTextFile(
 							output.getFileName(), program));
 				} catch (IOException ioex) {
-					errorHandler
-							.error(new SAXParseException(
-									MessageFormat
-											.format("Could not create the code for the module [{0}].",
-													module.getName()), null,
-									ioex));
+					try {
+						errorHandler.error(new SAXParseException(
+								MessageFormat
+										.format("Could not create the code for the module [{0}].",
+												module.getName()), null, ioex));
+					} catch (SAXException ignored) {
+
+					}
 				}
 			}
-		}
+		});
 
 		return true;
 	}

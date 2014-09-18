@@ -10,10 +10,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
-import org.hisrc.jsonix.compilation.Module;
-import org.hisrc.jsonix.compilation.Modules;
-import org.hisrc.jsonix.compiler.StandardNaming;
-import org.hisrc.jsonix.compiler.graph.ModelInfoGraphAnalyzer;
+import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
+import org.hisrc.jsonix.definition.Module;
+import org.hisrc.jsonix.definition.Modules;
+import org.hisrc.jsonix.log.Log;
+import org.hisrc.jsonix.naming.StandardNaming;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 
 @XmlRootElement(name = ModulesConfiguration.LOCAL_ELEMENT_NAME)
@@ -60,10 +61,10 @@ public class ModulesConfiguration {
 		this.outputConfigurations = outputConfigurations;
 	}
 
-	public <T, C> Modules build(MModelInfo<T, C> model) {
+	public <T, C> Modules build(Log log, MModelInfo<T, C> model) {
 
 		final ModelInfoGraphAnalyzer<T, C> analyzer = new ModelInfoGraphAnalyzer<T, C>(
-				model);
+				log, model);
 
 		final Set<String> packageNames = new HashSet<String>(
 				analyzer.getPackageNames());
@@ -121,12 +122,12 @@ public class ModulesConfiguration {
 		final List<Module> modules = new ArrayList<Module>(
 				moduleConfigurations.size());
 		for (ModuleConfiguration moduleConfiguration : moduleConfigurations) {
-			final Module module = moduleConfiguration.build(model,
+			final Module module = moduleConfiguration.build(log, model,
 					analyzer.getPackageInfoMap());
 			if (module != null) {
 				modules.add(module);
 			}
 		}
-		return new Modules(modules);
+		return new Modules(log, modules);
 	}
 }

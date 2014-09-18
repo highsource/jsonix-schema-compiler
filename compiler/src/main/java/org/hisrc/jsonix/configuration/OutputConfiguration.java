@@ -8,10 +8,10 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.Validate;
-import org.hisrc.jsonix.compilation.Output;
-import org.hisrc.jsonix.compiler.CompactNaming;
-import org.hisrc.jsonix.compiler.Naming;
-import org.hisrc.jsonix.compiler.StandardNaming;
+import org.hisrc.jsonix.definition.Output;
+import org.hisrc.jsonix.naming.CompactNaming;
+import org.hisrc.jsonix.naming.Naming;
+import org.hisrc.jsonix.naming.StandardNaming;
 
 @XmlRootElement(name = OutputConfiguration.LOCAL_ELEMENT_NAME)
 @XmlType(propOrder = {})
