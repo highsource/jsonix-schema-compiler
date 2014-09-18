@@ -35,6 +35,7 @@ package org.hisrc.jsonix.compiler;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang3.Validate;
 import org.hisrc.jscm.codemodel.JSCodeModel;
 import org.hisrc.jscm.codemodel.expression.JSArrayLiteral;
 import org.hisrc.jscm.codemodel.expression.JSAssignmentExpression;
@@ -62,20 +63,16 @@ import org.jvnet.jaxb2_commons.xml.bind.model.util.DefaultTypeInfoVisitor;
 
 final class PropertyInfoVisitor<T, C extends T> implements
 		MPropertyInfoVisitor<T, C, JSObjectLiteral> {
-	/**
-	 * 
-	 */
-	private final JsonixCompiler<T, C> jsonixCompiler;
+
 	private final JSCodeModel codeModel;
-	private final JsonixModule module;
+	private final MappingCompiler<T, C> mappingCompiler;
 	private final Naming naming;
 
-	public PropertyInfoVisitor(JsonixCompiler<T, C> jsonixCompiler,
-			JSCodeModel codeModel, JsonixModule module) {
-		this.jsonixCompiler = jsonixCompiler;
-		this.codeModel = codeModel;
-		this.module = module;
-		this.naming = module.getOutput().getNaming();
+	public PropertyInfoVisitor(MappingCompiler<T, C> mappingCompiler) {
+		Validate.notNull(mappingCompiler);
+		this.codeModel = mappingCompiler.getCodeModel();
+		this.mappingCompiler = mappingCompiler;
+		this.naming = mappingCompiler.getNaming();
 	}
 
 	private void createPropertyInfoOptions(MPropertyInfo<T, C> propertyInfo,
@@ -94,8 +91,8 @@ final class PropertyInfoVisitor<T, C extends T> implements
 		typeInfo.acceptTypeInfoVisitor(new DefaultTypeInfoVisitor<T, C, Void>() {
 			@Override
 			public Void visitTypeInfo(MTypeInfo<T, C> typeInfo) {
-				final JSAssignmentExpression typeInfoDeclaration = PropertyInfoVisitor.this.jsonixCompiler
-						.getTypeInfoDeclaration(module, typeInfo);
+				final JSAssignmentExpression typeInfoDeclaration = PropertyInfoVisitor.this.mappingCompiler
+						.getTypeInfoDeclaration(typeInfo);
 				if (!typeInfoDeclaration
 						.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor(
 								"String"))) {
@@ -115,8 +112,8 @@ final class PropertyInfoVisitor<T, C extends T> implements
 	private void createWrappableOptions(MWrappable info, JSObjectLiteral options) {
 		final QName wrapperElementName = info.getWrapperElementName();
 		if (wrapperElementName != null) {
-			options.append(naming.wrapperElementName(),
-					module.createElementNameExpression(wrapperElementName));
+			options.append(naming.wrapperElementName(), mappingCompiler
+					.createElementNameExpression(wrapperElementName));
 		}
 	}
 
@@ -124,13 +121,13 @@ final class PropertyInfoVisitor<T, C extends T> implements
 			JSObjectLiteral options) {
 		final QName elementName = info.getElementName();
 		options.append(naming.elementName(),
-				module.createElementNameExpression(elementName));
+				mappingCompiler.createElementNameExpression(elementName));
 		createTypedOptions(info, options);
 	}
 
 	private void createElementTypeInfoOptions(MElementTypeInfo<T, C> info,
 			String privateName, QName elementName, JSObjectLiteral options) {
-		JSMemberExpression elementNameExpression = module
+		JSMemberExpression elementNameExpression = mappingCompiler
 				.createElementNameExpression(elementName);
 		if (!elementNameExpression
 				.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor(
@@ -211,7 +208,7 @@ final class PropertyInfoVisitor<T, C extends T> implements
 		createPropertyInfoOptions(info, options);
 		createTypedOptions(info, options);
 
-		final JSMemberExpression attributeNameExpression = module
+		final JSMemberExpression attributeNameExpression = mappingCompiler
 				.createAttributeNameExpression(info.getAttributeName());
 		if (!attributeNameExpression
 				.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor(

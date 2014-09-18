@@ -101,10 +101,6 @@ public class ModulesConfiguration {
 			for (final MappingConfiguration mappingConfiguration : moduleConfiguration
 					.getMappingConfigurations()) {
 				mappedPackagesNames.add(mappingConfiguration.getPackage());
-				if (mappingConfiguration.getOutputConfigurations().isEmpty()) {
-					mappingConfiguration.getOutputConfigurations().addAll(
-							moduleConfiguration.getOutputConfigurations());
-				}
 			}
 		}
 
@@ -113,8 +109,6 @@ public class ModulesConfiguration {
 		for (final String packageName : packageNames) {
 			final MappingConfiguration mappingConfiguration = new MappingConfiguration();
 			mappingConfiguration.setPackage(packageName);
-			mappingConfiguration.getOutputConfigurations().addAll(
-					defaultOutputConfigurations);
 			final ModuleConfiguration moduleConfiguration = new ModuleConfiguration();
 			moduleConfiguration.getMappingConfigurations().add(
 					mappingConfiguration);

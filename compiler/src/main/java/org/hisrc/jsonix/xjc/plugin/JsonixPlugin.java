@@ -39,13 +39,15 @@ import java.text.MessageFormat;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
+import org.hisrc.jscm.codemodel.JSCodeModel;
 import org.hisrc.jscm.codemodel.JSProgram;
+import org.hisrc.jscm.codemodel.impl.CodeModelImpl;
 import org.hisrc.jscm.codemodel.writer.CodeWriter;
+import org.hisrc.jsonix.compilation.Module;
 import org.hisrc.jsonix.compilation.Modules;
 import org.hisrc.jsonix.compilation.Output;
 import org.hisrc.jsonix.compiler.CompactNaming;
-import org.hisrc.jsonix.compiler.JsonixCompiler;
-import org.hisrc.jsonix.compiler.JsonixModule;
+import org.hisrc.jsonix.compiler.ModuleCompiler;
 import org.hisrc.jsonix.compiler.Naming;
 import org.hisrc.jsonix.compiler.StandardNaming;
 import org.hisrc.jsonix.compiler.log.Log;
@@ -142,27 +144,29 @@ public class JsonixPlugin extends Plugin {
 
 		final Modules modules = modulesConfiguration.build(mModel);
 
-		final JsonixCompiler<NType, NClass> compiler = new JsonixCompiler<NType, NClass>(
-				mModel, modules);
+		final JSCodeModel codeModel = new CodeModelImpl();
 
-		final Iterable<JsonixModule> compiledModules = compiler.compile();
+		for (Module module : modules.getModules()) {
+			for (Output output : module.getOutputs()) {
+				// TODO isEmpty
+				final ModuleCompiler<NType, NClass> moduleCompiler = new ModuleCompiler<NType, NClass>(
+						codeModel, modules, module, output);
 
-		for (JsonixModule compiledModule : compiledModules) {
-			try {
-				if (!compiledModule.isEmpty()) {
-					final Output output = compiledModule.getOutput();
-					final JPackage _package = model.codeModel._package(output
-							.getOutputPackageName());
+				final JSProgram program = moduleCompiler.compile(mModel);
+				final JPackage _package = model.codeModel._package(output
+						.getOutputPackageName());
+				try {
 					_package.addResourceFile(createTextFile(
-							output.getFileName(), compiledModule.declarations,
-							compiledModule.exportDeclarations));
+							output.getFileName(), program));
+				} catch (IOException ioex) {
+					errorHandler
+							.error(new SAXParseException(
+									MessageFormat
+											.format("Could not create the code for the module [{0}].",
+													module.getName()), null,
+									ioex));
 				}
-			} catch (IOException ioex) {
-				errorHandler.error(new SAXParseException(MessageFormat.format(
-						"Could not create the code for the module [{0}].",
-						compiledModule.mappingName), null, ioex));
 			}
-
 		}
 
 		return true;

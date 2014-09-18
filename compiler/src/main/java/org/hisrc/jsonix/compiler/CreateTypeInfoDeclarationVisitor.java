@@ -42,6 +42,7 @@ import org.apache.commons.lang3.Validate;
 import org.hisrc.jscm.codemodel.JSCodeModel;
 import org.hisrc.jscm.codemodel.expression.JSAssignmentExpression;
 import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
+import org.hisrc.jsonix.compilation.Modules;
 import org.jvnet.jaxb2_commons.xml.bind.model.MBuiltinLeafInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassRef;
@@ -129,33 +130,28 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
 		// XSD_TYPE_MAPPING.put(XmlSchemaConstants.CALENDAR, "String");
 	}
 
-	private final JsonixCompiler<T, C> jsonixCompiler;
 	private final JSCodeModel codeModel;
+	private final Modules mappingNameResolver;
 	private final Naming naming;
-	private final JsonixModule module;
+	private final String mappingName;
 
-	CreateTypeInfoDeclarationVisitor(JsonixCompiler<T, C> jsonixCompiler,
-			JSCodeModel codeModel, JsonixModule module) {
-		Validate.notNull(jsonixCompiler);
-		Validate.notNull(codeModel);
-		Validate.notNull(module);
-		this.jsonixCompiler = jsonixCompiler;
-		this.codeModel = codeModel;
-		this.module = module;
-		this.naming = module.getOutput().getNaming();
+	CreateTypeInfoDeclarationVisitor(MappingCompiler<T, C> mappingCompiler) {
+		Validate.notNull(mappingCompiler);
+		this.mappingNameResolver = mappingCompiler.getMappingNameResolver();
+		this.codeModel = mappingCompiler.getCodeModel();
+		this.naming = mappingCompiler.getNaming();
+		this.mappingName = mappingCompiler.getMapping().getMappingName();
 	}
 
 	private JSAssignmentExpression createTypeInfoDeclaration(
-			String localSpaceName, MPackagedTypeInfo<T, C> info) {
-		final String typeInfoSpaceName = this.jsonixCompiler.getSpaceName(info);
-		if (typeInfoSpaceName == null) {
-			this.jsonixCompiler.getSpaceName(info);
-		}
-		final String spaceName = typeInfoSpaceName.equals(localSpaceName) ? ""
-				: typeInfoSpaceName;
+			MPackagedTypeInfo<T, C> info) {
+		final String typeInfoMappingName = this.mappingNameResolver
+				.getMappingName(info.getPackageInfo().getPackageName());
+		final String spaceName = typeInfoMappingName.equals(this.mappingName) ? ""
+				: typeInfoMappingName;
 		final String typeInfoName = spaceName
 				+ "."
-				+ info.getContainerLocalName(JsonixCompiler.DEFAULT_SCOPED_NAME_DELIMITER);
+				+ info.getContainerLocalName(MappingCompiler.DEFAULT_SCOPED_NAME_DELIMITER);
 		return this.codeModel.string(typeInfoName);
 
 	}
@@ -165,12 +161,12 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
 	}
 
 	public JSAssignmentExpression visitClassInfo(MClassInfo<T, C> info) {
-		return createTypeInfoDeclaration(module.mappingName, info);
+		return createTypeInfoDeclaration(info);
 	}
 
 	@Override
 	public JSAssignmentExpression visitClassRef(MClassRef<T, C> info) {
-		return createTypeInfoDeclaration(module.mappingName, info);
+		return createTypeInfoDeclaration(info);
 	}
 
 	public JSAssignmentExpression visitList(MList<T, C> info) {

@@ -1,12 +1,9 @@
 package org.hisrc.jsonix.configuration;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
@@ -32,8 +29,6 @@ public class MappingConfiguration {
 	private String _package;
 	private String defaultElementNamespaceURI;
 	private String defaultAttributeNamespaceURI;
-	private List<OutputConfiguration> outputConfigurations = new ArrayList<OutputConfiguration>(
-			2);
 
 	public static final QName MAPPING_NAME = new QName(
 			ModulesConfiguration.NAMESPACE_URI, LOCAL_ELEMENT_NAME,
@@ -74,17 +69,6 @@ public class MappingConfiguration {
 	public void setDefaultAttributeNamespaceURI(
 			String defaultAttributeNamespaceURI) {
 		this.defaultAttributeNamespaceURI = defaultAttributeNamespaceURI;
-	}
-
-	@XmlElement(name = "output")
-	public List<OutputConfiguration> getOutputConfigurations() {
-		return outputConfigurations;
-	}
-
-	public void setOutputConfigurations(
-			List<OutputConfiguration> outputConfigurations) {
-		Validate.noNullElements(outputConfigurations);
-		this.outputConfigurations = outputConfigurations;
 	}
 
 	public <T, C> Mapping build(MModelInfo<T, C> model,

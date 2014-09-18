@@ -100,9 +100,9 @@ public class ModuleConfiguration {
 		for (Mapping mapping : mappings) {
 			if (!first) {
 				sb.append(MODULE_NAME_SEPARATOR);
-				first = false;
 			}
 			sb.append(mapping.getMappingName());
+			first = false;
 		}
 		return sb.toString();
 	}

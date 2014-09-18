@@ -42,13 +42,15 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
+import org.hisrc.jscm.codemodel.JSCodeModel;
 import org.hisrc.jscm.codemodel.JSProgram;
+import org.hisrc.jscm.codemodel.impl.CodeModelImpl;
 import org.hisrc.jscm.codemodel.writer.CodeWriter;
+import org.hisrc.jsonix.compilation.Module;
 import org.hisrc.jsonix.compilation.Modules;
 import org.hisrc.jsonix.compilation.Output;
 import org.hisrc.jsonix.compiler.CompactNaming;
-import org.hisrc.jsonix.compiler.JsonixCompiler;
-import org.hisrc.jsonix.compiler.JsonixModule;
+import org.hisrc.jsonix.compiler.ModuleCompiler;
 import org.hisrc.jsonix.compiler.Naming;
 import org.hisrc.jsonix.compiler.StandardNaming;
 import org.hisrc.jsonix.compiler.log.Log;
@@ -61,6 +63,7 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 import org.xml.sax.SAXParseException;
 
 import com.sun.codemodel.JCodeModel;
+import com.sun.codemodel.JPackage;
 import com.sun.tools.xjc.ConsoleErrorReporter;
 import com.sun.tools.xjc.ErrorReceiver;
 import com.sun.tools.xjc.ModelLoader;
@@ -130,24 +133,29 @@ public class JsonixMain {
 
 		final Modules modules = modulesConfiguration.build(mModel);
 
-		final JsonixCompiler<NType, NClass> compiler = new JsonixCompiler<NType, NClass>(
-				mModel, modules);
-		final Iterable<JsonixModule> compiledModules = compiler.compile();
+		final JSCodeModel codeModel = new CodeModelImpl();
 
-		for (JsonixModule compiledModule : compiledModules) {
-			try {
-				final Output output = compiledModule.getOutput();
-				if (!compiledModule.isEmpty()) {
+		for (Module module : modules.getModules()) {
+			for (Output output : module.getOutputs()) {
+				// TODO isEmpty
+				final ModuleCompiler<NType, NClass> moduleCompiler = new ModuleCompiler<NType, NClass>(
+						codeModel, modules, module, output);
+
+				final JSProgram program = moduleCompiler.compile(mModel);
+				final JPackage _package = model.codeModel._package(output
+						.getOutputPackageName());
+				try {
 					writePrograms(options.targetDir, output.getDirectory(),
-							output.getFileName(), compiledModule.declarations,
-							compiledModule.exportDeclarations);
+							output.getFileName(), program);
+				} catch (IOException ioex) {
+					errorReceiver
+							.error(new SAXParseException(
+									MessageFormat
+											.format("Could not create the code for the module [{0}].",
+													module.getName()), null,
+									ioex));
 				}
-			} catch (IOException ioex) {
-				errorReceiver.error(new SAXParseException(MessageFormat.format(
-						"Could not create the code for the module [{0}].",
-						compiledModule.mappingName), null, ioex));
 			}
-
 		}
 	}
 
