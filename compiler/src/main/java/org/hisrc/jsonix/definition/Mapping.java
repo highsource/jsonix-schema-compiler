@@ -37,7 +37,6 @@ public class Mapping<T, C extends T> {
 		this.mappingName = mappingName;
 		this.defaultElementNamespaceURI = defaultElementNamespaceURI;
 		this.defaultAttributeNamespaceURI = defaultAttributeNamespaceURI;
-		includePackage(packageInfo);
 	}
 
 	public void includePackage(MPackageInfo packageInfo) {
