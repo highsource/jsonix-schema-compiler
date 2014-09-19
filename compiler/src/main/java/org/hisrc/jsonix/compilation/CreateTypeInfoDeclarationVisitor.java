@@ -132,13 +132,13 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
 	}
 
 	private final JSCodeModel codeModel;
-	private final Modules mappingNameResolver;
+	private final Modules<T, C> mappingNameResolver;
 	private final Naming naming;
 	private final String mappingName;
 
 	CreateTypeInfoDeclarationVisitor(MappingCompiler<T, C> mappingCompiler) {
 		Validate.notNull(mappingCompiler);
-		this.mappingNameResolver = mappingCompiler.getMappingNameResolver();
+		this.mappingNameResolver = mappingCompiler.getModules();
 		this.codeModel = mappingCompiler.getCodeModel();
 		this.naming = mappingCompiler.getNaming();
 		this.mappingName = mappingCompiler.getMapping().getMappingName();

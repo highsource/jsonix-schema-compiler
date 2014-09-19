@@ -13,19 +13,18 @@ import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Modules;
 import org.hisrc.jsonix.definition.Output;
-import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 
 public class ModuleCompiler<T, C extends T> {
 
 	private final JSCodeModel codeModel;
 
 	private Output output;
-	private Modules modules;
-	private Module module;
+	private Modules<T, C> modules;
+	private Module<T, C> module;
 	private final String moduleName;
 
-	public ModuleCompiler(JSCodeModel codeModel, Modules modules,
-			Module module, Output output) {
+	public ModuleCompiler(JSCodeModel codeModel, Modules<T, C> modules,
+			Module<T, C> module, Output output) {
 		Validate.notNull(codeModel);
 		Validate.notNull(modules);
 		Validate.notNull(module);
@@ -37,7 +36,7 @@ public class ModuleCompiler<T, C extends T> {
 		this.output = output;
 	}
 
-	public JSProgram compile(MModelInfo<T, C> model) {
+	public JSProgram compile() {
 		final JSProgram moduleProgram = codeModel.program();
 
 		final Function moduleFactoryFunction = codeModel.function();
@@ -46,12 +45,12 @@ public class ModuleCompiler<T, C extends T> {
 				this.moduleName + "_Module_Factory", moduleFactoryFunction);
 
 		final JSObjectLiteral moduleFactoryResult = codeModel.object();
-		for (Mapping mapping : this.module.getMappings()) {
+		for (Mapping<T, C> mapping : this.module.getMappings()) {
 			final String mappingName = mapping.getMappingName();
 			final MappingCompiler<T, C> mappingCompiler = new MappingCompiler<T, C>(
 					codeModel, modules, module, output, mapping);
 
-			final JSObjectLiteral mappingBody = mappingCompiler.compile(model);
+			final JSObjectLiteral mappingBody = mappingCompiler.compile();
 
 			final JSVariableStatement mappingVariable = moduleFactoryFunction
 					.getBody().var(mappingName, mappingBody);
@@ -82,14 +81,14 @@ public class ModuleCompiler<T, C extends T> {
 
 		final JSBlock moduleExportsThenBlock = ifModuleExports._then().block();
 
-		for (Mapping mapping : this.module.getMappings()) {
+		for (Mapping<T, C> mapping : this.module.getMappings()) {
 			final String mappingName = mapping.getMappingName();
 			moduleExportsThenBlock.expression(module.p("exports")
 					.p(mappingName)
 					.assign(moduleInstance.getVariable().p(mappingName)));
 		}
 		final JSBlock moduleExportsElseBlock = ifModuleExports._else().block();
-		for (Mapping mapping : this.module.getMappings()) {
+		for (Mapping<T, C> mapping : this.module.getMappings()) {
 			final String mappingName = mapping.getMappingName();
 			moduleExportsElseBlock.var(mappingName, moduleInstance
 					.getVariable().p(mappingName));

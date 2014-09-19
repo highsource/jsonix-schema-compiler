@@ -56,7 +56,6 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MEnumConstantInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 
@@ -69,23 +68,23 @@ public class MappingCompiler<T, C extends T> {
 	private final String defaultElementNamespaceURI;
 	private final String defaultAttributeNamespaceURI;
 
-	private final Modules mappingNameResolver;
+	private final Modules<T, C> modules;
+	private final MModelInfo<T, C> modelInfo;
 	private Naming naming;
-	private Mapping mapping;
+	private Mapping<T, C> mapping;
 	private Output output;
-	private final MPackageInfo packageInfo;
 
-	public MappingCompiler(JSCodeModel codeModel, Modules modules,
-			Module module, Output output, Mapping mapping) {
+	public MappingCompiler(JSCodeModel codeModel, Modules<T, C> modules,
+			Module<T, C> module, Output output, Mapping<T, C> mapping) {
 		Validate.notNull(codeModel);
 		Validate.notNull(modules);
 		Validate.notNull(module);
 		Validate.notNull(mapping);
 		Validate.notNull(output);
 		this.codeModel = codeModel;
-		this.mappingNameResolver = modules;
+		this.modules = modules;
+		this.modelInfo= modules.getModelInfo();
 		this.mapping = mapping;
-		this.packageInfo = mapping.getPackageInfo();
 		this.mappingName = mapping.getMappingName();
 		this.defaultElementNamespaceURI = mapping
 				.getDefaultElementNamespaceURI();
@@ -96,8 +95,8 @@ public class MappingCompiler<T, C extends T> {
 		this.naming = output.getNaming();
 	}
 
-	public Modules getMappingNameResolver() {
-		return mappingNameResolver;
+	public Modules<T, C> getModules() {
+		return modules;
 	}
 
 	public JSCodeModel getCodeModel() {
@@ -108,7 +107,7 @@ public class MappingCompiler<T, C extends T> {
 		return naming;
 	}
 
-	public Mapping getMapping() {
+	public Mapping<T, C> getMapping() {
 		return mapping;
 	}
 
@@ -116,7 +115,8 @@ public class MappingCompiler<T, C extends T> {
 		return output;
 	}
 
-	public JSObjectLiteral compile(MModelInfo<T, C> model) {
+	public JSObjectLiteral compile() {
+		
 		final JSObjectLiteral mappingBody = codeModel.object();
 
 		mappingBody.append(naming.name(), codeModel.string(this.mappingName));
@@ -137,9 +137,9 @@ public class MappingCompiler<T, C extends T> {
 		final JSArrayLiteral elementInfos = codeModel.array();
 		mappingBody.append(naming.elementInfos(), elementInfos);
 
-		compileClassInfos(typeInfos, model.getClassInfos());
-		compileEnumLeafInfos(typeInfos, model.getEnumLeafInfos());
-		compileElementInfos(elementInfos, model.getElementInfos());
+		compileClassInfos(typeInfos, mapping.getClassInfos());
+		compileEnumLeafInfos(typeInfos, mapping.getEnumLeafInfos());
+		compileElementInfos(elementInfos, mapping.getElementInfos());
 
 		return mappingBody;
 	}
@@ -147,18 +147,14 @@ public class MappingCompiler<T, C extends T> {
 	private void compileClassInfos(JSArrayLiteral typeInfos,
 			Collection<MClassInfo<T, C>> classInfos) {
 		for (MClassInfo<T, C> classInfo : classInfos) {
-			if (packageInfo == classInfo.getPackageInfo()) {
-				typeInfos.append(compileClassInfo(classInfo));
-			}
+			typeInfos.append(compileClassInfo(classInfo));
 		}
 	}
 
 	private void compileEnumLeafInfos(JSArrayLiteral typeInfos,
 			Collection<MEnumLeafInfo<T, C>> enumLeafInfos) {
 		for (MEnumLeafInfo<T, C> enumLeafInfo : enumLeafInfos) {
-			if (packageInfo == enumLeafInfo.getPackageInfo()) {
-				typeInfos.append(compileEnumLeafInfo(enumLeafInfo));
-			}
+			typeInfos.append(compileEnumLeafInfo(enumLeafInfo));
 		}
 	}
 
@@ -223,10 +219,7 @@ public class MappingCompiler<T, C extends T> {
 	private void compileElementInfos(JSArrayLiteral eis,
 			Collection<MElementInfo<T, C>> elementInfos) {
 		for (MElementInfo<T, C> elementInfo : elementInfos) {
-			if (packageInfo == elementInfo.getPackageInfo()) {
-				// JsonixModule module = getModule(elementInfo);
-				eis.append(compileElementInfo(elementInfo));
-			}
+			eis.append(compileElementInfo(elementInfo));
 		}
 	}
 

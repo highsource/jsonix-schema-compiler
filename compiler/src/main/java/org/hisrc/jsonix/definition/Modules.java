@@ -7,21 +7,25 @@ import java.util.Map;
 
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.log.Log;
+import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 
-public class Modules {
+public class Modules<T, C extends T> {
 
-	private final Collection<Module> modules;
-	private final Map<String, String> packageMappingNameMap = new HashMap<String, String>();
 	private final Log log;
+	private final Collection<Module<T, C>> modules;
+	private final Map<String, String> packageMappingNameMap = new HashMap<String, String>();
+	private final MModelInfo<T, C> modelInfo;
 
-	public Modules(Log log, Collection<Module> modules) {
+	public Modules(Log log, MModelInfo<T, C> modelInfo, Collection<Module<T, C>> modules) {
 		Validate.notNull(log);
+		Validate.notNull(modelInfo);
 		Validate.noNullElements(modules);
 		this.log = log;
+		this.modelInfo = modelInfo;
 		this.modules = modules;
 
-		for (Module module : modules) {
-			for (Mapping mapping : module.getMappings()) {
+		for (Module<T, C> module : modules) {
+			for (Mapping<T, C> mapping : module.getMappings()) {
 
 				final String packageName = mapping.getPackageName();
 				final String mappingName = mapping.getMappingName();
@@ -42,12 +46,16 @@ public class Modules {
 			}
 		}
 	}
+	
+	public MModelInfo<T, C> getModelInfo() {
+		return modelInfo;
+	}
 
 	public String getMappingName(String packageName) {
 		return this.packageMappingNameMap.get(packageName);
 	}
 
-	public Collection<Module> getModules() {
+	public Collection<Module<T, C>> getModules() {
 		return modules;
 	}
 

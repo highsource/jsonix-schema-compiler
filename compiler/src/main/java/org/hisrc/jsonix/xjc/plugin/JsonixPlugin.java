@@ -137,17 +137,20 @@ public class JsonixPlugin extends Plugin {
 		final ModulesConfiguration modulesConfiguration = this.customizationHandler
 				.unmarshal(model, this.defaultNaming);
 
-		final MModelInfo<NType, NClass> mModel = new XJCCMInfoFactory(model)
+		final MModelInfo<NType, NClass> modelinfo = new XJCCMInfoFactory(model)
 				.createModel();
 
-		final Modules modules = modulesConfiguration.build(log, mModel);
+		final Modules<NType, NClass> modules = modulesConfiguration.build(log,
+				modelinfo);
+		
 		final ModulesCompiler<NType, NClass> modulesCompiler = new ModulesCompiler<NType, NClass>(
 				modules);
-		modulesCompiler.compile(mModel, new ProgramWriter() {
+		
+		modulesCompiler.compile(new ProgramWriter<NType, NClass>() {
 
 			@Override
-			public void writeProgram(Module module, JSProgram program,
-					Output output) {
+			public void writeProgram(Module<NType, NClass> module,
+					JSProgram program, Output output) {
 				try {
 					final JPackage _package = model.codeModel._package(output
 							.getOutputPackageName());

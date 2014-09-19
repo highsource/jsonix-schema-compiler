@@ -61,10 +61,10 @@ public class ModulesConfiguration {
 		this.outputConfigurations = outputConfigurations;
 	}
 
-	public <T, C> Modules build(Log log, MModelInfo<T, C> model) {
+	public <T, C extends T> Modules<T, C> build(Log log, MModelInfo<T, C> modelInfo) {
 
 		final ModelInfoGraphAnalyzer<T, C> analyzer = new ModelInfoGraphAnalyzer<T, C>(
-				log, model);
+				log, modelInfo);
 
 		final Set<String> packageNames = new HashSet<String>(
 				analyzer.getPackageNames());
@@ -119,15 +119,15 @@ public class ModulesConfiguration {
 			mappedPackagesNames.add(packageName);
 		}
 
-		final List<Module> modules = new ArrayList<Module>(
+		final List<Module<T, C>> modules = new ArrayList<Module<T, C>>(
 				moduleConfigurations.size());
 		for (ModuleConfiguration moduleConfiguration : moduleConfigurations) {
-			final Module module = moduleConfiguration.build(log, model,
+			final Module<T, C> module = moduleConfiguration.build(log, modelInfo,
 					analyzer.getPackageInfoMap());
 			if (module != null) {
 				modules.add(module);
 			}
 		}
-		return new Modules(log, modules);
+		return new Modules<T, C>(log, modelInfo, modules);
 	}
 }

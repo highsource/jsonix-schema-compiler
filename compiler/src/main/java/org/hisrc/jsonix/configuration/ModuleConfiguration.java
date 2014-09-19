@@ -24,7 +24,7 @@ public class ModuleConfiguration {
 
 	public static final String LOCAL_ELEMENT_NAME = "module";
 
-//	private Log log = new SystemLog();
+	// private Log log = new SystemLog();
 
 	public static final String MODULE_NAME_PROPERTY = "${module.name}";
 	public static final String MODULE_NAME_SEPARATOR = "_";
@@ -33,8 +33,9 @@ public class ModuleConfiguration {
 	private List<MappingConfiguration> mappingConfigurations = new LinkedList<MappingConfiguration>();
 	private List<OutputConfiguration> outputConfigurations = new LinkedList<OutputConfiguration>();
 
-	public static final QName MODULE_NAME = new QName(ModulesConfiguration.NAMESPACE_URI,
-	LOCAL_ELEMENT_NAME, ModulesConfiguration.DEFAULT_PREFIX);
+	public static final QName MODULE_NAME = new QName(
+			ModulesConfiguration.NAMESPACE_URI, LOCAL_ELEMENT_NAME,
+			ModulesConfiguration.DEFAULT_PREFIX);
 
 	@XmlAttribute(name = "name")
 	public String getName() {
@@ -65,13 +66,13 @@ public class ModuleConfiguration {
 		this.outputConfigurations = outputConfigurations;
 	}
 
-	public <T, C> Module build(Log log, MModelInfo<T, C> model,
-			Map<String, MPackageInfo> packageInfos) {
-		final List<Mapping> mappings = new ArrayList<Mapping>(
+	public <T, C extends T> Module<T, C> build(Log log,
+			MModelInfo<T, C> modelInfo, Map<String, MPackageInfo> packageInfos) {
+		final List<Mapping<T, C>> mappings = new ArrayList<Mapping<T, C>>(
 				this.mappingConfigurations.size());
 		for (MappingConfiguration mappingConfiguration : this.mappingConfigurations) {
-			final Mapping mapping = mappingConfiguration.build(log, model,
-					packageInfos);
+			final Mapping<T, C> mapping = mappingConfiguration.build(log,
+					modelInfo, packageInfos);
 			if (mapping != null) {
 				mappings.add(mapping);
 			}
@@ -92,13 +93,14 @@ public class ModuleConfiguration {
 				outputs.add(output);
 			}
 		}
-		return new Module(moduleName, mappings, outputs);
+		return new Module<T, C>(modelInfo, moduleName, mappings, outputs);
 	}
 
-	private String createModuleName(Iterable<Mapping> mappings) {
+	private <T, C extends T> String createModuleName(
+			Iterable<Mapping<T, C>> mappings) {
 		boolean first = true;
 		final StringBuilder sb = new StringBuilder();
-		for (Mapping mapping : mappings) {
+		for (Mapping<T, C> mapping : mappings) {
 			if (!first) {
 				sb.append(MODULE_NAME_SEPARATOR);
 			}

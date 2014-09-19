@@ -68,9 +68,9 @@ public class MappingConfiguration {
 		this.defaultAttributeNamespaceURI = defaultAttributeNamespaceURI;
 	}
 
-	public <T, C> Mapping build(Log log, MModelInfo<T, C> model,
+	public <T, C extends T> Mapping<T, C> build(Log log, MModelInfo<T, C> modelInfo,
 			Map<String, MPackageInfo> packageInfos) {
-		Validate.notNull(model);
+		Validate.notNull(modelInfo);
 		Validate.notNull(packageInfos);
 
 		final String packageName = createPackageName();
@@ -90,7 +90,7 @@ public class MappingConfiguration {
 				packageName, mappingName));
 
 		final PackageInfoQNameAnalyzer<T, C> analyzer = new PackageInfoQNameAnalyzer<T, C>(
-				model);
+				modelInfo);
 
 		final String draftMostUsedElementNamespaceURI = analyzer
 				.getMostUsedElementNamespaceURI(packageInfo);
@@ -126,8 +126,10 @@ public class MappingConfiguration {
 
 		}
 
-		return new Mapping(packageInfo, mappingName,
+		final Mapping<T, C> mapping = new Mapping<T, C>(modelInfo, packageInfo, mappingName,
 				defaultElementNamespaceURI, defaultAttributeNamespaceURI);
+		mapping.includePackage(packageInfo);
+		return mapping;
 
 	}
 

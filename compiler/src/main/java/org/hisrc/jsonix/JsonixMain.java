@@ -93,18 +93,18 @@ public class JsonixMain {
 
 		final ErrorReceiver errorReceiver = new ConsoleErrorReporter();
 
-		final MModelInfo<NType, NClass> mModel = new XJCCMInfoFactory(model)
+		final MModelInfo<NType, NClass> modelInfo = new XJCCMInfoFactory(model)
 				.createModel();
 
-		final Modules modules = modulesConfiguration.build(log, mModel);
+		final Modules<NType, NClass> modules = modulesConfiguration.build(log, modelInfo);
 
 		final ModulesCompiler<NType, NClass> modulesCompiler = new ModulesCompiler<NType, NClass>(
 				modules);
 
-		modulesCompiler.compile(mModel, new ProgramWriter() {
+		modulesCompiler.compile(new ProgramWriter<NType, NClass>() {
 
 			@Override
-			public void writeProgram(Module module, JSProgram program,
+			public void writeProgram(Module<NType, NClass> module, JSProgram program,
 					Output output) {
 				try {
 					writePrograms(options.targetDir, output.getDirectory(),
