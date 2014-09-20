@@ -234,4 +234,33 @@
 		</xs:sequence>
 	</xs:complexType>
 
+	<xs:element name="elementWithAnonymousTypeOne">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="doubled">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="content" type="xs:string"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="elementWithAnonymousTypeTwo">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="doubled">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="content" type="xs:integer"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+
 </xs:schema>
