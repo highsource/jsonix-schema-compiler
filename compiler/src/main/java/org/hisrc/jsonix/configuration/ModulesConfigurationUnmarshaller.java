@@ -63,8 +63,10 @@ public class ModulesConfigurationUnmarshaller {
 			context = JAXBContext.newInstance(ModulesConfiguration.class,
 					ModuleConfiguration.class, MappingConfiguration.class,
 					OutputConfiguration.class, PackageMapping.class,
-					IncludesConfiguration.class, TypeInfoConfiguration.class,
-					ElementInfoConfiguration.class);
+					IncludesConfiguration.class, ExcludesConfiguration.class,
+					TypeInfoConfiguration.class,
+					ElementInfoConfiguration.class,
+					PropertyInfoConfiguration.class);
 		} catch (JAXBException jaxbex) {
 			throw new ExceptionInInitializerError(jaxbex);
 		}

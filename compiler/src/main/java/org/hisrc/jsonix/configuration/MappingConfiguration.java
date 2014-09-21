@@ -32,6 +32,7 @@ public class MappingConfiguration {
 	private String defaultElementNamespaceURI;
 	private String defaultAttributeNamespaceURI;
 	private IncludesConfiguration includesConfiguration;
+	private ExcludesConfiguration excludesConfiguration;
 
 	public static final QName MAPPING_NAME = new QName(
 			ModulesConfiguration.NAMESPACE_URI,
@@ -83,6 +84,16 @@ public class MappingConfiguration {
 	public void setIncludesConfiguration(
 			IncludesConfiguration includesConfiguration) {
 		this.includesConfiguration = includesConfiguration;
+	}
+	
+	@XmlElement(name = ExcludesConfiguration.LOCAL_ELEMENT_NAME)
+	public ExcludesConfiguration getExcludesConfiguration() {
+		return excludesConfiguration;
+	}
+	
+	public void setExcludesConfiguration(
+			ExcludesConfiguration excludesConfiguration) {
+		this.excludesConfiguration = excludesConfiguration;
 	}
 
 	public <T, C extends T> Mapping<T, C> build(Log log,
@@ -178,6 +189,11 @@ public class MappingConfiguration {
 					mapping.includePropertyInfo(propertyInfo);
 				}
 			}
+		}
+		if (getExcludesConfiguration() != null)
+		{
+			// TODO 
+			final ExcludesConfiguration excludesConfiguration = getExcludesConfiguration();
 		}
 
 		return mapping;
