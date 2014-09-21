@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
+import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
 import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Output;
@@ -67,12 +68,13 @@ public class ModuleConfiguration {
 	}
 
 	public <T, C extends T> Module<T, C> build(Log log,
-			MModelInfo<T, C> modelInfo, Map<String, MPackageInfo> packageInfos) {
+			ModelInfoGraphAnalyzer<T, C> analyzer, MModelInfo<T, C> modelInfo,
+			Map<String, MPackageInfo> packageInfos) {
 		final List<Mapping<T, C>> mappings = new ArrayList<Mapping<T, C>>(
 				this.mappingConfigurations.size());
 		for (MappingConfiguration mappingConfiguration : this.mappingConfigurations) {
 			final Mapping<T, C> mapping = mappingConfiguration.build(log,
-					modelInfo, packageInfos);
+					analyzer, modelInfo, packageInfos);
 			if (mapping != null) {
 				mappings.add(mapping);
 			}
@@ -93,7 +95,7 @@ public class ModuleConfiguration {
 				outputs.add(output);
 			}
 		}
-		return new Module<T, C>(modelInfo, moduleName, mappings, outputs);
+		return new Module<T, C>(moduleName, mappings, outputs);
 	}
 
 	private <T, C extends T> String createModuleName(

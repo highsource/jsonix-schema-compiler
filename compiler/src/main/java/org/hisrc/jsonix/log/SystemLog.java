@@ -4,7 +4,7 @@ public class SystemLog implements Log {
 
 	@Override
 	public void trace(Object message) {
-//		System.out.println(message);
+		System.out.println(message);
 	}
 
 	@Override

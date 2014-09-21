@@ -11,8 +11,8 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 
 public class ElementInfoVertex<T, C> extends InfoVertex<T,C> {
 
-	private MPackageInfo packageInfo;
-	private MElementInfo<T, C> elementInfo;
+	private final MPackageInfo packageInfo;
+	private final MElementInfo<T, C> elementInfo;
 
 	public ElementInfoVertex(MElementInfo<T, C> elementInfo) {
 		Validate.notNull(elementInfo);

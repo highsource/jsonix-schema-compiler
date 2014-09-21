@@ -2,35 +2,67 @@ package org.hisrc.jsonix.definition;
 
 import java.text.MessageFormat;
 import java.util.Collection;
+import java.util.Deque;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.commons.lang3.Validate;
+import org.hisrc.jsonix.analysis.DefaultInfoVertexVisitor;
+import org.hisrc.jsonix.analysis.DependencyEdge;
+import org.hisrc.jsonix.analysis.DependencyType;
+import org.hisrc.jsonix.analysis.ElementInfoVertex;
+import org.hisrc.jsonix.analysis.InfoVertex;
+import org.hisrc.jsonix.analysis.InfoVertexVisitor;
+import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
+import org.hisrc.jsonix.analysis.PropertyInfoVertex;
+import org.hisrc.jsonix.analysis.TypeInfoVertex;
+import org.hisrc.jsonix.log.Log;
+import org.jgrapht.DirectedGraph;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfoVisitor;
+import org.jvnet.jaxb2_commons.xml.bind.model.util.DefaultTypeInfoVisitor;
 
 public class Mapping<T, C extends T> {
 
+	private final Log log;
+	private final ModelInfoGraphAnalyzer<T, C> analyzer;
 	private final MModelInfo<T, C> modelInfo;
 	private final MPackageInfo packageInfo;
+	// Inclusion
 	private final Collection<MClassInfo<T, C>> classInfos = new HashSet<MClassInfo<T, C>>();
+	private final Collection<MPropertyInfo<T, C>> propertyInfos = new HashSet<MPropertyInfo<T, C>>();
 	private final Collection<MEnumLeafInfo<T, C>> enumLeafInfos = new HashSet<MEnumLeafInfo<T, C>>();
 	private final Collection<MElementInfo<T, C>> elementInfos = new HashSet<MElementInfo<T, C>>();
 	private final String packageName;
 	private final String mappingName;
 	private final String defaultElementNamespaceURI;
 	private final String defaultAttributeNamespaceURI;
+	private final Map<InfoVertex<T, C>, ContainmentType> includedVerticesMap = new HashMap<InfoVertex<T, C>, ContainmentType>();
 
-	public Mapping(MModelInfo<T, C> modelInfo, MPackageInfo packageInfo,
+	public Mapping(Log log, ModelInfoGraphAnalyzer<T, C> analyzer,
+			MModelInfo<T, C> modelInfo, MPackageInfo packageInfo,
 			String mappingName, String defaultElementNamespaceURI,
 			String defaultAttributeNamespaceURI) {
+		Validate.notNull(log);
+		Validate.notNull(analyzer);
 		Validate.notNull(modelInfo);
 		Validate.notNull(packageInfo);
 		Validate.notNull(mappingName);
 		Validate.notNull(defaultElementNamespaceURI);
 		Validate.notNull(defaultAttributeNamespaceURI);
+		this.log = log;
+		this.analyzer = analyzer;
 		this.modelInfo = modelInfo;
 		this.packageInfo = packageInfo;
 		this.packageName = packageInfo.getPackageName();
@@ -43,6 +75,10 @@ public class Mapping<T, C extends T> {
 		for (MClassInfo<T, C> classInfo : this.modelInfo.getClassInfos()) {
 			if (packageInfo == classInfo.getPackageInfo()) {
 				this.classInfos.add(classInfo);
+				for (MPropertyInfo<T, C> propertyInfo : classInfo
+						.getProperties()) {
+					this.propertyInfos.add(propertyInfo);
+				}
 			}
 		}
 
@@ -57,6 +93,162 @@ public class Mapping<T, C extends T> {
 			if (packageInfo == elementInfo.getPackageInfo()) {
 				this.elementInfos.add(elementInfo);
 			}
+		}
+	}
+
+	public void includePropertyInfo(MPropertyInfo<T, C> propertyInfo) {
+		Validate.notNull(propertyInfo);
+		final PropertyInfoVertex<T, C> vertex = new PropertyInfoVertex<T, C>(
+				propertyInfo);
+		includeInfoVertex(vertex);
+	}
+
+	public void includeElementInfo(MElementInfo<T, C> elementInfo) {
+		Validate.notNull(elementInfo);
+		final ElementInfoVertex<T, C> vertex = new ElementInfoVertex<T, C>(
+				elementInfo);
+		includeInfoVertex(vertex);
+	}
+
+	public void includeTypeInfo(MTypeInfo<T, C> typeInfo) {
+		Validate.notNull(typeInfo);
+		final TypeInfoVertex<T, C> vertex = new TypeInfoVertex<T, C>(
+				this.packageInfo, typeInfo);
+		includeInfoVertex(vertex);
+	}
+
+	private void includeInfoVertex(final InfoVertex<T, C> initialVertex) {
+		log.trace(MessageFormat.format("Including the initial vertex [{0}].",
+				initialVertex));
+
+		final DirectedGraph<InfoVertex<T, C>, DependencyEdge> graph = analyzer
+				.getGraph();
+
+		final SortedMap<ContainmentType, Deque<InfoVertex<T, C>>> deques = new TreeMap<ContainmentType, Deque<InfoVertex<T, C>>>();
+		deques.put(ContainmentType.EXPLICIT, new LinkedList<InfoVertex<T, C>>());
+		deques.put(ContainmentType.AS_HARD_DEPENDENCY,
+				new LinkedList<InfoVertex<T, C>>());
+		deques.put(ContainmentType.AS_SOFT_DEPENDENCY,
+				new LinkedList<InfoVertex<T, C>>());
+		deques.get(ContainmentType.EXPLICIT).add(initialVertex);
+
+		for (Map.Entry<ContainmentType, Deque<InfoVertex<T, C>>> dequeEntry : deques
+				.entrySet()) {
+			final ContainmentType dequeContainmentType = dequeEntry.getKey();
+			final Deque<InfoVertex<T, C>> deque = dequeEntry.getValue();
+			while (!deque.isEmpty()) {
+				final InfoVertex<T, C> sourceVertex = deque.removeFirst();
+
+				ContainmentType sourceContainmentType = includedVerticesMap
+						.get(sourceVertex);
+
+				if (sourceContainmentType == null
+						|| sourceContainmentType
+								.compareTo(dequeContainmentType) > 0) {
+					sourceContainmentType = dequeContainmentType;
+					log.trace(MessageFormat
+							.format("Including the vertex [{0}] with the containment type [{1}].",
+									sourceVertex, sourceContainmentType));
+
+					addInfoVertex(sourceVertex, sourceContainmentType);
+
+					final Set<DependencyEdge> edges = graph
+							.outgoingEdgesOf(sourceVertex);
+					for (DependencyEdge edge : edges) {
+						final InfoVertex<T, C> targetVertex = graph
+								.getEdgeTarget(edge);
+
+						final DependencyType dependencyType = edge.getType();
+						final ContainmentType targetContainmentType = dependencyType
+								.targetContainmentType(sourceContainmentType);
+						log.trace(MessageFormat
+								.format("Queueing the inclusion of the vertex [{0}] with the containment type [{1}].",
+										targetVertex, targetContainmentType));
+						deques.get(targetContainmentType).add(targetVertex);
+					}
+				} else {
+					log.trace(MessageFormat
+							.format("Vertex [{0}] is already included with the containment type [{1}].",
+									sourceVertex, sourceContainmentType));
+				}
+			}
+		}
+	}
+
+	private final InfoVertexVisitor<T, C, Void> infoVertexAdder = new DefaultInfoVertexVisitor<T, C, Void>() {
+
+		@Override
+		public Void visitTypeInfoVertex(TypeInfoVertex<T, C> vertex) {
+			addTypeInfo(vertex.getTypeInfo());
+			return null;
+		}
+
+		@Override
+		public Void visitElementInfoVertex(ElementInfoVertex<T, C> vertex) {
+			addElementInfo(vertex.getElementInfo());
+			return null;
+		}
+
+		@Override
+		public Void visitPropertyInfoVertex(PropertyInfoVertex<T, C> vertex) {
+			addPropertyInfo(vertex.getPropertyInfo());
+			return null;
+		}
+	};
+
+	private void addInfoVertex(InfoVertex<T, C> vertex,
+			ContainmentType containmentType) {
+		Validate.notNull(vertex);
+		includedVerticesMap.put(vertex, containmentType);
+		vertex.accept(infoVertexAdder);
+	}
+
+	private final MTypeInfoVisitor<T, C, Void> typeInfoAdder = new DefaultTypeInfoVisitor<T, C, Void>() {
+
+		@Override
+		public Void visitClassInfo(MClassInfo<T, C> info) {
+			Mapping.this.addClassInfo(info);
+			return null;
+		}
+
+		@Override
+		public Void visitEnumLeafInfo(MEnumLeafInfo<T, C> info) {
+			Mapping.this.addEnumLeafInfo(info);
+			return null;
+		}
+	};
+
+	private void addTypeInfo(MTypeInfo<T, C> typeInfo) {
+		Validate.notNull(typeInfo);
+		typeInfo.acceptTypeInfoVisitor(typeInfoAdder);
+	}
+
+	private void addElementInfo(MElementInfo<T, C> elementInfo) {
+		Validate.notNull(elementInfo);
+		if (this.packageInfo.equals(elementInfo.getPackageInfo())) {
+			this.elementInfos.add(elementInfo);
+		}
+	}
+
+	private void addClassInfo(MClassInfo<T, C> classInfo) {
+		Validate.notNull(classInfo);
+		if (this.packageInfo.equals(classInfo.getPackageInfo())) {
+			this.classInfos.add(classInfo);
+		}
+	}
+
+	private void addEnumLeafInfo(MEnumLeafInfo<T, C> enumLeafInfo) {
+		Validate.notNull(enumLeafInfo);
+		if (this.packageInfo.equals(enumLeafInfo.getPackageInfo())) {
+			this.enumLeafInfos.add(enumLeafInfo);
+		}
+	}
+
+	private void addPropertyInfo(MPropertyInfo<T, C> propertyInfo) {
+		Validate.notNull(propertyInfo);
+		if (this.packageInfo.equals(propertyInfo.getClassInfo()
+				.getPackageInfo())) {
+			this.propertyInfos.add(propertyInfo);
 		}
 	}
 
@@ -82,7 +274,10 @@ public class Mapping<T, C extends T> {
 
 	public Collection<MClassInfo<T, C>> getClassInfos() {
 		return this.classInfos;
+	}
 
+	public Collection<MPropertyInfo<T, C>> getPropertyInfos() {
+		return propertyInfos;
 	}
 
 	public Collection<MEnumLeafInfo<T, C>> getEnumLeafInfos() {

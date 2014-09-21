@@ -4,22 +4,18 @@ import java.text.MessageFormat;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
-import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 
 public class Module<T, C extends T> {
 
-	private final MModelInfo<T, C> modelInfo;
 	private final String name;
 	private final List<Mapping<T, C>> mappings;
 	private final List<Output> outputs;
 
-	public Module(MModelInfo<T, C> modelInfo, String name,
+	public Module(String name,
 			List<Mapping<T, C>> mappings, List<Output> outputs) {
-		Validate.notNull(modelInfo);
 		Validate.notNull(name);
 		Validate.noNullElements(mappings);
 		Validate.noNullElements(outputs);
-		this.modelInfo = modelInfo;
 		this.name = name;
 		this.mappings = mappings;
 		this.outputs = outputs;

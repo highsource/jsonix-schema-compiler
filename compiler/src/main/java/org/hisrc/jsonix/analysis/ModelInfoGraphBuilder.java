@@ -83,9 +83,18 @@ public class ModelInfoGraphBuilder<T, C> {
 	}
 
 	public PropertyInfoVertex<T, C> propertyInfo(MPropertyInfo<T, C> info) {
-		return info
-				.acceptPropertyInfoVisitor(new PropertyInfoGraphBuilder<T, C>(
-						this, this.modelInfo));
+		final PropertyInfoVertex<T, C> propertyInfoVertex = new PropertyInfoVertex<T, C>(
+				info);
+		if (addInfoVertex(propertyInfoVertex)) {
+			final MClassInfo<T, C> classInfo = info.getClassInfo();
+			final MPackageInfo packageInfo = classInfo.getPackageInfo();
+			final TypeInfoVertex<T, C> classInfoVertex = new TypeInfoVertex<T, C>(
+					packageInfo, classInfo);
+			addHardDependency(propertyInfoVertex, classInfoVertex);
+			info.acceptPropertyInfoVisitor(new PropertyInfoGraphBuilder<T, C>(
+					this, this.modelInfo, propertyInfoVertex));
+		}
+		return propertyInfoVertex;
 	}
 
 	public boolean addInfoVertex(InfoVertex<T, C> vertex) {

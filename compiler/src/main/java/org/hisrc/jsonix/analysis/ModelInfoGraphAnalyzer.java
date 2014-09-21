@@ -7,11 +7,19 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.xml.namespace.QName;
+
+import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.log.Log;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.traverse.BreadthFirstIterator;
+import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 
 public class ModelInfoGraphAnalyzer<T, C> {
 
@@ -27,6 +35,10 @@ public class ModelInfoGraphAnalyzer<T, C> {
 	// private final ConnectivityInspector<InfoVertex<T, C>, DependencyEdge>
 	// connectivityInspector;
 
+	private final Map<String, MTypeInfo<T, C>> typeInfoMap;
+	private final Map<String, MPropertyInfo<T, C>> propertyInfoMap;
+	private final Map<QName, MElementInfo<T, C>> elementInfoMap;
+
 	public ModelInfoGraphAnalyzer(Log log, MModelInfo<T, C> modelInfo) {
 		final DirectedGraph<InfoVertex<T, C>, DependencyEdge> graph = new ModelInfoGraphBuilder<T, C>(
 				log, modelInfo).build();
@@ -37,6 +49,10 @@ public class ModelInfoGraphAnalyzer<T, C> {
 		this.packageInfos = this.packageInfoMap.values();
 		this.packageVerticesMap = createPackageVerticesMap(graph);
 		this.graph = graph;
+
+		this.typeInfoMap = createTypeInfoMap(modelInfo);
+		this.elementInfoMap = createElementInfoMap(modelInfo);
+		this.propertyInfoMap = createPropertyInfoMap(modelInfo);
 		// this.connectivityInspector = new ConnectivityInspector<InfoVertex<T,
 		// C>, DependencyEdge>(
 		// this.graph);
@@ -57,6 +73,53 @@ public class ModelInfoGraphAnalyzer<T, C> {
 		// }
 		// }
 		// }
+	}
+
+	private Map<QName, MElementInfo<T, C>> createElementInfoMap(
+			MModelInfo<T, C> modelInfo) {
+		final Map<QName, MElementInfo<T, C>> elementInfoMap = new HashMap<QName, MElementInfo<T, C>>();
+		for (MElementInfo<T, C> elementInfo : modelInfo.getElementInfos()) {
+			final QName elementName = elementInfo.getElementName();
+			if (elementInfo.getScope() == null) {
+				elementInfoMap.put(elementName, elementInfo);
+			} else {
+				final MElementInfo<T, C> existingElementinfo = elementInfoMap
+						.get(elementName);
+				if (existingElementinfo == null) {
+					elementInfoMap.put(elementName, elementInfo);
+				}
+			}
+		}
+		return elementInfoMap;
+	}
+
+	private Map<String, MTypeInfo<T, C>> createTypeInfoMap(
+			MModelInfo<T, C> modelInfo) {
+		final Map<String, MTypeInfo<T, C>> typeInfoMap = new HashMap<String, MTypeInfo<T, C>>();
+		for (MClassInfo<T, C> classInfo : modelInfo.getClassInfos()) {
+			typeInfoMap.put(classInfo.getName(), classInfo);
+		}
+		for (MEnumLeafInfo<T, C> enumLeafInfo : modelInfo.getEnumLeafInfos()) {
+			typeInfoMap.put(enumLeafInfo.getName(), enumLeafInfo);
+		}
+		return typeInfoMap;
+	}
+
+	private Map<String, MPropertyInfo<T, C>> createPropertyInfoMap(
+			MModelInfo<T, C> modelInfo) {
+		final Map<String, MPropertyInfo<T, C>> propertyInfoMap = new HashMap<String, MPropertyInfo<T, C>>();
+		for (MClassInfo<T, C> classInfo : modelInfo.getClassInfos()) {
+			for (MPropertyInfo<T, C> propertyInfo : classInfo.getProperties()) {
+				final String name = classInfo.getName() + "."
+						+ propertyInfo.getPrivateName();
+				propertyInfoMap.put(name, propertyInfo);
+			}
+		}
+		return propertyInfoMap;
+	}
+
+	public DirectedGraph<InfoVertex<T, C>, DependencyEdge> getGraph() {
+		return graph;
 	}
 
 	public Collection<MPackageInfo> getPackageInfos() {
@@ -143,4 +206,25 @@ public class ModelInfoGraphAnalyzer<T, C> {
 		return connectedSet;
 	}
 
+	public MTypeInfo<T, C> findTypeInfoByName(MPackageInfo packageInfo,
+			String name) {
+		Validate.notNull(packageInfo);
+		Validate.notNull(name);
+		final String typeInfoName = packageInfo.getPackagedName(name);
+		return this.typeInfoMap.get(typeInfoName);
+	}
+
+	public MPropertyInfo<T, C> findPropertyInfoByName(MPackageInfo packageInfo,
+			String name) {
+		Validate.notNull(packageInfo);
+		Validate.notNull(name);
+		final String propertyInfoName = packageInfo.getPackageName() + "."
+				+ name;
+		return this.propertyInfoMap.get(propertyInfoName);
+	}
+
+	public MElementInfo<T, C> findElementInfoByQName(QName name) {
+		Validate.notNull(name);
+		return this.elementInfoMap.get(name);
+	}
 }

@@ -45,6 +45,15 @@
 			<jsonix:mapping package="org.w3.smil.v_2_0" name="SMIL_2_0"/>
 			<jsonix:mapping package="org.w3.smil.v_2_0.language" name="SMIL_2_0_Language"/>
 		</jsonix:module>
+		<jsonix:module name="GML_3_1_1_GeometryBasic2D">
+			<jsonix:mapping package="net.opengis.gml.v_3_1_1" name="GML_3_1_1">
+				<jsonix:includes>
+					<jsonix:type name="PolygonType"/>
+					<jsonix:element name="gml:Point" xmlns:gml="http://www.opengis.net/gml"/>
+					<jsonix:property name="PointPropertyType.point"/>
+				</jsonix:includes>
+			</jsonix:mapping>
+		</jsonix:module>
 	</jaxb:bindings>
 
 	<jaxb:bindings 

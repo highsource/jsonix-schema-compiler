@@ -23,14 +23,17 @@ public final class PropertyInfoGraphBuilder<T, C> implements
 
 	private final ModelInfoGraphBuilder<T, C> modelInfoGraphBuilder;
 	private final MModelInfo<T, C> modelInfo;
+	private final PropertyInfoVertex<T, C> vertex;
 
 	public PropertyInfoGraphBuilder(
 			ModelInfoGraphBuilder<T, C> modelInfoGraphBuilder,
-			MModelInfo<T, C> modelInfo) {
+			MModelInfo<T, C> modelInfo, PropertyInfoVertex<T, C> vertex) {
 		Validate.notNull(modelInfoGraphBuilder);
 		Validate.notNull(modelInfo);
+		Validate.notNull(vertex);
 		this.modelInfoGraphBuilder = modelInfoGraphBuilder;
 		this.modelInfo = modelInfo;
+		this.vertex = vertex;
 	}
 
 	private void addHardDependencyOnType(
@@ -52,63 +55,47 @@ public final class PropertyInfoGraphBuilder<T, C> implements
 	@Override
 	public PropertyInfoVertex<T, C> visitValuePropertyInfo(
 			MValuePropertyInfo<T, C> info) {
-		PropertyInfoVertex<T, C> vertex = new PropertyInfoVertex<T, C>(info);
-		if (addInfoVertex(vertex)) {
-			// Value property depends on its type
-			addHardDependencyOnType(vertex, info);
-		}
+		// Value property depends on its type
+		addHardDependencyOnType(vertex, info);
 		return vertex;
 	}
 
 	@Override
 	public PropertyInfoVertex<T, C> visitAttributePropertyInfo(
 			MAttributePropertyInfo<T, C> info) {
-		PropertyInfoVertex<T, C> vertex = new PropertyInfoVertex<T, C>(info);
-		if (addInfoVertex(vertex)) {
-			// Attribute property depends on its type
-			addHardDependencyOnType(vertex, info);
-		}
+		// Attribute property depends on its type
+		addHardDependencyOnType(vertex, info);
 		return vertex;
 	}
 
 	@Override
 	public PropertyInfoVertex<T, C> visitAnyAttributePropertyInfo(
 			MAnyAttributePropertyInfo<T, C> info) {
-		PropertyInfoVertex<T, C> vertex = new PropertyInfoVertex<T, C>(info);
-		addInfoVertex(vertex);
 		return vertex;
 	}
 
 	@Override
 	public PropertyInfoVertex<T, C> visitAnyElementPropertyInfo(
 			MAnyElementPropertyInfo<T, C> info) {
-		PropertyInfoVertex<T, C> vertex = new PropertyInfoVertex<T, C>(info);
-		addInfoVertex(vertex);
 		return vertex;
 	}
 
 	@Override
 	public PropertyInfoVertex<T, C> visitElementPropertyInfo(
 			MElementPropertyInfo<T, C> info) {
-		PropertyInfoVertex<T, C> vertex = new PropertyInfoVertex<T, C>(info);
-		if (addInfoVertex(vertex)) {
-			// Element property depends on its type
-			addHardDependencyOnType(vertex, info);
-		}
+		// Element property depends on its type
+		addHardDependencyOnType(vertex, info);
 		return vertex;
 	}
 
 	@Override
 	public PropertyInfoVertex<T, C> visitElementsPropertyInfo(
 			MElementsPropertyInfo<T, C> info) {
-		PropertyInfoVertex<T, C> vertex = new PropertyInfoVertex<T, C>(info);
-		if (addInfoVertex(vertex)) {
-			// Elements property has a "soft" dependency types of its elements
-			// That is, some of these types may be excluded
-			for (MElementTypeInfo<T, C> elementTypeInfo : info
-					.getElementTypeInfos()) {
-				addSoftDependencyOnType(vertex, elementTypeInfo);
-			}
+		// Elements property has a "soft" dependency types of its elements
+		// That is, some of these types may be excluded
+		for (MElementTypeInfo<T, C> elementTypeInfo : info
+				.getElementTypeInfos()) {
+			addSoftDependencyOnType(vertex, elementTypeInfo);
 		}
 		return vertex;
 	}
@@ -116,28 +103,22 @@ public final class PropertyInfoGraphBuilder<T, C> implements
 	@Override
 	public PropertyInfoVertex<T, C> visitElementRefPropertyInfo(
 			MElementRefPropertyInfo<T, C> info) {
-		PropertyInfoVertex<T, C> vertex = new PropertyInfoVertex<T, C>(info);
-		if (addInfoVertex(vertex)) {
-			// Element reference property depends on the type of its element
-			addHardDependencyOnType(vertex, info);
-			addSoftDependenciesOnSubstitutionHead(info, vertex);
-		}
+		// Element reference property depends on the type of its element
+		addHardDependencyOnType(vertex, info);
+		addSoftDependenciesOnSubstitutionHead(info, vertex);
 		return vertex;
 	}
 
 	@Override
 	public PropertyInfoVertex<T, C> visitElementRefsPropertyInfo(
 			MElementRefsPropertyInfo<T, C> info) {
-		PropertyInfoVertex<T, C> vertex = new PropertyInfoVertex<T, C>(info);
-		if (addInfoVertex(vertex)) {
-			for (MElementTypeInfo<T, C> elementTypeInfo : info
-					.getElementTypeInfos()) {
-				// Element references property has "soft" dependencies on the
-				// types
-				// of its elements
-				addSoftDependencyOnType(vertex, elementTypeInfo);
-				addSoftDependenciesOnSubstitutionHead(elementTypeInfo, vertex);
-			}
+		for (MElementTypeInfo<T, C> elementTypeInfo : info
+				.getElementTypeInfos()) {
+			// Element references property has "soft" dependencies on the
+			// types
+			// of its elements
+			addSoftDependencyOnType(vertex, elementTypeInfo);
+			addSoftDependenciesOnSubstitutionHead(elementTypeInfo, vertex);
 		}
 		return vertex;
 	}
@@ -159,7 +140,4 @@ public final class PropertyInfoGraphBuilder<T, C> implements
 		}
 	}
 
-	private boolean addInfoVertex(InfoVertex<T, C> vertex) {
-		return modelInfoGraphBuilder.addInfoVertex(vertex);
-	}
 }

@@ -62,7 +62,9 @@ public class ModulesConfigurationUnmarshaller {
 		try {
 			context = JAXBContext.newInstance(ModulesConfiguration.class,
 					ModuleConfiguration.class, MappingConfiguration.class,
-					OutputConfiguration.class, PackageMapping.class);
+					OutputConfiguration.class, PackageMapping.class,
+					IncludesConfiguration.class, TypeInfoConfiguration.class,
+					ElementInfoConfiguration.class);
 		} catch (JAXBException jaxbex) {
 			throw new ExceptionInInitializerError(jaxbex);
 		}
@@ -76,7 +78,12 @@ public class ModulesConfigurationUnmarshaller {
 					ModulesConfiguration.LOCAL_ELEMENT_NAME,
 					ModuleConfiguration.LOCAL_ELEMENT_NAME,
 					MappingConfiguration.LOCAL_ELEMENT_NAME,
-					OutputConfiguration.LOCAL_ELEMENT_NAME));
+					OutputConfiguration.LOCAL_ELEMENT_NAME,
+					IncludesConfiguration.LOCAL_ELEMENT_NAME,
+					ExcludesConfiguration.LOCAL_ELEMENT_NAME,
+					TypeInfoConfiguration.LOCAL_ELEMENT_NAME,
+					ElementInfoConfiguration.LOCAL_ELEMENT_NAME,
+					PropertyInfoConfiguration.LOCAL_ELEMENT_NAME));
 
 	public List<String> getCustomizationURIs() {
 		return CUSTOMIZATION_URIS;

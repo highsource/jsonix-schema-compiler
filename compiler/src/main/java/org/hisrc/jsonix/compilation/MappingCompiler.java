@@ -33,8 +33,6 @@
 
 package org.hisrc.jsonix.compilation;
 
-import java.util.Collection;
-
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -55,7 +53,6 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MClassTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MEnumConstantInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 
@@ -69,7 +66,6 @@ public class MappingCompiler<T, C extends T> {
 	private final String defaultAttributeNamespaceURI;
 
 	private final Modules<T, C> modules;
-	private final MModelInfo<T, C> modelInfo;
 	private Naming naming;
 	private Mapping<T, C> mapping;
 	private Output output;
@@ -83,7 +79,6 @@ public class MappingCompiler<T, C extends T> {
 		Validate.notNull(output);
 		this.codeModel = codeModel;
 		this.modules = modules;
-		this.modelInfo= modules.getModelInfo();
 		this.mapping = mapping;
 		this.mappingName = mapping.getMappingName();
 		this.defaultElementNamespaceURI = mapping
@@ -116,7 +111,7 @@ public class MappingCompiler<T, C extends T> {
 	}
 
 	public JSObjectLiteral compile() {
-		
+
 		final JSObjectLiteral mappingBody = codeModel.object();
 
 		mappingBody.append(naming.name(), codeModel.string(this.mappingName));
@@ -137,23 +132,21 @@ public class MappingCompiler<T, C extends T> {
 		final JSArrayLiteral elementInfos = codeModel.array();
 		mappingBody.append(naming.elementInfos(), elementInfos);
 
-		compileClassInfos(typeInfos, mapping.getClassInfos());
-		compileEnumLeafInfos(typeInfos, mapping.getEnumLeafInfos());
-		compileElementInfos(elementInfos, mapping.getElementInfos());
+		compileClassInfos(typeInfos);
+		compileEnumLeafInfos(typeInfos);
+		compileElementInfos(elementInfos);
 
 		return mappingBody;
 	}
 
-	private void compileClassInfos(JSArrayLiteral typeInfos,
-			Collection<MClassInfo<T, C>> classInfos) {
-		for (MClassInfo<T, C> classInfo : classInfos) {
+	private void compileClassInfos(JSArrayLiteral typeInfos) {
+		for (MClassInfo<T, C> classInfo : mapping.getClassInfos()) {
 			typeInfos.append(compileClassInfo(classInfo));
 		}
 	}
 
-	private void compileEnumLeafInfos(JSArrayLiteral typeInfos,
-			Collection<MEnumLeafInfo<T, C>> enumLeafInfos) {
-		for (MEnumLeafInfo<T, C> enumLeafInfo : enumLeafInfos) {
+	private void compileEnumLeafInfos(JSArrayLiteral typeInfos) {
+		for (MEnumLeafInfo<T, C> enumLeafInfo : mapping.getEnumLeafInfos()) {
 			typeInfos.append(compileEnumLeafInfo(enumLeafInfo));
 		}
 	}
@@ -198,9 +191,12 @@ public class MappingCompiler<T, C extends T> {
 	private JSArrayLiteral compilePropertyInfos(MClassInfo<T, C> classInfo) {
 		final JSArrayLiteral propertyInfoMappings = this.codeModel.array();
 		for (MPropertyInfo<T, C> propertyInfo : classInfo.getProperties()) {
-			propertyInfoMappings.append(propertyInfo
-					.acceptPropertyInfoVisitor(new PropertyInfoVisitor<T, C>(
-							this)));
+			if (mapping.getPropertyInfos().contains(propertyInfo)) {
+				propertyInfoMappings
+						.append(propertyInfo
+								.acceptPropertyInfoVisitor(new PropertyInfoVisitor<T, C>(
+										this)));
+			}
 		}
 		return propertyInfoMappings;
 	}
@@ -216,9 +212,8 @@ public class MappingCompiler<T, C extends T> {
 		return mappings;
 	}
 
-	private void compileElementInfos(JSArrayLiteral eis,
-			Collection<MElementInfo<T, C>> elementInfos) {
-		for (MElementInfo<T, C> elementInfo : elementInfos) {
+	private void compileElementInfos(JSArrayLiteral eis) {
+		for (MElementInfo<T, C> elementInfo : mapping.getElementInfos()) {
 			eis.append(compileElementInfo(elementInfo));
 		}
 	}
