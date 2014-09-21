@@ -85,12 +85,12 @@ public class MappingConfiguration {
 			IncludesConfiguration includesConfiguration) {
 		this.includesConfiguration = includesConfiguration;
 	}
-	
+
 	@XmlElement(name = ExcludesConfiguration.LOCAL_ELEMENT_NAME)
 	public ExcludesConfiguration getExcludesConfiguration() {
 		return excludesConfiguration;
 	}
-	
+
 	public void setExcludesConfiguration(
 			ExcludesConfiguration excludesConfiguration) {
 		this.excludesConfiguration = excludesConfiguration;
@@ -158,6 +158,35 @@ public class MappingConfiguration {
 		final Mapping<T, C> mapping = new Mapping<T, C>(log, analyzer,
 				modelInfo, packageInfo, mappingName,
 				defaultElementNamespaceURI, defaultAttributeNamespaceURI);
+
+		if (getExcludesConfiguration() != null) {
+			final ExcludesConfiguration excludesConfiguration = getExcludesConfiguration();
+			for (TypeInfoConfiguration typeInfoConfiguration : excludesConfiguration
+					.getTypeInfoConfigurations()) {
+				final MTypeInfo<T, C> typeInfo = typeInfoConfiguration
+						.findTypeInfo(log, analyzer, packageInfo);
+				if (typeInfo != null) {
+					mapping.excludeTypeInfo(typeInfo);
+				}
+			}
+			for (ElementInfoConfiguration elementInfoConfiguration : excludesConfiguration
+					.getElementInfoConfigurations()) {
+				final MElementInfo<T, C> elementInfo = elementInfoConfiguration
+						.findElementInfo(log, analyzer, packageInfo);
+				if (elementInfo != null) {
+					mapping.excludeElementInfo(elementInfo);
+				}
+			}
+			for (PropertyInfoConfiguration propertyInfoConfiguration : excludesConfiguration
+					.getPropertyInfoConfigurations()) {
+				final MPropertyInfo<T, C> propertyInfo = propertyInfoConfiguration
+						.findPropertyInfo(log, analyzer, packageInfo);
+				if (propertyInfo != null) {
+					mapping.excludePropertyInfo(propertyInfo);
+				}
+			}
+		}
+
 		if (getIncludesConfiguration() == null) {
 			log.trace(MessageFormat
 					.format("Includes configuration for the mapping [{0}] is not provided, including the whole package.",
@@ -189,11 +218,6 @@ public class MappingConfiguration {
 					mapping.includePropertyInfo(propertyInfo);
 				}
 			}
-		}
-		if (getExcludesConfiguration() != null)
-		{
-			// TODO 
-			final ExcludesConfiguration excludesConfiguration = getExcludesConfiguration();
 		}
 
 		return mapping;

@@ -6,25 +6,50 @@ import org.hisrc.jsonix.definition.ContainmentType;
 public enum DependencyType {
 
 	HARD {
-		public ContainmentType targetContainmentType(ContainmentType sourceContainmentType) {
+		public ContainmentType combineWith(
+				ContainmentType sourceContainmentType) {
 			Validate.notNull(sourceContainmentType);
 			switch (sourceContainmentType) {
-			case AS_SOFT_DEPENDENCY:
-				return ContainmentType.AS_SOFT_DEPENDENCY;
+			case EXCLUDED_EXPLICITLY:
+				return ContainmentType.EXCLUDED_AS_HARD_DEPENDENCY;
+			case EXCLUDED_AS_HARD_DEPENDENCY:
+				return ContainmentType.EXCLUDED_AS_HARD_DEPENDENCY;
+			case INCLUDED_EXPLICITLY:
+				return ContainmentType.INCLUDED_AS_HARD_DEPENDENCY;
+			case INCLUDED_AS_HARD_DEPENDENCY:
+				return ContainmentType.INCLUDED_AS_HARD_DEPENDENCY;
+			case INCLUDED_AS_SOFT_DEPENDENCY:
+				return ContainmentType.INCLUDED_AS_SOFT_DEPENDENCY;
 			default:
-				return ContainmentType.AS_HARD_DEPENDENCY;
+				throw new IllegalArgumentException();
 			}
 		}
 
 	},
 	SOFT {
-
 		@Override
-		public ContainmentType targetContainmentType(ContainmentType sourceContainmentType) {
-			return ContainmentType.AS_SOFT_DEPENDENCY;
+		public ContainmentType combineWith(
+				ContainmentType sourceContainmentType) {
+			Validate.notNull(sourceContainmentType);
+			switch (sourceContainmentType) {
+			// TODO I don't like this here
+			case EXCLUDED_EXPLICITLY:
+				return null;
+			case EXCLUDED_AS_HARD_DEPENDENCY:
+				return null;
+			case INCLUDED_EXPLICITLY:
+				return ContainmentType.INCLUDED_AS_SOFT_DEPENDENCY;
+			case INCLUDED_AS_HARD_DEPENDENCY:
+				return ContainmentType.INCLUDED_AS_SOFT_DEPENDENCY;
+			case INCLUDED_AS_SOFT_DEPENDENCY:
+				return ContainmentType.INCLUDED_AS_SOFT_DEPENDENCY;
+			default:
+				throw new IllegalArgumentException();
+			}
 		}
 	};
 
-	public abstract ContainmentType targetContainmentType(
+	public abstract ContainmentType combineWith(
 			ContainmentType sourceContainmentType);
+
 }

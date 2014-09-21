@@ -39,7 +39,6 @@ public class Mapping<T, C extends T> {
 	private final ModelInfoGraphAnalyzer<T, C> analyzer;
 	private final MModelInfo<T, C> modelInfo;
 	private final MPackageInfo packageInfo;
-	// Inclusion
 	private final Collection<MClassInfo<T, C>> classInfos = new HashSet<MClassInfo<T, C>>();
 	private final Collection<MPropertyInfo<T, C>> propertyInfos = new HashSet<MPropertyInfo<T, C>>();
 	private final Collection<MEnumLeafInfo<T, C>> enumLeafInfos = new HashSet<MEnumLeafInfo<T, C>>();
@@ -48,7 +47,7 @@ public class Mapping<T, C extends T> {
 	private final String mappingName;
 	private final String defaultElementNamespaceURI;
 	private final String defaultAttributeNamespaceURI;
-	private final Map<InfoVertex<T, C>, ContainmentType> includedVerticesMap = new HashMap<InfoVertex<T, C>, ContainmentType>();
+	private final Map<InfoVertex<T, C>, ContainmentType> verticesContainmentMap = new HashMap<InfoVertex<T, C>, ContainmentType>();
 
 	public Mapping(Log log, ModelInfoGraphAnalyzer<T, C> analyzer,
 			MModelInfo<T, C> modelInfo, MPackageInfo packageInfo,
@@ -117,20 +116,42 @@ public class Mapping<T, C extends T> {
 		includeInfoVertex(vertex);
 	}
 
+	public void excludePropertyInfo(MPropertyInfo<T, C> propertyInfo) {
+		Validate.notNull(propertyInfo);
+		final PropertyInfoVertex<T, C> vertex = new PropertyInfoVertex<T, C>(
+				propertyInfo);
+		excludeInfoVertex(vertex);
+	}
+
+	public void excludeElementInfo(MElementInfo<T, C> elementInfo) {
+		Validate.notNull(elementInfo);
+		final ElementInfoVertex<T, C> vertex = new ElementInfoVertex<T, C>(
+				elementInfo);
+		excludeInfoVertex(vertex);
+	}
+
+	public void excludeTypeInfo(MTypeInfo<T, C> typeInfo) {
+		Validate.notNull(typeInfo);
+		final TypeInfoVertex<T, C> vertex = new TypeInfoVertex<T, C>(
+				this.packageInfo, typeInfo);
+		excludeInfoVertex(vertex);
+	}
+
 	private void includeInfoVertex(final InfoVertex<T, C> initialVertex) {
-		log.trace(MessageFormat.format("Including the initial vertex [{0}].",
+		log.trace(MessageFormat.format("Including the vertex [{0}].",
 				initialVertex));
 
 		final DirectedGraph<InfoVertex<T, C>, DependencyEdge> graph = analyzer
 				.getGraph();
 
 		final SortedMap<ContainmentType, Deque<InfoVertex<T, C>>> deques = new TreeMap<ContainmentType, Deque<InfoVertex<T, C>>>();
-		deques.put(ContainmentType.EXPLICIT, new LinkedList<InfoVertex<T, C>>());
-		deques.put(ContainmentType.AS_HARD_DEPENDENCY,
+		deques.put(ContainmentType.INCLUDED_EXPLICITLY,
 				new LinkedList<InfoVertex<T, C>>());
-		deques.put(ContainmentType.AS_SOFT_DEPENDENCY,
+		deques.put(ContainmentType.INCLUDED_AS_HARD_DEPENDENCY,
 				new LinkedList<InfoVertex<T, C>>());
-		deques.get(ContainmentType.EXPLICIT).add(initialVertex);
+		deques.put(ContainmentType.INCLUDED_AS_SOFT_DEPENDENCY,
+				new LinkedList<InfoVertex<T, C>>());
+		deques.get(ContainmentType.INCLUDED_EXPLICITLY).add(initialVertex);
 
 		for (Map.Entry<ContainmentType, Deque<InfoVertex<T, C>>> dequeEntry : deques
 				.entrySet()) {
@@ -139,18 +160,30 @@ public class Mapping<T, C extends T> {
 			while (!deque.isEmpty()) {
 				final InfoVertex<T, C> sourceVertex = deque.removeFirst();
 
-				ContainmentType sourceContainmentType = includedVerticesMap
-						.get(sourceVertex);
+				final ContainmentType currentSourceContainmentType = getInfoVertexContainmentType(sourceVertex);
+				final ContainmentType sourceContainmentType = dequeContainmentType
+						.combineWith(currentSourceContainmentType);
 
-				if (sourceContainmentType == null
-						|| sourceContainmentType
-								.compareTo(dequeContainmentType) > 0) {
-					sourceContainmentType = dequeContainmentType;
-					log.trace(MessageFormat
-							.format("Including the vertex [{0}] with the containment type [{1}].",
-									sourceVertex, sourceContainmentType));
+				if (currentSourceContainmentType == null
+						|| currentSourceContainmentType
+								.compareTo(sourceContainmentType) > 0) {
 
-					addInfoVertex(sourceVertex, sourceContainmentType);
+					if (currentSourceContainmentType != null
+							&& !currentSourceContainmentType.isIncluded()) {
+						log.warn(MessageFormat
+								.format("The vertex [{0}] was excluded with the containment type [{1}], but it must be included with containment type [{2}], otherwise mappings will not be consistent.",
+										sourceVertex,
+										currentSourceContainmentType,
+										sourceContainmentType));
+					} else {
+
+						log.trace(MessageFormat
+								.format("Including the vertex [{0}] with the containment type [{1}].",
+										sourceVertex, dequeContainmentType));
+					}
+
+					setInfoVertexContainmentType(sourceVertex,
+							sourceContainmentType);
 
 					final Set<DependencyEdge> edges = graph
 							.outgoingEdgesOf(sourceVertex);
@@ -160,16 +193,95 @@ public class Mapping<T, C extends T> {
 
 						final DependencyType dependencyType = edge.getType();
 						final ContainmentType targetContainmentType = dependencyType
-								.targetContainmentType(sourceContainmentType);
-						log.trace(MessageFormat
-								.format("Queueing the inclusion of the vertex [{0}] with the containment type [{1}].",
-										targetVertex, targetContainmentType));
-						deques.get(targetContainmentType).add(targetVertex);
+								.combineWith(sourceContainmentType);
+						if (targetContainmentType != null) {
+							final Deque<InfoVertex<T, C>> targetDeque = deques
+									.get(targetContainmentType);
+							if (targetDeque != null) {
+								log.trace(MessageFormat
+										.format("Queueing the inclusion of the vertex [{0}] with the containment type [{1}].",
+												targetVertex,
+												targetContainmentType));
+								targetDeque.add(targetVertex);
+							}
+						}
 					}
 				} else {
 					log.trace(MessageFormat
 							.format("Vertex [{0}] is already included with the containment type [{1}].",
-									sourceVertex, sourceContainmentType));
+									sourceVertex, currentSourceContainmentType));
+				}
+			}
+		}
+	}
+
+	private ContainmentType getInfoVertexContainmentType(
+			final InfoVertex<T, C> sourceVertex) {
+		ContainmentType sourceContainmentType = verticesContainmentMap
+				.get(sourceVertex);
+		return sourceContainmentType;
+	}
+
+	private void excludeInfoVertex(final InfoVertex<T, C> vertex) {
+		Validate.notNull(vertex);
+		log.trace(MessageFormat.format("Excluding [{0}].", vertex));
+
+		final DirectedGraph<InfoVertex<T, C>, DependencyEdge> graph = analyzer
+				.getGraph();
+
+		final SortedMap<ContainmentType, Deque<InfoVertex<T, C>>> deques = new TreeMap<ContainmentType, Deque<InfoVertex<T, C>>>();
+		deques.put(ContainmentType.EXCLUDED_EXPLICITLY,
+				new LinkedList<InfoVertex<T, C>>());
+		deques.put(ContainmentType.EXCLUDED_AS_HARD_DEPENDENCY,
+				new LinkedList<InfoVertex<T, C>>());
+		deques.get(ContainmentType.EXCLUDED_EXPLICITLY).add(vertex);
+
+		for (Map.Entry<ContainmentType, Deque<InfoVertex<T, C>>> dequeEntry : deques
+				.entrySet()) {
+			final ContainmentType dequeContainmentType = dequeEntry.getKey();
+			final Deque<InfoVertex<T, C>> deque = dequeEntry.getValue();
+			while (!deque.isEmpty()) {
+				final InfoVertex<T, C> targetVertex = deque.removeFirst();
+
+				final ContainmentType currentTargetContainmentType = getInfoVertexContainmentType(targetVertex);
+				final ContainmentType targetContainmentType = dequeContainmentType
+						.combineWith(currentTargetContainmentType);
+
+				if (currentTargetContainmentType == null
+						|| currentTargetContainmentType
+								.compareTo(targetContainmentType) > 0) {
+
+					log.trace(MessageFormat
+							.format("Excluding the vertex [{0}] with the containment type [{1}].",
+									targetVertex, targetContainmentType));
+
+					setInfoVertexContainmentType(targetVertex,
+							targetContainmentType);
+
+					final Set<DependencyEdge> edges = graph
+							.incomingEdgesOf(targetVertex);
+					for (DependencyEdge edge : edges) {
+						final InfoVertex<T, C> sourceVertex = graph
+								.getEdgeSource(edge);
+						final DependencyType dependencyType = edge.getType();
+						final ContainmentType sourceContainmentType = dependencyType
+								.combineWith(targetContainmentType);
+						if (sourceContainmentType != null) {
+							final Deque<InfoVertex<T, C>> sourceDeque = deques
+									.get(sourceContainmentType);
+							if (sourceDeque != null) {
+								log.trace(MessageFormat
+										.format("Queueing the exclusion of the vertex [{0}] with the containment type [{1}].",
+												sourceVertex,
+												sourceContainmentType));
+								sourceDeque.add(sourceVertex);
+							}
+						}
+					}
+				} else {
+					log.trace(MessageFormat
+							.format("Vertex [{0}] is already excluded with the containment type [{1}].",
+									targetVertex, targetContainmentType));
 				}
 			}
 		}
@@ -196,11 +308,13 @@ public class Mapping<T, C extends T> {
 		}
 	};
 
-	private void addInfoVertex(InfoVertex<T, C> vertex,
+	private void setInfoVertexContainmentType(InfoVertex<T, C> vertex,
 			ContainmentType containmentType) {
 		Validate.notNull(vertex);
-		includedVerticesMap.put(vertex, containmentType);
-		vertex.accept(infoVertexAdder);
+		verticesContainmentMap.put(vertex, containmentType);
+		if (containmentType.isIncluded()) {
+			vertex.accept(infoVertexAdder);
+		}
 	}
 
 	private final MTypeInfoVisitor<T, C, Void> typeInfoAdder = new DefaultTypeInfoVisitor<T, C, Void>() {

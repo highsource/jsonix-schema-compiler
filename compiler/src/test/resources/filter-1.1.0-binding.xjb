@@ -46,15 +46,19 @@
 			<jsonix:mapping package="org.w3.smil.v_2_0.language" name="SMIL_2_0_Language"/>
 		</jsonix:module>
 		<jsonix:module name="GML_3_1_1_GeometryBasic2D" xmlns:gml="http://www.opengis.net/gml">
-			<jsonix:mapping package="net.opengis.gml.v_3_1_1" name="GML_3_1_1">
+			<jsonix:mapping package="net.opengis.gml.v_3_1_1" name="GML_3_1_1"
+				defaultAttributeNamespaceURI="">
 				<jsonix:includes>
 					<jsonix:type name="PolygonType"/>
 					<jsonix:element name="gml:Point"/>
 					<jsonix:property name="PointPropertyType.point"/>
+					<jsonix:property name="EnvelopeType.lowerCorner"/>
+					<jsonix:property name="EnvelopeType.upperCorner"/>
 				</jsonix:includes>
 				<jsonix:excludes>
 					<jsonix:element name="gml:pointRep"/>
 					<jsonix:type name="CoordinatesType"/>
+					<jsonix:type name="EnvelopeType"/>
 					<jsonix:property name="AbstractGeometryType.gid"/>
 				</jsonix:excludes>
 			</jsonix:mapping>
