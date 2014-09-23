@@ -66,7 +66,8 @@ public class ModulesConfigurationUnmarshaller {
 					IncludesConfiguration.class, ExcludesConfiguration.class,
 					TypeInfoConfiguration.class,
 					ElementInfoConfiguration.class,
-					PropertyInfoConfiguration.class);
+					PropertyInfoConfiguration.class,
+					DependenciesOfMappingConfiguration.class);
 		} catch (JAXBException jaxbex) {
 			throw new ExceptionInInitializerError(jaxbex);
 		}
@@ -83,6 +84,7 @@ public class ModulesConfigurationUnmarshaller {
 					OutputConfiguration.LOCAL_ELEMENT_NAME,
 					IncludesConfiguration.LOCAL_ELEMENT_NAME,
 					ExcludesConfiguration.LOCAL_ELEMENT_NAME,
+					DependenciesOfMappingConfiguration.LOCAL_ELEMENT_NAME,
 					TypeInfoConfiguration.LOCAL_ELEMENT_NAME,
 					ElementInfoConfiguration.LOCAL_ELEMENT_NAME,
 					PropertyInfoConfiguration.LOCAL_ELEMENT_NAME));

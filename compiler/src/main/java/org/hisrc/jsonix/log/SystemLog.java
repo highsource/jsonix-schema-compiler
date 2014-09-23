@@ -16,5 +16,10 @@ public class SystemLog implements Log {
 	public void warn(Object message) {
 		System.err.println(message);
 	}
+	
+	@Override
+	public void error(Object message) {
+		System.err.println(message);
+	}
 
 }

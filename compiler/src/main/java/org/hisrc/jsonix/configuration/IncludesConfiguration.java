@@ -13,9 +13,9 @@ public class IncludesConfiguration {
 
 	public static final String LOCAL_ELEMENT_NAME = "includes";
 
+	private List<DependenciesOfMappingConfiguration> dependenciesOfMappingConfiguration = new LinkedList<DependenciesOfMappingConfiguration>();
 	private List<TypeInfoConfiguration> typeInfoConfigurations = new LinkedList<TypeInfoConfiguration>();
 	private List<ElementInfoConfiguration> elementInfoConfigurations = new LinkedList<ElementInfoConfiguration>();
-
 	private List<PropertyInfoConfiguration> propertyInfoConfigurations = new LinkedList<PropertyInfoConfiguration>();
 
 	@XmlElement(name = TypeInfoConfiguration.LOCAL_ELEMENT_NAME)
@@ -46,5 +46,15 @@ public class IncludesConfiguration {
 	public void setPropertyInfoConfigurations(
 			List<PropertyInfoConfiguration> propertyInfoConfigurations) {
 		this.propertyInfoConfigurations = propertyInfoConfigurations;
+	}
+	
+	@XmlElement(name = DependenciesOfMappingConfiguration.LOCAL_ELEMENT_NAME)
+	public List<DependenciesOfMappingConfiguration> getDependenciesOfMappingConfiguration() {
+		return dependenciesOfMappingConfiguration;
+	}
+	
+	public void setDependenciesOfMappingConfiguration(
+			List<DependenciesOfMappingConfiguration> dependenciesOfMappingConfiguration) {
+		this.dependenciesOfMappingConfiguration = dependenciesOfMappingConfiguration;
 	}
 }

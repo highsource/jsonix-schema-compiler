@@ -1,21 +1,33 @@
 package org.hisrc.jsonix.configuration;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
+import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Modules;
 import org.hisrc.jsonix.log.Log;
 import org.hisrc.jsonix.naming.StandardNaming;
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.EdgeFactory;
+import org.jgrapht.alg.StrongConnectivityInspector;
+import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
 
 @XmlRootElement(name = ModulesConfiguration.LOCAL_ELEMENT_NAME)
 @XmlType(propOrder = {})
@@ -67,9 +79,176 @@ public class ModulesConfiguration {
 		final ModelInfoGraphAnalyzer<T, C> analyzer = new ModelInfoGraphAnalyzer<T, C>(
 				log, modelInfo);
 
-		final Set<String> packageNames = new HashSet<String>(
-				analyzer.getPackageNames());
+		final List<ModuleConfiguration> moduleConfigurations = new LinkedList<ModuleConfiguration>(
+				getModuleConfigurations());
 
+		createModuleConfigurationsForMappingConfigurations(
+				moduleConfigurations, getMappingConfigurations());
+
+		createModuleConfigurationsForUnmappedPackages(analyzer,
+				moduleConfigurations);
+
+		assignDefaultOutputConfigurations(moduleConfigurations);
+
+		assignMappingNamesAndIds(log, moduleConfigurations);
+
+		return buildModules(log, modelInfo, analyzer, moduleConfigurations);
+	}
+
+	private void assignMappingNamesAndIds(Log log,
+			final List<ModuleConfiguration> moduleConfigurations) {
+		// Generate ids where missing
+		final Map<String, MappingConfiguration> idToMappingConfiguration = new HashMap<String, MappingConfiguration>();
+		final Map<String, List<MappingConfiguration>> nameToMappingConfiguration = new HashMap<String, List<MappingConfiguration>>();
+
+		// Set mapping name and ids
+		for (final ModuleConfiguration moduleConfiguration : moduleConfigurations) {
+			for (final MappingConfiguration mappingConfiguration : moduleConfiguration
+					.getMappingConfigurations()) {
+
+				assignMappingName(mappingConfiguration);
+
+				assignMappingId(log, idToMappingConfiguration,
+						nameToMappingConfiguration, mappingConfiguration);
+			}
+		}
+	}
+
+	private void assignMappingId(
+			Log log,
+			final Map<String, MappingConfiguration> idToMappingConfiguration,
+			final Map<String, List<MappingConfiguration>> nameToMappingConfiguration,
+			final MappingConfiguration mappingConfiguration) {
+		final String mappingName = mappingConfiguration.getName();
+		String mappingId = mappingConfiguration.getId();
+
+		if (mappingId != null) {
+			// TODO throw an exception, don't try to correct
+			if (idToMappingConfiguration.containsKey(mappingId)) {
+				log.error(MessageFormat
+						.format("Mapping id [{0}] is already defined, generating a new mapping id.",
+								mappingId));
+				mappingId = null;
+			}
+		}
+		if (mappingId != null) {
+			idToMappingConfiguration.put(mappingId, mappingConfiguration);
+		} else {
+			List<MappingConfiguration> mappings = nameToMappingConfiguration
+					.get(mappingName);
+			if (mappings == null) {
+				mappings = new ArrayList<MappingConfiguration>(2);
+				log.debug(MessageFormat.format(
+						"Assigning id [{0}] to the mapping with name [{1}].",
+						mappingName, mappingName));
+				mappingId = mappingName;
+				mappingConfiguration.setId(mappingId);
+				mappings.add(mappingConfiguration);
+				nameToMappingConfiguration.put(mappingName, mappings);
+				idToMappingConfiguration.put(mappingId, mappingConfiguration);
+			} else if (mappings.size() == 1) {
+				log.debug(MessageFormat
+						.format("There are more than one mapping with the name [{0}] without id.",
+								mappingName));
+				final String mappingId0 = mappingName + "-0";
+				final MappingConfiguration mappingConfiguration0 = mappings
+						.get(0);
+				log.debug(MessageFormat.format(
+						"Assigning id [{0}] to the mapping with name [{1}].",
+						mappingId0, mappingName));
+				mappingConfiguration0.setId(mappingId0);
+
+				mappingId = mappingName + "-1";
+				log.debug(MessageFormat.format(
+						"Assigning id [{0}] to the mapping with name [{1}].",
+						mappingId, mappingName));
+				mappingConfiguration.setId(mappingId);
+				mappings.add(mappingConfiguration);
+				idToMappingConfiguration.remove(mappingName);
+				idToMappingConfiguration.put(mappingId0, mappingConfiguration0);
+				idToMappingConfiguration.put(mappingId, mappingConfiguration);
+			} else {
+				mappingId = mappingName + mappings.size();
+				log.debug(MessageFormat.format(
+						"Assigning id [{0}] to the mapping with name [{1}].",
+						mappingId, mappingName));
+				mappingConfiguration.setId(mappingId);
+				mappings.add(mappingConfiguration);
+				idToMappingConfiguration.put(mappingId, mappingConfiguration);
+			}
+		}
+	}
+
+	private String assignMappingName(
+			final MappingConfiguration mappingConfiguration) {
+		String mappingName = mappingConfiguration.getName();
+		if (StringUtils.isBlank(mappingName)) {
+			final String packageName = mappingConfiguration.getPackage();
+			if (packageName != null) {
+				mappingName = StringUtils.isBlank(packageName) ? "Mapping"
+						: packageName.replace('.', '_');
+			}
+			mappingConfiguration.setName(mappingName);
+		}
+		return mappingName;
+	}
+
+	private <T, C extends T> void createModuleConfigurationsForUnmappedPackages(
+			final ModelInfoGraphAnalyzer<T, C> analyzer,
+			final List<ModuleConfiguration> moduleConfigurations) {
+		final Set<String> packageNames = findUnmappedPackageNames(
+				analyzer.getPackageNames(), moduleConfigurations);
+
+		for (final String packageName : packageNames) {
+			final MappingConfiguration mappingConfiguration = new MappingConfiguration();
+			mappingConfiguration.setPackage(packageName);
+			final ModuleConfiguration moduleConfiguration = new ModuleConfiguration();
+			moduleConfiguration.getMappingConfigurations().add(
+					mappingConfiguration);
+			moduleConfigurations.add(moduleConfiguration);
+		}
+	}
+
+	private void assignDefaultOutputConfigurations(
+			final List<ModuleConfiguration> moduleConfigurations) {
+		final List<OutputConfiguration> defaultOutputConfigurations = createDefaultOutputConfigurations();
+		for (final ModuleConfiguration moduleConfiguration : moduleConfigurations) {
+			if (moduleConfiguration.getOutputConfigurations().isEmpty()) {
+				moduleConfiguration.getOutputConfigurations().addAll(
+						defaultOutputConfigurations);
+			}
+		}
+	}
+
+	private Set<String> findUnmappedPackageNames(
+			final Set<String> allPackageNames,
+			final List<ModuleConfiguration> moduleConfigurations) {
+		final Set<String> packageNames = new HashSet<String>(allPackageNames);
+
+		final Set<String> mappedPackagesNames = new HashSet<String>();
+		for (final ModuleConfiguration moduleConfiguration : moduleConfigurations) {
+			for (final MappingConfiguration mappingConfiguration : moduleConfiguration
+					.getMappingConfigurations()) {
+				mappedPackagesNames.add(mappingConfiguration.getPackage());
+			}
+		}
+		packageNames.removeAll(mappedPackagesNames);
+		return packageNames;
+	}
+
+	private void createModuleConfigurationsForMappingConfigurations(
+			final List<ModuleConfiguration> moduleConfigurations,
+			final List<MappingConfiguration> mappingConfigurations) {
+		// Create one module configuration per mapping configuration
+		for (final MappingConfiguration mappingConfiguration : mappingConfigurations) {
+			final ModuleConfiguration moduleConfiguration = new ModuleConfiguration();
+			moduleConfiguration.getMappingConfigurations().add(
+					mappingConfiguration);
+			moduleConfigurations.add(moduleConfiguration);
+		}
+	}
+
+	private List<OutputConfiguration> createDefaultOutputConfigurations() {
 		final List<OutputConfiguration> defaultOutputConfigurations = getOutputConfigurations();
 
 		// If default output configurations are not configured, add the standard
@@ -78,57 +257,178 @@ public class ModulesConfiguration {
 			defaultOutputConfigurations.add(new OutputConfiguration(
 					StandardNaming.NAMING_NAME));
 		}
+		return defaultOutputConfigurations;
+	}
 
-		final Set<String> mappedPackagesNames = new HashSet<String>();
+	private <T, C extends T> Modules<T, C> buildModules(Log log,
+			MModelInfo<T, C> modelInfo,
+			final ModelInfoGraphAnalyzer<T, C> analyzer,
+			final List<ModuleConfiguration> moduleConfigurations) {
 
-		final List<ModuleConfiguration> moduleConfigurations = new LinkedList<ModuleConfiguration>(
-				getModuleConfigurations());
+		final List<MappingConfiguration> mappingConfigurations = getTopologicallyOrderedMappingConfigurations(
+				log, moduleConfigurations);
 
-		// Create one module configuration per mapping configuration
-		for (final MappingConfiguration mappingConfiguration : this.mappingConfigurations) {
-			mappedPackagesNames.add(mappingConfiguration.getPackage());
-			final ModuleConfiguration moduleConfiguration = new ModuleConfiguration();
-			moduleConfiguration.getMappingConfigurations().add(
-					mappingConfiguration);
-			moduleConfiguration.getOutputConfigurations().addAll(
-					defaultOutputConfigurations);
-			moduleConfigurations.add(moduleConfiguration);
-		}
-
-		for (final ModuleConfiguration moduleConfiguration : moduleConfigurations) {
-			if (moduleConfiguration.getOutputConfigurations().isEmpty()) {
-				moduleConfiguration.getOutputConfigurations().addAll(
-						defaultOutputConfigurations);
-			}
-			for (final MappingConfiguration mappingConfiguration : moduleConfiguration
-					.getMappingConfigurations()) {
-				mappedPackagesNames.add(mappingConfiguration.getPackage());
-			}
-		}
-
-		packageNames.removeAll(mappedPackagesNames);
-
-		for (final String packageName : packageNames) {
-			final MappingConfiguration mappingConfiguration = new MappingConfiguration();
-			mappingConfiguration.setPackage(packageName);
-			final ModuleConfiguration moduleConfiguration = new ModuleConfiguration();
-			moduleConfiguration.getMappingConfigurations().add(
-					mappingConfiguration);
-			moduleConfiguration.getOutputConfigurations().addAll(
-					defaultOutputConfigurations);
-			moduleConfigurations.add(moduleConfiguration);
-			mappedPackagesNames.add(packageName);
-		}
+		final Map<String, Mapping<T, C>> mappings = buildMappings(log,
+				modelInfo, analyzer, mappingConfigurations);
 
 		final List<Module<T, C>> modules = new ArrayList<Module<T, C>>(
 				moduleConfigurations.size());
 		for (ModuleConfiguration moduleConfiguration : moduleConfigurations) {
 			final Module<T, C> module = moduleConfiguration.build(log,
-					analyzer, modelInfo, analyzer.getPackageInfoMap());
-			if (module != null) {
-				modules.add(module);
-			}
+					analyzer, modelInfo, mappings);
+			modules.add(module);
 		}
 		return new Modules<T, C>(log, modelInfo, modules);
+	}
+
+	private <T, C extends T> Map<String, Mapping<T, C>> buildMappings(Log log,
+			MModelInfo<T, C> modelInfo,
+			final ModelInfoGraphAnalyzer<T, C> analyzer,
+			final List<MappingConfiguration> mappingConfigurations) {
+		final Map<String, Mapping<T, C>> mappings = new HashMap<String, Mapping<T, C>>();
+		for (MappingConfiguration mappingConfiguration : mappingConfigurations) {
+			final String packageName = mappingConfiguration.getPackage();
+			final MPackageInfo packageInfo = analyzer.getPackageInfoMap().get(
+					packageName);
+			if (packageInfo == null) {
+				throw new IllegalArgumentException(
+						MessageFormat
+								.format("Package name [{0}] could not be found in the given, mapping configuration will be ignored",
+										packageName));
+			}
+			final Mapping<T, C> mapping = mappingConfiguration.build(log,
+					analyzer, modelInfo, packageInfo, mappings);
+			mappings.put(mappingConfiguration.getId(), mapping);
+		}
+		return mappings;
+	}
+
+	private List<MappingConfiguration> getTopologicallyOrderedMappingConfigurations(
+			Log log, final List<ModuleConfiguration> moduleConfigurations) {
+		final DirectedGraph<MappingConfiguration, Object> mappingConfigurationDependencyGraph = buildMappingConfigurationDependencyGraph(
+				log, moduleConfigurations);
+
+		final StrongConnectivityInspector<MappingConfiguration, Object> strongConnectivityInspector = new StrongConnectivityInspector<MappingConfiguration, Object>(
+				mappingConfigurationDependencyGraph);
+
+		final List<Set<MappingConfiguration>> stronglyConnectedSets = strongConnectivityInspector
+				.stronglyConnectedSets();
+
+		for (Set<MappingConfiguration> stronglyConnectedSet : stronglyConnectedSets) {
+			if (stronglyConnectedSet.size() > 1) {
+				throw new IllegalArgumentException(MessageFormat.format(
+						"Mappings have the following dependency cycle: {0}",
+						stronglyConnectedSet.toString()));
+			}
+		}
+
+		final List<MappingConfiguration> mappingConfigurations = new ArrayList<MappingConfiguration>(
+				mappingConfigurationDependencyGraph.vertexSet().size());
+		for (Iterator<MappingConfiguration> mappingConfigurationsInTopologicalOrderIterator = new TopologicalOrderIterator<MappingConfiguration, Object>(
+				mappingConfigurationDependencyGraph); mappingConfigurationsInTopologicalOrderIterator
+				.hasNext();) {
+			mappingConfigurations
+					.add(mappingConfigurationsInTopologicalOrderIterator.next());
+		}
+		return mappingConfigurations;
+	}
+
+	private DirectedGraph<MappingConfiguration, Object> buildMappingConfigurationDependencyGraph(
+			Log log, final List<ModuleConfiguration> moduleConfigurations) {
+		final DirectedGraph<MappingConfiguration, Object> mappingDependenciesGraph = new DefaultDirectedGraph<MappingConfiguration, Object>(
+				new EdgeFactory<MappingConfiguration, Object>() {
+					public Object createEdge(MappingConfiguration sourceVertex,
+							MappingConfiguration targetVertex) {
+						return new Object();
+					};
+				});
+
+		final Map<String, MappingConfiguration> idToMappingConfiguration = new HashMap<String, MappingConfiguration>();
+		final Map<String, List<MappingConfiguration>> nameToMappingConfiguration = new HashMap<String, List<MappingConfiguration>>();
+		for (ModuleConfiguration moduleConfiguration : moduleConfigurations) {
+			for (MappingConfiguration mappingConfiguration : moduleConfiguration
+					.getMappingConfigurations()) {
+				final String id = mappingConfiguration.getId();
+				final String name = mappingConfiguration.getName();
+				idToMappingConfiguration.put(id, mappingConfiguration);
+				List<MappingConfiguration> mappings = nameToMappingConfiguration
+						.get(name);
+				if (mappings == null) {
+					mappings = new ArrayList<MappingConfiguration>(2);
+					nameToMappingConfiguration.put(name, mappings);
+				}
+				mappings.add(mappingConfiguration);
+			}
+		}
+
+		for (ModuleConfiguration moduleConfiguration : moduleConfigurations) {
+			for (MappingConfiguration mappingConfiguration : moduleConfiguration
+					.getMappingConfigurations()) {
+				mappingDependenciesGraph.addVertex(mappingConfiguration);
+				final IncludesConfiguration includesConfiguration = mappingConfiguration
+						.getIncludesConfiguration();
+				if (includesConfiguration != null) {
+					for (DependenciesOfMappingConfiguration dependenciesOfMappingConfiguration : includesConfiguration
+							.getDependenciesOfMappingConfiguration()) {
+						final String id = dependenciesOfMappingConfiguration
+								.getId();
+						final String name = dependenciesOfMappingConfiguration
+								.getName();
+						MappingConfiguration dependingMappingConfiguration = null;
+						if (id != null) {
+							dependingMappingConfiguration = idToMappingConfiguration
+									.get(id);
+							if (dependingMappingConfiguration == null) {
+								throw new IllegalArgumentException(
+										MessageFormat
+												.format("Could not find the referenced mapping with id [{0}].",
+														id));
+							}
+							mappingDependenciesGraph
+									.addVertex(dependingMappingConfiguration);
+							mappingDependenciesGraph.addEdge(
+									dependingMappingConfiguration,
+									mappingConfiguration);
+						} else if (name != null) {
+							final List<MappingConfiguration> dependingMappingConfigurations = nameToMappingConfiguration
+									.get(name);
+							if (dependingMappingConfigurations == null
+									|| dependingMappingConfigurations.isEmpty()) {
+								throw new IllegalArgumentException(
+										MessageFormat
+												.format("Could not find the referenced mapping with name [{0}].",
+														name));
+							} else if (dependingMappingConfigurations.size() > 1) {
+								throw new IllegalArgumentException(
+										MessageFormat
+												.format("There is more than one mapping with the name [{0}], please set and use id attributes for mapping references.",
+														name));
+							} else {
+								// Ok, now the payload
+								dependingMappingConfiguration = dependingMappingConfigurations
+										.get(0);
+								dependenciesOfMappingConfiguration
+										.setId(dependingMappingConfiguration
+												.getId());
+							}
+
+							mappingDependenciesGraph
+									.addVertex(dependingMappingConfiguration);
+							mappingDependenciesGraph.addEdge(
+									dependingMappingConfiguration,
+									mappingConfiguration);
+
+						} else {
+							throw new IllegalArgumentException(
+									MessageFormat
+											.format("Either [id] or [name] must be defined in the  [{0}] element.",
+													DependenciesOfMappingConfiguration.LOCAL_ELEMENT_NAME));
+						}
+
+					}
+				}
+			}
+		}
+		return mappingDependenciesGraph;
 	}
 }

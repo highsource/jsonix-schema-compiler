@@ -45,8 +45,20 @@
 			<jsonix:mapping package="org.w3.smil.v_2_0" name="SMIL_2_0"/>
 			<jsonix:mapping package="org.w3.smil.v_2_0.language" name="SMIL_2_0_Language"/>
 		</jsonix:module>
+		<jsonix:module name="GML_3_1_1_SMIL">
+			<jsonix:mapping package="org.w3.smil.v_2_0.language" name="SMIL_2_0_Language" id="GML_3_1_1_SMIL_2_0_Language">
+				<jsonix:includes>
+					<jsonix:dependencies-of-mapping id="GML_3_1_1"/>
+				</jsonix:includes>
+			</jsonix:mapping>
+			<jsonix:mapping package="org.w3.smil.v_2_0" name="SMIL_2_0">
+				<jsonix:includes>
+					<jsonix:dependencies-of-mapping id="GML_3_1_1_SMIL_2_0_Language"/>
+				</jsonix:includes>
+			</jsonix:mapping>
+		</jsonix:module>		
 		<jsonix:module name="GML_3_1_1_GeometryBasic2D" xmlns:gml="http://www.opengis.net/gml">
-			<jsonix:mapping package="net.opengis.gml.v_3_1_1" name="GML_3_1_1"
+			<jsonix:mapping package="net.opengis.gml.v_3_1_1" name="GML_3_1_1" id="GML_3_1_1_GeometryBasic2D"
 				defaultAttributeNamespaceURI="">
 				<jsonix:includes>
 					<jsonix:type name="PolygonType"/>
@@ -61,6 +73,13 @@
 					<jsonix:type name="EnvelopeType"/>
 					<jsonix:property name="AbstractGeometryType.gid"/>
 				</jsonix:excludes>
+			</jsonix:mapping>
+		</jsonix:module>
+		<jsonix:module name="GML_3_1_1_Filter_1_1_0">
+			<jsonix:mapping package="net.opengis.gml.v_3_1_1" name="GML_3_1_1" id="GML_3_1_1_Filter_1_1_0">
+				<jsonix:includes>
+					<jsonix:dependencies-of-mapping name="Filter_1_1_0"/>
+				</jsonix:includes>
 			</jsonix:mapping>
 		</jsonix:module>
 	</jaxb:bindings>
@@ -160,8 +179,12 @@
 			<jaxb:package name="org.hisrc.w3c.xlink.v_1_0"/>
 		</jaxb:schemaBindings>
 		<jsonix:mapping package="org.hisrc.w3c.xlink.v_1_0" name="XLink_1_0"/>
-		<jsonix:module name="XLink">
-			<jsonix:mapping package="org.hisrc.w3c.xlink.v_1_0" name="XLink_1_0"/>
+		<jsonix:module name="XLink_1_0_GML_3_1_1">
+			<jsonix:mapping package="org.hisrc.w3c.xlink.v_1_0" name="XLink_1_0">
+				<jsonix:includes>
+					<jsonix:dependencies-of-mapping id="GML_3_1_1"/>
+				</jsonix:includes>
+			</jsonix:mapping>
 		</jsonix:module>
 	</jaxb:bindings>
 

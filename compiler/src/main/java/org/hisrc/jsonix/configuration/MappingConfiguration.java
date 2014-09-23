@@ -9,12 +9,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
 import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.log.Log;
+import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
@@ -27,6 +28,7 @@ public class MappingConfiguration {
 
 	public static final String LOCAL_ELEMENT_NAME = "mapping";
 
+	private String id;
 	private String name;
 	private String _package;
 	private String defaultElementNamespaceURI;
@@ -38,6 +40,15 @@ public class MappingConfiguration {
 			ModulesConfiguration.NAMESPACE_URI,
 			MappingConfiguration.LOCAL_ELEMENT_NAME,
 			ModulesConfiguration.DEFAULT_PREFIX);
+
+	@XmlAttribute(name = "id")
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	@XmlAttribute(name = "name")
 	public String getName() {
@@ -98,21 +109,15 @@ public class MappingConfiguration {
 
 	public <T, C extends T> Mapping<T, C> build(Log log,
 			ModelInfoGraphAnalyzer<T, C> analyzer, MModelInfo<T, C> modelInfo,
-			Map<String, MPackageInfo> packageInfos) {
+			MPackageInfo packageInfo, Map<String, Mapping<T, C>> mappings) {
+		Validate.notNull(log);
 		Validate.notNull(modelInfo);
-		Validate.notNull(packageInfos);
+		Validate.notNull(packageInfo);
+		Validate.notNull(mappings);
 
-		final String packageName = createPackageName();
+		final String packageName = getPackage();
 
-		final MPackageInfo packageInfo = packageInfos.get(packageName);
-		if (packageInfo == null) {
-			log.warn(MessageFormat
-					.format("Package name [{0}] could not be found in the given, mapping configuration will be ignored",
-							packageName));
-			return null;
-		}
-
-		final String mappingName = createMappingName(packageName);
+		final String mappingName = getName();
 
 		log.debug(MessageFormat.format(
 				"Package [{0}] will be mapped by the mapping [{1}].",
@@ -218,32 +223,61 @@ public class MappingConfiguration {
 					mapping.includePropertyInfo(propertyInfo);
 				}
 			}
+			for (DependenciesOfMappingConfiguration dependenciesOfMappingConfiguration : includesConfiguration
+					.getDependenciesOfMappingConfiguration()) {
+				final String id = dependenciesOfMappingConfiguration.getId();
+				final Mapping<T, C> dependingMapping = mappings.get(id);
+				if (dependingMapping == null) {
+					throw new IllegalArgumentException(
+							MessageFormat
+									.format("Could not find the referenced mapping with id [{0}].",
+											id));
+				}
+				for (MElementInfo<T, C> elementInfo : dependingMapping
+						.getElementInfos()) {
+					mapping.includeElementInfo(elementInfo);
+				}
+				for (MClassInfo<T, C> classInfo : dependingMapping
+						.getClassInfos()) {
+					// TODO this is not fully correct, includes all the properties, not just the selected ones.
+					mapping.includeTypeInfo(classInfo);
+				}
+				for (MEnumLeafInfo<T, C> enumLeafInfo : dependingMapping
+						.getEnumLeafInfos()) {
+					mapping.includeTypeInfo(enumLeafInfo);
+				}
+			}
 		}
 
 		return mapping;
 
 	}
 
-	private String createMappingName(final String packageName) {
-		final String name;
-		if (StringUtils.isBlank(this.name)) {
-			name = StringUtils.isBlank(packageName) ? "Mapping" : packageName
-					.replace('.', '_');
-		} else {
-			name = StringUtils.trim(this.name);
-		}
-		return name;
-	}
+	// private String createMappingName(final String packageName) {
+	// final String name;
+	// if (StringUtils.isBlank(this.name)) {
+	// name = StringUtils.isBlank(packageName) ? "Mapping" : packageName
+	// .replace('.', '_');
+	// } else {
+	// name = StringUtils.trim(this.name);
+	// }
+	// return name;
+	// }
+	//
+	// private String createPackageName() {
+	// final String packageName;
+	// if (this._package == null) {
+	// // TODO configuration exception?
+	// throw new IllegalArgumentException(
+	// "Package name is missing, please provide the package name in the [package] attribute.");
+	// } else {
+	// packageName = StringUtils.trim(this._package);
+	// }
+	// return packageName;
+	// }
 
-	private String createPackageName() {
-		final String packageName;
-		if (this._package == null) {
-			// TODO configuration exception?
-			throw new IllegalArgumentException(
-					"Package name is missing, please provide the package name in the [package] attribute.");
-		} else {
-			packageName = StringUtils.trim(this._package);
-		}
-		return packageName;
+	@Override
+	public String toString() {
+		return MessageFormat.format("[{0}:{1}]", getId(), getName());
 	}
 }

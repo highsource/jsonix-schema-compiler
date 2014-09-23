@@ -17,7 +17,6 @@ import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Output;
 import org.hisrc.jsonix.log.Log;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
 
 @XmlRootElement(name = ModuleConfiguration.LOCAL_ELEMENT_NAME)
 @XmlType(propOrder = {})
@@ -69,22 +68,20 @@ public class ModuleConfiguration {
 
 	public <T, C extends T> Module<T, C> build(Log log,
 			ModelInfoGraphAnalyzer<T, C> analyzer, MModelInfo<T, C> modelInfo,
-			Map<String, MPackageInfo> packageInfos) {
-		final List<Mapping<T, C>> mappings = new ArrayList<Mapping<T, C>>(
-				this.mappingConfigurations.size());
-		for (MappingConfiguration mappingConfiguration : this.mappingConfigurations) {
-			final Mapping<T, C> mapping = mappingConfiguration.build(log,
-					analyzer, modelInfo, packageInfos);
-			if (mapping != null) {
-				mappings.add(mapping);
-			}
+			Map<String, Mapping<T, C>> mappings) {
+		final List<MappingConfiguration> mappingConfigurations = getMappingConfigurations();
+
+		final List<Mapping<T, C>> moduleMappings = new ArrayList<Mapping<T, C>>(
+				mappingConfigurations.size());
+		for (MappingConfiguration mappingConfiguration : mappingConfigurations) {
+			moduleMappings.add(mappings.get(mappingConfiguration.getId()));
 		}
 
 		final String moduleName;
 		if (this.name != null) {
 			moduleName = this.name;
 		} else {
-			moduleName = createModuleName(mappings);
+			moduleName = createModuleName(moduleMappings);
 		}
 
 		final List<Output> outputs = new ArrayList<Output>(
@@ -95,7 +92,7 @@ public class ModuleConfiguration {
 				outputs.add(output);
 			}
 		}
-		return new Module<T, C>(moduleName, mappings, outputs);
+		return new Module<T, C>(moduleName, moduleMappings, outputs);
 	}
 
 	private <T, C extends T> String createModuleName(

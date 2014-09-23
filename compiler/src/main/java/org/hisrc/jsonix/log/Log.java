@@ -7,4 +7,6 @@ public interface Log {
 	public void debug(Object message);
 	
 	public void warn(Object message);
+	
+	public void error(Object message);
 }
