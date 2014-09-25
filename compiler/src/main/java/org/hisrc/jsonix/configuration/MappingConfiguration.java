@@ -13,9 +13,7 @@ import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
 import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.log.Log;
-import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
@@ -161,8 +159,8 @@ public class MappingConfiguration {
 		}
 
 		final Mapping<T, C> mapping = new Mapping<T, C>(log, analyzer,
-				modelInfo, packageInfo, mappingName,
-				defaultElementNamespaceURI, defaultAttributeNamespaceURI);
+				packageInfo, mappingName, defaultElementNamespaceURI,
+				defaultAttributeNamespaceURI);
 
 		if (getExcludesConfiguration() != null) {
 			final ExcludesConfiguration excludesConfiguration = getExcludesConfiguration();
@@ -233,19 +231,7 @@ public class MappingConfiguration {
 									.format("Could not find the referenced mapping with id [{0}].",
 											id));
 				}
-				for (MElementInfo<T, C> elementInfo : dependingMapping
-						.getElementInfos()) {
-					mapping.includeElementInfo(elementInfo);
-				}
-				for (MClassInfo<T, C> classInfo : dependingMapping
-						.getClassInfos()) {
-					// TODO this is not fully correct, includes all the properties, not just the selected ones.
-					mapping.includeTypeInfo(classInfo);
-				}
-				for (MEnumLeafInfo<T, C> enumLeafInfo : dependingMapping
-						.getEnumLeafInfos()) {
-					mapping.includeTypeInfo(enumLeafInfo);
-				}
+				mapping.includeDependenciesOfMapping(dependingMapping);
 			}
 		}
 

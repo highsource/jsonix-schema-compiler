@@ -105,7 +105,7 @@ public final class PropertyInfoGraphBuilder<T, C> implements
 			MElementRefPropertyInfo<T, C> info) {
 		// Element reference property depends on the type of its element
 		addHardDependencyOnType(vertex, info);
-		addSoftDependenciesOnSubstitutionHead(info, vertex);
+		addSubstitutionHeadDependencies(info, vertex);
 		return vertex;
 	}
 
@@ -118,12 +118,12 @@ public final class PropertyInfoGraphBuilder<T, C> implements
 			// types
 			// of its elements
 			addSoftDependencyOnType(vertex, elementTypeInfo);
-			addSoftDependenciesOnSubstitutionHead(elementTypeInfo, vertex);
+			addSubstitutionHeadDependencies(elementTypeInfo, vertex);
 		}
 		return vertex;
 	}
 
-	private void addSoftDependenciesOnSubstitutionHead(
+	private void addSubstitutionHeadDependencies(
 			MElementTypeInfo<T, C> elementTypeInfo,
 			PropertyInfoVertex<T, C> propertyInfoVertex) {
 		final MClassInfo<T, C> classInfo = propertyInfoVertex.getClassInfo();
@@ -136,6 +136,7 @@ public final class PropertyInfoGraphBuilder<T, C> implements
 						.elementInfo(elementInfo);
 				modelInfoGraphBuilder.addSoftDependency(elementInfoVertex,
 						propertyInfoVertex);
+				modelInfoGraphBuilder.addSoftDependency(propertyInfoVertex, elementInfoVertex);
 			}
 		}
 	}

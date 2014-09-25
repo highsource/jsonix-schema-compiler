@@ -19,6 +19,7 @@ import org.hisrc.jsonix.analysis.ElementInfoVertex;
 import org.hisrc.jsonix.analysis.InfoVertex;
 import org.hisrc.jsonix.analysis.InfoVertexVisitor;
 import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
+import org.hisrc.jsonix.analysis.PackageInfoVertex;
 import org.hisrc.jsonix.analysis.PropertyInfoVertex;
 import org.hisrc.jsonix.analysis.TypeInfoVertex;
 import org.hisrc.jsonix.log.Log;
@@ -26,7 +27,6 @@ import org.jgrapht.DirectedGraph;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
@@ -37,7 +37,6 @@ public class Mapping<T, C extends T> {
 
 	private final Log log;
 	private final ModelInfoGraphAnalyzer<T, C> analyzer;
-	private final MModelInfo<T, C> modelInfo;
 	private final MPackageInfo packageInfo;
 	private final Collection<MClassInfo<T, C>> classInfos = new HashSet<MClassInfo<T, C>>();
 	private final Collection<MPropertyInfo<T, C>> propertyInfos = new HashSet<MPropertyInfo<T, C>>();
@@ -50,19 +49,17 @@ public class Mapping<T, C extends T> {
 	private final Map<InfoVertex<T, C>, ContainmentType> verticesContainmentMap = new HashMap<InfoVertex<T, C>, ContainmentType>();
 
 	public Mapping(Log log, ModelInfoGraphAnalyzer<T, C> analyzer,
-			MModelInfo<T, C> modelInfo, MPackageInfo packageInfo,
-			String mappingName, String defaultElementNamespaceURI,
+			MPackageInfo packageInfo, String mappingName,
+			String defaultElementNamespaceURI,
 			String defaultAttributeNamespaceURI) {
 		Validate.notNull(log);
 		Validate.notNull(analyzer);
-		Validate.notNull(modelInfo);
 		Validate.notNull(packageInfo);
 		Validate.notNull(mappingName);
 		Validate.notNull(defaultElementNamespaceURI);
 		Validate.notNull(defaultAttributeNamespaceURI);
 		this.log = log;
 		this.analyzer = analyzer;
-		this.modelInfo = modelInfo;
 		this.packageInfo = packageInfo;
 		this.packageName = packageInfo.getPackageName();
 		this.mappingName = mappingName;
@@ -71,28 +68,10 @@ public class Mapping<T, C extends T> {
 	}
 
 	public void includePackage(MPackageInfo packageInfo) {
-		for (MClassInfo<T, C> classInfo : this.modelInfo.getClassInfos()) {
-			if (packageInfo == classInfo.getPackageInfo()) {
-				this.classInfos.add(classInfo);
-				for (MPropertyInfo<T, C> propertyInfo : classInfo
-						.getProperties()) {
-					this.propertyInfos.add(propertyInfo);
-				}
-			}
-		}
-
-		for (MEnumLeafInfo<T, C> enumLeafInfo : this.modelInfo
-				.getEnumLeafInfos()) {
-			if (packageInfo == enumLeafInfo.getPackageInfo()) {
-				this.enumLeafInfos.add(enumLeafInfo);
-			}
-		}
-
-		for (MElementInfo<T, C> elementInfo : this.modelInfo.getElementInfos()) {
-			if (packageInfo == elementInfo.getPackageInfo()) {
-				this.elementInfos.add(elementInfo);
-			}
-		}
+		Validate.notNull(packageInfo);
+		final PackageInfoVertex<T, C> vertex = new PackageInfoVertex<T, C>(
+				packageInfo);
+		includeInfoVertex(vertex);
 	}
 
 	public void includePropertyInfo(MPropertyInfo<T, C> propertyInfo) {
@@ -114,6 +93,40 @@ public class Mapping<T, C extends T> {
 		final TypeInfoVertex<T, C> vertex = new TypeInfoVertex<T, C>(
 				this.packageInfo, typeInfo);
 		includeInfoVertex(vertex);
+	}
+
+	public void includeDependenciesOfMapping(Mapping<T, C> mapping) {
+		Validate.notNull(mapping);
+
+		final Map<InfoVertex<T, C>, ContainmentType> dependendMappingVerticesContainmentMap = mapping.verticesContainmentMap;
+		for (Map.Entry<InfoVertex<T, C>, ContainmentType> entry : dependendMappingVerticesContainmentMap
+				.entrySet()) {
+			final ContainmentType dependendMappingVertexContainmentType = entry
+					.getValue();
+			// If a given vertex is excluded in the dependend mapping
+			if (!dependendMappingVertexContainmentType.isIncluded()) {
+				// Check if this vertex is included in the given map
+				final InfoVertex<T, C> dependendMappingVertex = entry.getKey();
+				final ContainmentType containmentType = this.verticesContainmentMap
+						.get(dependendMappingVertex);
+				final ContainmentType newContainmentType = dependendMappingVertexContainmentType
+						.combineWith(containmentType);
+				if (newContainmentType != containmentType) {
+					this.verticesContainmentMap.put(dependendMappingVertex,
+							newContainmentType);
+				}
+			}
+		}
+		for (Map.Entry<InfoVertex<T, C>, ContainmentType> entry : dependendMappingVerticesContainmentMap
+				.entrySet()) {
+			final ContainmentType dependendMappingVertexContainmentType = entry
+					.getValue();
+			// If a given vertex is excluded in the dependend mapping
+			if (dependendMappingVertexContainmentType.isIncluded()) {
+				final InfoVertex<T, C> dependendMappingVertex = entry.getKey();
+				includeInfoVertex(dependendMappingVertex);
+			}
+		}
 	}
 
 	public void excludePropertyInfo(MPropertyInfo<T, C> propertyInfo) {
