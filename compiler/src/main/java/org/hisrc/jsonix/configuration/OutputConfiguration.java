@@ -65,7 +65,7 @@ public class OutputConfiguration {
 			naming = StandardNaming.INSTANCE;
 			defaultFileNamePattern = STANDARD_FILE_NAME_PATTERN;
 		} else if (CompactNaming.NAMING_NAME.equals(this.naming)) {
-			naming = StandardNaming.INSTANCE;
+			naming = CompactNaming.INSTANCE;
 			defaultFileNamePattern = COMPACT_FILE_NAME_PATTERN;
 		} else {
 			throw new IllegalArgumentException(MessageFormat.format(

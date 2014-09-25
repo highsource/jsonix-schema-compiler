@@ -22,6 +22,7 @@
 		</jaxb:schemaBindings>
 
 		<jsonix:output fileName="${module.name}.standard.js"/>
+		<jsonix:output fileName="${module.name}.compact.js" naming="compact"/>
 		
 		<jsonix:mapping package="net.opengis.filter.v_1_1_0" name="Filter_1_1_0"/>
 
