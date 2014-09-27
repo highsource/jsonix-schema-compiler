@@ -33,7 +33,6 @@
 
 package org.hisrc.jsonix.configuration;
 
-import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -45,7 +44,6 @@ import javax.xml.bind.JAXBException;
 
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.log.Log;
-import org.hisrc.jsonix.xml.sax.LocatorUtils;
 import org.jvnet.jaxb2_commons.util.CustomizationUtils;
 
 import com.sun.tools.xjc.model.CPluginCustomization;
@@ -106,20 +104,16 @@ public class ModulesConfigurationUnmarshaller {
 					customization.element);
 			return value;
 		} catch (JAXBException jaxbex) {
-			final String location = LocatorUtils
-					.toString(customization.locator);
-			final String message = location == null ? MessageFormat.format(
-					"Could not unmarshal the {0}.", description)
-					: MessageFormat.format(
-							"Could not unmarshal the {0} located at [{1}].",
-							description, location);
-			throw new IllegalArgumentException(message, jaxbex);
+			throw (customization.locator == null ? new ConfigurationUnmarshallingException(
+					description) : new ConfigurationUnmarshallingException(
+					description, customization.locator));
 		}
 	}
 
-	public ModulesConfiguration unmarshal(Model model, String defaultNaming) {
+	public ModulesConfiguration unmarshal(Model model,
+			OutputConfiguration defaultOutputConfiguration) {
 		Validate.notNull(model);
-		Validate.notNull(defaultNaming);
+		Validate.notNull(defaultOutputConfiguration);
 		final ModulesConfiguration modulesConfiguration = new ModulesConfiguration();
 		for (CPluginCustomization customization : CustomizationUtils
 				.findCustomizations(model, PackageMapping.PACKAGE_MAPPING_NAME)) {
@@ -143,10 +137,8 @@ public class ModulesConfigurationUnmarshaller {
 		}
 
 		if (modulesConfiguration.getOutputConfigurations().isEmpty()) {
-			final OutputConfiguration outputConfiguration = new OutputConfiguration();
-			outputConfiguration.setNaming(defaultNaming);
 			modulesConfiguration.getOutputConfigurations().add(
-					outputConfiguration);
+					defaultOutputConfiguration);
 		}
 		return modulesConfiguration;
 	}

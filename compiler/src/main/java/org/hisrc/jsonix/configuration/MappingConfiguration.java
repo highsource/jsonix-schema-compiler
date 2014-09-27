@@ -226,10 +226,7 @@ public class MappingConfiguration {
 				final String id = dependenciesOfMappingConfiguration.getId();
 				final Mapping<T, C> dependingMapping = mappings.get(id);
 				if (dependingMapping == null) {
-					throw new IllegalArgumentException(
-							MessageFormat
-									.format("Could not find the referenced mapping with id [{0}].",
-											id));
+					throw new MissingMappingWithIdException(id);
 				}
 				mapping.includeDependenciesOfMapping(dependingMapping);
 			}
@@ -238,29 +235,6 @@ public class MappingConfiguration {
 		return mapping;
 
 	}
-
-	// private String createMappingName(final String packageName) {
-	// final String name;
-	// if (StringUtils.isBlank(this.name)) {
-	// name = StringUtils.isBlank(packageName) ? "Mapping" : packageName
-	// .replace('.', '_');
-	// } else {
-	// name = StringUtils.trim(this.name);
-	// }
-	// return name;
-	// }
-	//
-	// private String createPackageName() {
-	// final String packageName;
-	// if (this._package == null) {
-	// // TODO configuration exception?
-	// throw new IllegalArgumentException(
-	// "Package name is missing, please provide the package name in the [package] attribute.");
-	// } else {
-	// packageName = StringUtils.trim(this._package);
-	// }
-	// return packageName;
-	// }
 
 	@Override
 	public String toString() {

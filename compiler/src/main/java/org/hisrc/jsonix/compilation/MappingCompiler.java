@@ -156,7 +156,6 @@ public class MappingCompiler<T, C extends T> {
 		classInfoMapping.append(naming.localName(), this.codeModel
 				.string(classInfo
 						.getContainerLocalName(DEFAULT_SCOPED_NAME_DELIMITER)));
-
 		final MClassTypeInfo<T, C> baseTypeInfo = classInfo.getBaseTypeInfo();
 		if (baseTypeInfo != null) {
 			classInfoMapping.append(naming.baseTypeInfo(),

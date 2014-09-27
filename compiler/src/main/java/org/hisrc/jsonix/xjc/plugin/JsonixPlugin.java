@@ -45,6 +45,7 @@ import org.hisrc.jsonix.compilation.ModulesCompiler;
 import org.hisrc.jsonix.compilation.ProgramWriter;
 import org.hisrc.jsonix.configuration.ModulesConfiguration;
 import org.hisrc.jsonix.configuration.ModulesConfigurationUnmarshaller;
+import org.hisrc.jsonix.configuration.OutputConfiguration;
 import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Modules;
 import org.hisrc.jsonix.definition.Output;
@@ -78,14 +79,16 @@ public class JsonixPlugin extends Plugin {
 	public static final String OPTION = "-" + OPTION_NAME;
 	public static final String OPTION_COMPACT = OPTION + "-compact";
 
-	private String defaultNaming = StandardNaming.NAMING_NAME;
+	private OutputConfiguration defaultOutputConfiguration = new OutputConfiguration(
+			StandardNaming.NAMING_NAME,
+			OutputConfiguration.STANDARD_FILE_NAME_PATTERN);
 
-	public String getDefaultNaming() {
-		return defaultNaming;
+	public OutputConfiguration getDefaultOutputConfiguration() {
+		return defaultOutputConfiguration;
 	}
 
-	public void setDefaultNaming(String naming) {
-		this.defaultNaming = naming;
+	public void setDefaultOutputConfiguration(OutputConfiguration naming) {
+		this.defaultOutputConfiguration = naming;
 	}
 
 	@Override
@@ -102,7 +105,9 @@ public class JsonixPlugin extends Plugin {
 	public int parseArgument(Options opt, String[] args, int i)
 			throws BadCommandLineException, IOException {
 		if (OPTION_COMPACT.equals(args[i])) {
-			setDefaultNaming(CompactNaming.NAMING_NAME);
+			setDefaultOutputConfiguration(new OutputConfiguration(
+					CompactNaming.NAMING_NAME,
+					OutputConfiguration.STANDARD_FILE_NAME_PATTERN));
 			return 1;
 		} else {
 			return super.parseArgument(opt, args, i);
@@ -135,17 +140,17 @@ public class JsonixPlugin extends Plugin {
 		final Model model = outline.getModel();
 
 		final ModulesConfiguration modulesConfiguration = this.customizationHandler
-				.unmarshal(model, this.defaultNaming);
+				.unmarshal(model, this.defaultOutputConfiguration);
 
 		final MModelInfo<NType, NClass> modelinfo = new XJCCMInfoFactory(model)
 				.createModel();
 
 		final Modules<NType, NClass> modules = modulesConfiguration.build(log,
 				modelinfo);
-		
+
 		final ModulesCompiler<NType, NClass> modulesCompiler = new ModulesCompiler<NType, NClass>(
 				modules);
-		
+
 		modulesCompiler.compile(new ProgramWriter<NType, NClass>() {
 
 			@Override

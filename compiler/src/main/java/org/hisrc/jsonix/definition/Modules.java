@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.Validate;
+import org.hisrc.jsonix.configuration.AmbiguousPackageMappingException;
 import org.hisrc.jsonix.log.Log;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 
@@ -16,7 +17,8 @@ public class Modules<T, C extends T> {
 	private final Map<String, String> packageMappingNameMap = new HashMap<String, String>();
 	private final MModelInfo<T, C> modelInfo;
 
-	public Modules(Log log, MModelInfo<T, C> modelInfo, Collection<Module<T, C>> modules) {
+	public Modules(Log log, MModelInfo<T, C> modelInfo,
+			Collection<Module<T, C>> modules) {
 		Validate.notNull(log);
 		Validate.notNull(modelInfo);
 		Validate.noNullElements(modules);
@@ -37,16 +39,13 @@ public class Modules<T, C extends T> {
 					this.log.warn(MessageFormat
 							.format("Package [{0}] is mapped using at least two different mapping names [{1}] and [{2}]. Packages may be mapped by several mappings but they have to have equal names.",
 									packageName, knownMappingName, mappingName));
-					throw new IllegalArgumentException(
-							MessageFormat
-									.format("Package [{0}] is mapped using at least two different mapping names [{1}] and [{2}].",
-											packageName, knownMappingName,
-											mappingName));
+					throw new AmbiguousPackageMappingException(packageName,
+							knownMappingName, mappingName);
 				}
 			}
 		}
 	}
-	
+
 	public MModelInfo<T, C> getModelInfo() {
 		return modelInfo;
 	}

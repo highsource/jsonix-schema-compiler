@@ -15,6 +15,7 @@ import org.hisrc.jsonix.compilation.ModulesCompiler;
 import org.hisrc.jsonix.compilation.ProgramWriter;
 import org.hisrc.jsonix.configuration.ModulesConfiguration;
 import org.hisrc.jsonix.configuration.ModulesConfigurationUnmarshaller;
+import org.hisrc.jsonix.configuration.OutputConfiguration;
 import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Modules;
 import org.hisrc.jsonix.definition.Output;
@@ -48,16 +49,24 @@ public class JsonixMain {
 		if (!arguments.contains("-extension")) {
 			arguments.add("-extension");
 		}
-
+		
+		// TODO
+		arguments.add("-disableXmlSecurity");
+		// TODO
+		System.setProperty("javax.xml.accessExternalSchema", "all");
+		// TODO
+		System.setProperty("javax.xml.accessExternalDTD", "all");
+		
+		
 		if (!arguments.contains(JsonixPlugin.OPTION)) {
 			arguments.add(JsonixPlugin.OPTION);
 		}
 
-		final String defaultNaming;
+		final OutputConfiguration defaultOutputConfiguration;
 		if (arguments.contains(JsonixPlugin.OPTION_COMPACT)) {
-			defaultNaming = CompactNaming.NAMING_NAME;
+			defaultOutputConfiguration = new OutputConfiguration(CompactNaming.NAMING_NAME, OutputConfiguration.STANDARD_FILE_NAME_PATTERN);
 		} else {
-			defaultNaming = StandardNaming.NAMING_NAME;
+			defaultOutputConfiguration = new OutputConfiguration(StandardNaming.NAMING_NAME, OutputConfiguration.STANDARD_FILE_NAME_PATTERN);
 		}
 		// Driver.main(arguments.toArray(new String[arguments.size()]));
 
@@ -65,18 +74,18 @@ public class JsonixMain {
 
 		options.parseArguments(arguments.toArray(new String[arguments.size()]));
 
-		final JsonixMain main = new JsonixMain(options, defaultNaming);
+		final JsonixMain main = new JsonixMain(options, defaultOutputConfiguration);
 		main.execute();
 	}
 
 	private final Options options;
-	private final String defaultNaming;
+	private final OutputConfiguration defaultOutputConfiguration;
 
-	public JsonixMain(Options options, String defaultNaming) {
+	public JsonixMain(Options options, OutputConfiguration defaultOutputConfiguration) {
 		Validate.notNull(options);
-		Validate.notNull(defaultNaming);
+		Validate.notNull(defaultOutputConfiguration);
 		this.options = options;
-		this.defaultNaming = defaultNaming;
+		this.defaultOutputConfiguration = defaultOutputConfiguration;
 	}
 
 	private void execute() {
@@ -89,7 +98,7 @@ public class JsonixMain {
 				this.log);
 
 		final ModulesConfiguration modulesConfiguration = customizationHandler
-				.unmarshal(model, this.defaultNaming);
+				.unmarshal(model, this.defaultOutputConfiguration);
 
 		final ErrorReceiver errorReceiver = new ConsoleErrorReporter();
 

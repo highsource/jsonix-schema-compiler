@@ -1,0 +1,56 @@
+<jaxb:bindings version="1.0" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" 
+	xmlns:jsonix="http://jsonix.highsource.org/customizations"
+	jaxb:extensionBindingPrefixes="xjc jsonix">
+
+	<jaxb:bindings schemaLocation="w3c/1999/xlink.xsd" node="/xs:schema">
+		<jaxb:schemaBindings>
+			<jaxb:package name="org.hisrc.w3c.xlink.v_1_0"/>
+		</jaxb:schemaBindings>
+		<jsonix:mapping package="org.hisrc.w3c.xlink.v_1_0" name="XLink_1_0"/>
+		<jsonix:mapping package="foo" name="Foo"/>
+	</jaxb:bindings>
+
+        <jaxb:bindings scd="x-schema::xlink" xmlns:xlink="http://www.w3.org/1999/xlink">
+		<jaxb:bindings scd="/group::xlink:locatorModel/model::sequence/xlink:title">
+			<jaxb:property name="LocatorTitle"/>
+		</jaxb:bindings>
+	</jaxb:bindings>
+
+	<jaxb:bindings schemaLocation="ogc/wps/1.0.0/wpsAll.xsd" 
+		node="/xs:schema">
+		<jaxb:globalBindings
+			fixedAttributeAsConstantProperty="true"
+			typesafeEnumBase="xs:string"
+			typesafeEnumMemberName="generateName" 
+			generateIsSetMethod="true">
+			<xjc:noValidator />
+			<xjc:noValidatingUnmarshaller />
+		</jaxb:globalBindings>
+		<jaxb:schemaBindings>
+			<jaxb:package name="net.opengis.wps.v_1_0_0"/>
+		</jaxb:schemaBindings>
+		<jsonix:packageMapping
+			packageName="net.opengis.wps.v_1_0_0"
+			spaceName="WPS_1_0_0"/>
+	</jaxb:bindings>
+
+	<jaxb:bindings schemaLocation="ogc/ows/1.1.0/owsAll.xsd" 
+		node="/xs:schema">
+		<jaxb:schemaBindings>
+			<jaxb:package name="net.opengis.ows.v_1_1_0"/>
+		</jaxb:schemaBindings>
+		<jsonix:packageMapping
+			packageName="net.opengis.ows.v_1_1_0"
+			spaceName="OWS_1_1_0"/>
+		<jsonix:module name="WPS_1_0_0_OWS_1_1_0">
+			<jsonix:mapping name="OWS_1_1_0" package="net.opengis.ows.v_1_1_0">
+				<jsonix:includes>
+					<jsonix:dependencies-of-mapping name="WPS_1_0_0"/>
+				</jsonix:includes>
+			</jsonix:mapping>
+		</jsonix:module>
+	</jaxb:bindings>
+
+</jaxb:bindings>

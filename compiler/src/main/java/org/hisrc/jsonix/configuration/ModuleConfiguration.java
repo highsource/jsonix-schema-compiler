@@ -74,7 +74,16 @@ public class ModuleConfiguration {
 		final List<Mapping<T, C>> moduleMappings = new ArrayList<Mapping<T, C>>(
 				mappingConfigurations.size());
 		for (MappingConfiguration mappingConfiguration : mappingConfigurations) {
-			moduleMappings.add(mappings.get(mappingConfiguration.getId()));
+			Mapping<T, C> moduleMapping = mappings.get(mappingConfiguration.getId());
+			if (moduleMapping != null)
+			{
+			moduleMappings.add(moduleMapping);
+			}
+		}
+		
+		if (moduleMappings.isEmpty())
+		{
+			return null;
 		}
 
 		final String moduleName;

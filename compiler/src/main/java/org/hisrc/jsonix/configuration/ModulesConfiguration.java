@@ -15,6 +15,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
 import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.definition.Module;
@@ -276,7 +277,9 @@ public class ModulesConfiguration {
 		for (ModuleConfiguration moduleConfiguration : moduleConfigurations) {
 			final Module<T, C> module = moduleConfiguration.build(log,
 					analyzer, modelInfo, mappings);
-			modules.add(module);
+			if (module != null) {
+				modules.add(module);
+			}
 		}
 		return new Modules<T, C>(log, modelInfo, modules);
 	}
@@ -291,14 +294,15 @@ public class ModulesConfiguration {
 			final MPackageInfo packageInfo = analyzer.getPackageInfoMap().get(
 					packageName);
 			if (packageInfo == null) {
-				throw new IllegalArgumentException(
-						MessageFormat
-								.format("Package name [{0}] could not be found in the given, mapping configuration will be ignored",
-										packageName));
+				log.warn(MessageFormat.format(
+						"Package name [{0}] could not be found.",
+						Validate.notNull(packageName)));
+				// throw new MissingPackageException(packageName);
+			} else {
+				final Mapping<T, C> mapping = mappingConfiguration.build(log,
+						analyzer, modelInfo, packageInfo, mappings);
+				mappings.put(mappingConfiguration.getId(), mapping);
 			}
-			final Mapping<T, C> mapping = mappingConfiguration.build(log,
-					analyzer, modelInfo, packageInfo, mappings);
-			mappings.put(mappingConfiguration.getId(), mapping);
 		}
 		return mappings;
 	}
@@ -379,10 +383,7 @@ public class ModulesConfiguration {
 							dependingMappingConfiguration = idToMappingConfiguration
 									.get(id);
 							if (dependingMappingConfiguration == null) {
-								throw new IllegalArgumentException(
-										MessageFormat
-												.format("Could not find the referenced mapping with id [{0}].",
-														id));
+								throw new MissingMappingWithIdException(id);
 							}
 							mappingDependenciesGraph
 									.addVertex(dependingMappingConfiguration);
@@ -394,15 +395,9 @@ public class ModulesConfiguration {
 									.get(name);
 							if (dependingMappingConfigurations == null
 									|| dependingMappingConfigurations.isEmpty()) {
-								throw new IllegalArgumentException(
-										MessageFormat
-												.format("Could not find the referenced mapping with name [{0}].",
-														name));
+								throw new MissingMappinWithNameException(name);
 							} else if (dependingMappingConfigurations.size() > 1) {
-								throw new IllegalArgumentException(
-										MessageFormat
-												.format("There is more than one mapping with the name [{0}], please set and use id attributes for mapping references.",
-														name));
+								throw new AmbiguousMappingNameException(name);
 							} else {
 								// Ok, now the payload
 								dependingMappingConfiguration = dependingMappingConfigurations
@@ -419,10 +414,9 @@ public class ModulesConfiguration {
 									mappingConfiguration);
 
 						} else {
-							throw new IllegalArgumentException(
-									MessageFormat
-											.format("Either [id] or [name] must be defined in the  [{0}] element.",
-													DependenciesOfMappingConfiguration.LOCAL_ELEMENT_NAME));
+							log.warn(MessageFormat
+									.format("Either [id] or [name] must be defined in the  [{0}] element.",
+											DependenciesOfMappingConfiguration.LOCAL_ELEMENT_NAME));
 						}
 
 					}

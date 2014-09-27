@@ -1,7 +1,5 @@
 package org.hisrc.jsonix.configuration;
 
-import java.text.MessageFormat;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
@@ -18,15 +16,16 @@ import org.hisrc.jsonix.naming.StandardNaming;
 public class OutputConfiguration {
 
 	public static final String LOCAL_ELEMENT_NAME = "output";
-	private static final String COMPACT_FILE_NAME_PATTERN = ModuleConfiguration.MODULE_NAME_PROPERTY
+	public static final String COMPACT_FILE_NAME_PATTERN = ModuleConfiguration.MODULE_NAME_PROPERTY
 			+ ".compact.js";
-	private static final String STANDARD_FILE_NAME_PATTERN = ModuleConfiguration.MODULE_NAME_PROPERTY
+	public static final String STANDARD_FILE_NAME_PATTERN = ModuleConfiguration.MODULE_NAME_PROPERTY
 			+ ".js";
 
 	private String fileName;
 	private String naming;
-	public static final QName OUTPUT_NAME = new QName(ModulesConfiguration.NAMESPACE_URI,
-	LOCAL_ELEMENT_NAME, ModulesConfiguration.DEFAULT_PREFIX);
+	public static final QName OUTPUT_NAME = new QName(
+			ModulesConfiguration.NAMESPACE_URI, LOCAL_ELEMENT_NAME,
+			ModulesConfiguration.DEFAULT_PREFIX);
 
 	public OutputConfiguration() {
 
@@ -35,6 +34,12 @@ public class OutputConfiguration {
 	public OutputConfiguration(String naming) {
 		super();
 		this.naming = naming;
+	}
+	
+	public OutputConfiguration(String naming, String fileName) {
+		super();
+		this.naming = naming;
+		this.fileName = fileName;
 	}
 
 	@XmlAttribute(name = "fileName")
@@ -68,8 +73,7 @@ public class OutputConfiguration {
 			naming = CompactNaming.INSTANCE;
 			defaultFileNamePattern = COMPACT_FILE_NAME_PATTERN;
 		} else {
-			throw new IllegalArgumentException(MessageFormat.format(
-					"Unsupported naming [{0}].", this.naming));
+			throw new UnsupportedNamingException(this.naming);
 		}
 		final String fileNamePattern = this.fileName == null ? defaultFileNamePattern
 				: this.fileName;

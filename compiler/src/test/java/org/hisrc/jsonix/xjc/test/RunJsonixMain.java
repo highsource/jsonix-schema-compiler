@@ -61,6 +61,7 @@ public class RunJsonixMain {
 	}
 
 	@Test
+	@Ignore
 	public void compilesFilter_V_1_1_0() throws Exception {
 
 		// Khm...
@@ -79,5 +80,24 @@ public class RunJsonixMain {
 
 		JsonixMain.main(arguments);
 	}
+	
+	@Test
+	public void compilesWPS_V_1_1_0() throws Exception {
+
+		// Khm...
+		new File("target/generated-sources/xjc").mkdirs();
+
+		URL wps = getClass().getResource("/ogc/wps/1.0.0/wpsAll.xsd");
+//		URL gml = getClass().getResource("/ogc/gml/3.1.1/base/gmlBase.xsd");
+//		URL xlink = getClass().getResource("/w3c/1999/xlink.xsd");
+		URL binding = getClass().getResource("/wps-1.0.0-binding.xjb");
+		final String[] arguments = new String[] { "-xmlschema",
+				wps.toExternalForm(), "-b", binding.toExternalForm(), "-d",
+				"target/generated-sources/xjc", "-Xjsonix-compact"
+
+		};
+
+		JsonixMain.main(arguments);
+	}	
 
 }
