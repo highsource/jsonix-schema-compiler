@@ -46,16 +46,18 @@ public class ModuleCompiler<T, C extends T> {
 
 		final JSObjectLiteral moduleFactoryResult = codeModel.object();
 		for (Mapping<T, C> mapping : this.module.getMappings()) {
-			final String mappingName = mapping.getMappingName();
-			final MappingCompiler<T, C> mappingCompiler = new MappingCompiler<T, C>(
-					codeModel, modules, module, output, mapping);
+			if (!mapping.isEmpty()) {
+				final String mappingName = mapping.getMappingName();
+				final MappingCompiler<T, C> mappingCompiler = new MappingCompiler<T, C>(
+						codeModel, modules, module, output, mapping);
 
-			final JSObjectLiteral mappingBody = mappingCompiler.compile();
+				final JSObjectLiteral mappingBody = mappingCompiler.compile();
 
-			final JSVariableStatement mappingVariable = moduleFactoryFunction
-					.getBody().var(mappingName, mappingBody);
-			moduleFactoryResult.append(mappingName,
-					mappingVariable.getVariable());
+				final JSVariableStatement mappingVariable = moduleFactoryFunction
+						.getBody().var(mappingName, mappingBody);
+				moduleFactoryResult.append(mappingName,
+						mappingVariable.getVariable());
+			}
 		}
 		moduleFactoryFunction.getBody()._return(moduleFactoryResult);
 
@@ -82,16 +84,20 @@ public class ModuleCompiler<T, C extends T> {
 		final JSBlock moduleExportsThenBlock = ifModuleExports._then().block();
 
 		for (Mapping<T, C> mapping : this.module.getMappings()) {
-			final String mappingName = mapping.getMappingName();
-			moduleExportsThenBlock.expression(module.p("exports")
-					.p(mappingName)
-					.assign(moduleInstance.getVariable().p(mappingName)));
+			if (!mapping.isEmpty()) {
+				final String mappingName = mapping.getMappingName();
+				moduleExportsThenBlock.expression(module.p("exports")
+						.p(mappingName)
+						.assign(moduleInstance.getVariable().p(mappingName)));
+			}
 		}
 		final JSBlock moduleExportsElseBlock = ifModuleExports._else().block();
 		for (Mapping<T, C> mapping : this.module.getMappings()) {
-			final String mappingName = mapping.getMappingName();
-			moduleExportsElseBlock.var(mappingName, moduleInstance
-					.getVariable().p(mappingName));
+			if (!mapping.isEmpty()) {
+				final String mappingName = mapping.getMappingName();
+				moduleExportsElseBlock.var(mappingName, moduleInstance
+						.getVariable().p(mappingName));
+			}
 		}
 		return moduleProgram;
 	}
