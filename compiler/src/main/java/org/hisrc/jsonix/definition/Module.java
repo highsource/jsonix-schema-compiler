@@ -11,14 +11,23 @@ public class Module<T, C extends T> {
 	private final List<Mapping<T, C>> mappings;
 	private final List<Output> outputs;
 
-	public Module(String name,
-			List<Mapping<T, C>> mappings, List<Output> outputs) {
+	public Module(String name, List<Mapping<T, C>> mappings,
+			List<Output> outputs) {
 		Validate.notNull(name);
 		Validate.noNullElements(mappings);
 		Validate.noNullElements(outputs);
 		this.name = name;
 		this.mappings = mappings;
 		this.outputs = outputs;
+	}
+
+	public boolean isEmpty() {
+		for (Mapping<T, C> mapping : getMappings()) {
+			if (!mapping.isEmpty()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public String getName() {

@@ -67,6 +67,11 @@ public class Mapping<T, C extends T> {
 		this.defaultAttributeNamespaceURI = defaultAttributeNamespaceURI;
 	}
 
+	public boolean isEmpty() {
+		return this.elementInfos.isEmpty() && this.classInfos.isEmpty()
+				&& this.enumLeafInfos.isEmpty();
+	}
+
 	public void includePackage(MPackageInfo packageInfo) {
 		Validate.notNull(packageInfo);
 		final PackageInfoVertex<T, C> vertex = new PackageInfoVertex<T, C>(

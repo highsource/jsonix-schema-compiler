@@ -21,13 +21,14 @@ public class ModulesCompiler<T, C extends T> {
 		final JSCodeModel codeModel = new CodeModelImpl();
 
 		for (Module<T, C> module : this.modules.getModules()) {
-			for (Output output : module.getOutputs()) {
-				// TODO isEmpty
-				final ModuleCompiler<T, C> moduleCompiler = new ModuleCompiler<T, C>(
-						codeModel, modules, module, output);
+			if (!module.isEmpty()) {
+				for (Output output : module.getOutputs()) {
+					final ModuleCompiler<T, C> moduleCompiler = new ModuleCompiler<T, C>(
+							codeModel, modules, module, output);
 
-				final JSProgram program = moduleCompiler.compile();
-				programWriter.writeProgram(module, program, output);
+					final JSProgram program = moduleCompiler.compile();
+					programWriter.writeProgram(module, program, output);
+				}
 			}
 		}
 	}
