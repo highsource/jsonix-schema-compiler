@@ -15,12 +15,16 @@ import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
 import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Output;
-import org.hisrc.jsonix.log.Log;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @XmlRootElement(name = ModuleConfiguration.LOCAL_ELEMENT_NAME)
 @XmlType(propOrder = {})
 public class ModuleConfiguration {
+
+	private final Logger logger = LoggerFactory
+			.getLogger(ModuleConfiguration.class);
 
 	public static final String LOCAL_ELEMENT_NAME = "module";
 
@@ -66,7 +70,7 @@ public class ModuleConfiguration {
 		this.outputConfigurations = outputConfigurations;
 	}
 
-	public <T, C extends T> Module<T, C> build(Log log,
+	public <T, C extends T> Module<T, C> build(
 			ModelInfoGraphAnalyzer<T, C> analyzer, MModelInfo<T, C> modelInfo,
 			Map<String, Mapping<T, C>> mappings) {
 		final List<MappingConfiguration> mappingConfigurations = getMappingConfigurations();
@@ -74,15 +78,14 @@ public class ModuleConfiguration {
 		final List<Mapping<T, C>> moduleMappings = new ArrayList<Mapping<T, C>>(
 				mappingConfigurations.size());
 		for (MappingConfiguration mappingConfiguration : mappingConfigurations) {
-			Mapping<T, C> moduleMapping = mappings.get(mappingConfiguration.getId());
-			if (moduleMapping != null)
-			{
-			moduleMappings.add(moduleMapping);
+			Mapping<T, C> moduleMapping = mappings.get(mappingConfiguration
+					.getId());
+			if (moduleMapping != null) {
+				moduleMappings.add(moduleMapping);
 			}
 		}
-		
-		if (moduleMappings.isEmpty())
-		{
+
+		if (moduleMappings.isEmpty()) {
 			return null;
 		}
 

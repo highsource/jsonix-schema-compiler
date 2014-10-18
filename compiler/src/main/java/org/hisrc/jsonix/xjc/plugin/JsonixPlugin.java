@@ -49,12 +49,14 @@ import org.hisrc.jsonix.configuration.OutputConfiguration;
 import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Modules;
 import org.hisrc.jsonix.definition.Output;
-import org.hisrc.jsonix.log.Log;
-import org.hisrc.jsonix.log.SystemLog;
 import org.hisrc.jsonix.naming.CompactNaming;
 import org.hisrc.jsonix.naming.StandardNaming;
 import org.jvnet.jaxb2_commons.xjc.model.concrete.XJCCMInfoFactory;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
+import org.slf4j.ILoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.helpers.NOPLoggerFactory;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -71,9 +73,8 @@ import com.sun.tools.xjc.outline.Outline;
 
 public class JsonixPlugin extends Plugin {
 
-	private final Log log = new SystemLog();
-	private final ModulesConfigurationUnmarshaller customizationHandler = new ModulesConfigurationUnmarshaller(
-			this.log);
+	private final Logger logger = LoggerFactory.getLogger(JsonixPlugin.class);
+	private final ModulesConfigurationUnmarshaller customizationHandler = new ModulesConfigurationUnmarshaller();
 
 	public static final String OPTION_NAME = "Xjsonix";
 	public static final String OPTION = "-" + OPTION_NAME;
@@ -116,6 +117,12 @@ public class JsonixPlugin extends Plugin {
 
 	@Override
 	public void onActivated(Options opts) throws BadCommandLineException {
+		final ILoggerFactory iLoggerFactory = LoggerFactory.getILoggerFactory();
+		if (iLoggerFactory instanceof NOPLoggerFactory) {
+			System.err.println("You seem to be using the NOP provider of the SLF4j logging facade. "
+					+ "With this configuration, log messages will be completely suppressed. "
+					+ "Please consider adding a SLF4j provider (for instance slf4j-simple) to enable logging.");
+		}
 	}
 
 	@Override
@@ -145,8 +152,8 @@ public class JsonixPlugin extends Plugin {
 		final MModelInfo<NType, NClass> modelinfo = new XJCCMInfoFactory(model)
 				.createModel();
 
-		final Modules<NType, NClass> modules = modulesConfiguration.build(log,
-				modelinfo);
+		final Modules<NType, NClass> modules = modulesConfiguration
+				.build(modelinfo);
 
 		final ModulesCompiler<NType, NClass> modulesCompiler = new ModulesCompiler<NType, NClass>(
 				modules);

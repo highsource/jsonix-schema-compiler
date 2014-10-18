@@ -43,20 +43,20 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.lang3.Validate;
-import org.hisrc.jsonix.log.Log;
 import org.jvnet.jaxb2_commons.util.CustomizationUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sun.tools.xjc.model.CPluginCustomization;
 import com.sun.tools.xjc.model.Model;
 
 public class ModulesConfigurationUnmarshaller {
 
-	private final Log log;
+	private final Logger logger = LoggerFactory
+			.getLogger(ModuleConfiguration.class);
 	private final JAXBContext context;
 
-	public ModulesConfigurationUnmarshaller(final Log log) {
-		Validate.notNull(log);
-		this.log = log;
+	public ModulesConfigurationUnmarshaller() {
 		try {
 			context = JAXBContext.newInstance(ModulesConfiguration.class,
 					ModuleConfiguration.class, MappingConfiguration.class,
@@ -147,7 +147,7 @@ public class ModulesConfigurationUnmarshaller {
 			CPluginCustomization customization) {
 		final PackageMapping packageMapping = unmarshal(customization,
 				"package mapping");
-		log.warn("The [packageMapping] customization is deprecated, please use the [mapping] customization in the future.");
+		logger.warn("The [packageMapping] customization is deprecated, please use the [mapping] customization in the future.");
 
 		final MappingConfiguration mappingConfiguration = new MappingConfiguration();
 		mappingConfiguration.setName(packageMapping.getSpaceName());

@@ -3,7 +3,6 @@ package org.hisrc.jsonix.analysis;
 import java.text.MessageFormat;
 
 import org.apache.commons.lang3.Validate;
-import org.hisrc.jsonix.log.Log;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -14,11 +13,13 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ModelInfoGraphBuilder<T, C> {
 
-	private final Log log;
-
+	private Logger logger = LoggerFactory
+			.getLogger(ModelInfoGraphAnalyzer.class);
 	private final MModelInfo<T, C> modelInfo;
 
 	private final EdgeFactory<InfoVertex<T, C>, DependencyEdge> edgeFactory = new EdgeFactory<InfoVertex<T, C>, DependencyEdge>() {
@@ -31,10 +32,8 @@ public class ModelInfoGraphBuilder<T, C> {
 
 	private final DirectedGraph<InfoVertex<T, C>, DependencyEdge> graph;
 
-	public ModelInfoGraphBuilder(Log log, MModelInfo<T, C> modelInfo) {
-		Validate.notNull(log);
+	public ModelInfoGraphBuilder(MModelInfo<T, C> modelInfo) {
 		Validate.notNull(modelInfo);
-		this.log = log;
 		this.modelInfo = modelInfo;
 		this.graph = new DefaultDirectedGraph<InfoVertex<T, C>, DependencyEdge>(
 				this.edgeFactory);
@@ -101,7 +100,7 @@ public class ModelInfoGraphBuilder<T, C> {
 		Validate.notNull(vertex);
 		final boolean added = this.graph.addVertex(vertex);
 		if (added) {
-			log.trace(MessageFormat.format("Added ({0}).", vertex.toString()));
+			logger.trace(MessageFormat.format("Added ({0}).", vertex.toString()));
 		}
 		return added;
 	}
@@ -113,7 +112,7 @@ public class ModelInfoGraphBuilder<T, C> {
 		final boolean added = this.graph.addEdge(source, target,
 				new DependencyEdge(DependencyType.HARD));
 		if (added) {
-			log.trace(MessageFormat.format(
+			logger.trace(MessageFormat.format(
 					"Added hard dependency ({0})->({1}).", source.toString(),
 					target.toString()));
 		}
@@ -127,7 +126,7 @@ public class ModelInfoGraphBuilder<T, C> {
 		final boolean added = this.graph.addEdge(source, target,
 				new DependencyEdge(DependencyType.SOFT));
 		if (added) {
-			log.trace(MessageFormat.format(
+			logger.trace(MessageFormat.format(
 					"Added soft dependency ({0})->({1}).", source.toString(),
 					target.toString()));
 		}

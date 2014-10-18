@@ -20,7 +20,6 @@ import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
 import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Modules;
-import org.hisrc.jsonix.log.Log;
 import org.hisrc.jsonix.naming.StandardNaming;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
@@ -29,10 +28,15 @@ import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @XmlRootElement(name = ModulesConfiguration.LOCAL_ELEMENT_NAME)
 @XmlType(propOrder = {})
 public class ModulesConfiguration {
+
+	private final Logger logger = LoggerFactory
+			.getLogger(ModulesConfiguration.class);
 
 	public static final String DEFAULT_PREFIX = "jsonix";
 
@@ -74,11 +78,10 @@ public class ModulesConfiguration {
 		this.outputConfigurations = outputConfigurations;
 	}
 
-	public <T, C extends T> Modules<T, C> build(Log log,
-			MModelInfo<T, C> modelInfo) {
+	public <T, C extends T> Modules<T, C> build(MModelInfo<T, C> modelInfo) {
 
 		final ModelInfoGraphAnalyzer<T, C> analyzer = new ModelInfoGraphAnalyzer<T, C>(
-				log, modelInfo);
+				modelInfo);
 
 		final List<ModuleConfiguration> moduleConfigurations = new LinkedList<ModuleConfiguration>(
 				getModuleConfigurations());
@@ -91,12 +94,12 @@ public class ModulesConfiguration {
 
 		assignDefaultOutputConfigurations(moduleConfigurations);
 
-		assignMappingNamesAndIds(log, moduleConfigurations);
+		assignMappingNamesAndIds(moduleConfigurations);
 
-		return buildModules(log, modelInfo, analyzer, moduleConfigurations);
+		return buildModules(modelInfo, analyzer, moduleConfigurations);
 	}
 
-	private void assignMappingNamesAndIds(Log log,
+	private void assignMappingNamesAndIds(
 			final List<ModuleConfiguration> moduleConfigurations) {
 		// Generate ids where missing
 		final Map<String, MappingConfiguration> idToMappingConfiguration = new HashMap<String, MappingConfiguration>();
@@ -109,14 +112,13 @@ public class ModulesConfiguration {
 
 				assignMappingName(mappingConfiguration);
 
-				assignMappingId(log, idToMappingConfiguration,
+				assignMappingId(idToMappingConfiguration,
 						nameToMappingConfiguration, mappingConfiguration);
 			}
 		}
 	}
 
 	private void assignMappingId(
-			Log log,
 			final Map<String, MappingConfiguration> idToMappingConfiguration,
 			final Map<String, List<MappingConfiguration>> nameToMappingConfiguration,
 			final MappingConfiguration mappingConfiguration) {
@@ -126,7 +128,7 @@ public class ModulesConfiguration {
 		if (mappingId != null) {
 			// TODO throw an exception, don't try to correct
 			if (idToMappingConfiguration.containsKey(mappingId)) {
-				log.error(MessageFormat
+				logger.error(MessageFormat
 						.format("Mapping id [{0}] is already defined, generating a new mapping id.",
 								mappingId));
 				mappingId = null;
@@ -139,7 +141,7 @@ public class ModulesConfiguration {
 					.get(mappingName);
 			if (mappings == null) {
 				mappings = new ArrayList<MappingConfiguration>(2);
-				log.debug(MessageFormat.format(
+				logger.debug(MessageFormat.format(
 						"Assigning id [{0}] to the mapping with name [{1}].",
 						mappingName, mappingName));
 				mappingId = mappingName;
@@ -148,19 +150,19 @@ public class ModulesConfiguration {
 				nameToMappingConfiguration.put(mappingName, mappings);
 				idToMappingConfiguration.put(mappingId, mappingConfiguration);
 			} else if (mappings.size() == 1) {
-				log.debug(MessageFormat
+				logger.debug(MessageFormat
 						.format("There are more than one mapping with the name [{0}] without id.",
 								mappingName));
 				final String mappingId0 = mappingName + "-0";
 				final MappingConfiguration mappingConfiguration0 = mappings
 						.get(0);
-				log.debug(MessageFormat.format(
+				logger.debug(MessageFormat.format(
 						"Assigning id [{0}] to the mapping with name [{1}].",
 						mappingId0, mappingName));
 				mappingConfiguration0.setId(mappingId0);
 
 				mappingId = mappingName + "-1";
-				log.debug(MessageFormat.format(
+				logger.debug(MessageFormat.format(
 						"Assigning id [{0}] to the mapping with name [{1}].",
 						mappingId, mappingName));
 				mappingConfiguration.setId(mappingId);
@@ -170,7 +172,7 @@ public class ModulesConfiguration {
 				idToMappingConfiguration.put(mappingId, mappingConfiguration);
 			} else {
 				mappingId = mappingName + mappings.size();
-				log.debug(MessageFormat.format(
+				logger.debug(MessageFormat.format(
 						"Assigning id [{0}] to the mapping with name [{1}].",
 						mappingId, mappingName));
 				mappingConfiguration.setId(mappingId);
@@ -261,30 +263,29 @@ public class ModulesConfiguration {
 		return defaultOutputConfigurations;
 	}
 
-	private <T, C extends T> Modules<T, C> buildModules(Log log,
+	private <T, C extends T> Modules<T, C> buildModules(
 			MModelInfo<T, C> modelInfo,
 			final ModelInfoGraphAnalyzer<T, C> analyzer,
 			final List<ModuleConfiguration> moduleConfigurations) {
 
-		final List<MappingConfiguration> mappingConfigurations = getTopologicallyOrderedMappingConfigurations(
-				log, moduleConfigurations);
+		final List<MappingConfiguration> mappingConfigurations = getTopologicallyOrderedMappingConfigurations(moduleConfigurations);
 
-		final Map<String, Mapping<T, C>> mappings = buildMappings(log,
-				modelInfo, analyzer, mappingConfigurations);
+		final Map<String, Mapping<T, C>> mappings = buildMappings(modelInfo,
+				analyzer, mappingConfigurations);
 
 		final List<Module<T, C>> modules = new ArrayList<Module<T, C>>(
 				moduleConfigurations.size());
 		for (ModuleConfiguration moduleConfiguration : moduleConfigurations) {
-			final Module<T, C> module = moduleConfiguration.build(log,
-					analyzer, modelInfo, mappings);
+			final Module<T, C> module = moduleConfiguration.build(analyzer,
+					modelInfo, mappings);
 			if (module != null) {
 				modules.add(module);
 			}
 		}
-		return new Modules<T, C>(log, modelInfo, modules);
+		return new Modules<T, C>(modelInfo, modules);
 	}
 
-	private <T, C extends T> Map<String, Mapping<T, C>> buildMappings(Log log,
+	private <T, C extends T> Map<String, Mapping<T, C>> buildMappings(
 			MModelInfo<T, C> modelInfo,
 			final ModelInfoGraphAnalyzer<T, C> analyzer,
 			final List<MappingConfiguration> mappingConfigurations) {
@@ -294,12 +295,12 @@ public class ModulesConfiguration {
 			final MPackageInfo packageInfo = analyzer.getPackageInfoMap().get(
 					packageName);
 			if (packageInfo == null) {
-				log.warn(MessageFormat.format(
+				logger.warn(MessageFormat.format(
 						"Package name [{0}] could not be found.",
 						Validate.notNull(packageName)));
 				// throw new MissingPackageException(packageName);
 			} else {
-				final Mapping<T, C> mapping = mappingConfiguration.build(log,
+				final Mapping<T, C> mapping = mappingConfiguration.build(
 						analyzer, modelInfo, packageInfo, mappings);
 				mappings.put(mappingConfiguration.getId(), mapping);
 			}
@@ -308,9 +309,8 @@ public class ModulesConfiguration {
 	}
 
 	private List<MappingConfiguration> getTopologicallyOrderedMappingConfigurations(
-			Log log, final List<ModuleConfiguration> moduleConfigurations) {
-		final DirectedGraph<MappingConfiguration, Object> mappingConfigurationDependencyGraph = buildMappingConfigurationDependencyGraph(
-				log, moduleConfigurations);
+			final List<ModuleConfiguration> moduleConfigurations) {
+		final DirectedGraph<MappingConfiguration, Object> mappingConfigurationDependencyGraph = buildMappingConfigurationDependencyGraph(moduleConfigurations);
 
 		final StrongConnectivityInspector<MappingConfiguration, Object> strongConnectivityInspector = new StrongConnectivityInspector<MappingConfiguration, Object>(
 				mappingConfigurationDependencyGraph);
@@ -338,7 +338,7 @@ public class ModulesConfiguration {
 	}
 
 	private DirectedGraph<MappingConfiguration, Object> buildMappingConfigurationDependencyGraph(
-			Log log, final List<ModuleConfiguration> moduleConfigurations) {
+			final List<ModuleConfiguration> moduleConfigurations) {
 		final DirectedGraph<MappingConfiguration, Object> mappingDependenciesGraph = new DefaultDirectedGraph<MappingConfiguration, Object>(
 				new EdgeFactory<MappingConfiguration, Object>() {
 					public Object createEdge(MappingConfiguration sourceVertex,
@@ -414,7 +414,7 @@ public class ModulesConfiguration {
 									mappingConfiguration);
 
 						} else {
-							log.warn(MessageFormat
+							logger.warn(MessageFormat
 									.format("Either [id] or [name] must be defined in the  [{0}] element.",
 											DependenciesOfMappingConfiguration.LOCAL_ELEMENT_NAME));
 						}

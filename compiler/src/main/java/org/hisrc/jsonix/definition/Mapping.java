@@ -22,7 +22,6 @@ import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
 import org.hisrc.jsonix.analysis.PackageInfoVertex;
 import org.hisrc.jsonix.analysis.PropertyInfoVertex;
 import org.hisrc.jsonix.analysis.TypeInfoVertex;
-import org.hisrc.jsonix.log.Log;
 import org.jgrapht.DirectedGraph;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
@@ -32,10 +31,12 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfoVisitor;
 import org.jvnet.jaxb2_commons.xml.bind.model.util.DefaultTypeInfoVisitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Mapping<T, C extends T> {
 
-	private final Log log;
+	private final Logger logger = LoggerFactory.getLogger(Mapping.class);
 	private final ModelInfoGraphAnalyzer<T, C> analyzer;
 	private final MPackageInfo packageInfo;
 	private final Collection<MClassInfo<T, C>> classInfos = new HashSet<MClassInfo<T, C>>();
@@ -48,17 +49,15 @@ public class Mapping<T, C extends T> {
 	private final String defaultAttributeNamespaceURI;
 	private final Map<InfoVertex<T, C>, ContainmentType> verticesContainmentMap = new HashMap<InfoVertex<T, C>, ContainmentType>();
 
-	public Mapping(Log log, ModelInfoGraphAnalyzer<T, C> analyzer,
+	public Mapping(ModelInfoGraphAnalyzer<T, C> analyzer,
 			MPackageInfo packageInfo, String mappingName,
 			String defaultElementNamespaceURI,
 			String defaultAttributeNamespaceURI) {
-		Validate.notNull(log);
 		Validate.notNull(analyzer);
 		Validate.notNull(packageInfo);
 		Validate.notNull(mappingName);
 		Validate.notNull(defaultElementNamespaceURI);
 		Validate.notNull(defaultAttributeNamespaceURI);
-		this.log = log;
 		this.analyzer = analyzer;
 		this.packageInfo = packageInfo;
 		this.packageName = packageInfo.getPackageName();
@@ -156,7 +155,7 @@ public class Mapping<T, C extends T> {
 	}
 
 	private void includeInfoVertex(final InfoVertex<T, C> initialVertex) {
-		log.trace(MessageFormat.format("Including the vertex [{0}].",
+		logger.trace(MessageFormat.format("Including the vertex [{0}].",
 				initialVertex));
 
 		final DirectedGraph<InfoVertex<T, C>, DependencyEdge> graph = analyzer
@@ -188,14 +187,14 @@ public class Mapping<T, C extends T> {
 
 					if (currentSourceContainmentType != null
 							&& !currentSourceContainmentType.isIncluded()) {
-						log.warn(MessageFormat
+						logger.warn(MessageFormat
 								.format("The vertex [{0}] was excluded with the containment type [{1}], but it must be included with containment type [{2}], otherwise mappings will not be consistent.",
 										sourceVertex,
 										currentSourceContainmentType,
 										sourceContainmentType));
 					} else {
 
-						log.trace(MessageFormat
+						logger.trace(MessageFormat
 								.format("Including the vertex [{0}] with the containment type [{1}].",
 										sourceVertex, dequeContainmentType));
 					}
@@ -216,7 +215,7 @@ public class Mapping<T, C extends T> {
 							final Deque<InfoVertex<T, C>> targetDeque = deques
 									.get(targetContainmentType);
 							if (targetDeque != null) {
-								log.trace(MessageFormat
+								logger.trace(MessageFormat
 										.format("Queueing the inclusion of the vertex [{0}] with the containment type [{1}].",
 												targetVertex,
 												targetContainmentType));
@@ -225,7 +224,7 @@ public class Mapping<T, C extends T> {
 						}
 					}
 				} else {
-					log.trace(MessageFormat
+					logger.trace(MessageFormat
 							.format("Vertex [{0}] is already included with the containment type [{1}].",
 									sourceVertex, currentSourceContainmentType));
 				}
@@ -242,7 +241,7 @@ public class Mapping<T, C extends T> {
 
 	private void excludeInfoVertex(final InfoVertex<T, C> vertex) {
 		Validate.notNull(vertex);
-		log.trace(MessageFormat.format("Excluding [{0}].", vertex));
+		logger.trace(MessageFormat.format("Excluding [{0}].", vertex));
 
 		final DirectedGraph<InfoVertex<T, C>, DependencyEdge> graph = analyzer
 				.getGraph();
@@ -269,7 +268,7 @@ public class Mapping<T, C extends T> {
 						|| currentTargetContainmentType
 								.compareTo(targetContainmentType) > 0) {
 
-					log.trace(MessageFormat
+					logger.trace(MessageFormat
 							.format("Excluding the vertex [{0}] with the containment type [{1}].",
 									targetVertex, targetContainmentType));
 
@@ -288,7 +287,7 @@ public class Mapping<T, C extends T> {
 							final Deque<InfoVertex<T, C>> sourceDeque = deques
 									.get(sourceContainmentType);
 							if (sourceDeque != null) {
-								log.trace(MessageFormat
+								logger.trace(MessageFormat
 										.format("Queueing the exclusion of the vertex [{0}] with the containment type [{1}].",
 												sourceVertex,
 												sourceContainmentType));
@@ -297,7 +296,7 @@ public class Mapping<T, C extends T> {
 						}
 					}
 				} else {
-					log.trace(MessageFormat
+					logger.trace(MessageFormat
 							.format("Vertex [{0}] is already excluded with the containment type [{1}].",
 									targetVertex, targetContainmentType));
 				}

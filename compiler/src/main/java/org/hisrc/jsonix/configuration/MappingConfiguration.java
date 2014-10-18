@@ -12,17 +12,21 @@ import javax.xml.namespace.QName;
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
 import org.hisrc.jsonix.definition.Mapping;
-import org.hisrc.jsonix.log.Log;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.util.PackageInfoQNameAnalyzer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @XmlRootElement(name = MappingConfiguration.LOCAL_ELEMENT_NAME)
 @XmlType(propOrder = {})
 public class MappingConfiguration {
+
+	private final Logger logger = LoggerFactory
+			.getLogger(MappingConfiguration.class);
 
 	public static final String LOCAL_ELEMENT_NAME = "mapping";
 
@@ -105,10 +109,9 @@ public class MappingConfiguration {
 		this.excludesConfiguration = excludesConfiguration;
 	}
 
-	public <T, C extends T> Mapping<T, C> build(Log log,
+	public <T, C extends T> Mapping<T, C> build(
 			ModelInfoGraphAnalyzer<T, C> analyzer, MModelInfo<T, C> modelInfo,
 			MPackageInfo packageInfo, Map<String, Mapping<T, C>> mappings) {
-		Validate.notNull(log);
 		Validate.notNull(modelInfo);
 		Validate.notNull(packageInfo);
 		Validate.notNull(mappings);
@@ -117,7 +120,7 @@ public class MappingConfiguration {
 
 		final String mappingName = getName();
 
-		log.debug(MessageFormat.format(
+		logger.debug(MessageFormat.format(
 				"Package [{0}] will be mapped by the mapping [{1}].",
 				packageName, mappingName));
 
@@ -133,7 +136,7 @@ public class MappingConfiguration {
 		if (this.defaultElementNamespaceURI != null) {
 			defaultElementNamespaceURI = this.defaultElementNamespaceURI;
 		} else {
-			log.debug(MessageFormat
+			logger.debug(MessageFormat
 					.format("Mapping [{0}] will use \"{1}\" as it is the most used element namespace URI in the package [{2}].",
 							mappingName, mostUsedElementNamespaceURI,
 							packageName));
@@ -150,7 +153,7 @@ public class MappingConfiguration {
 		if (this.defaultAttributeNamespaceURI != null) {
 			defaultAttributeNamespaceURI = this.defaultAttributeNamespaceURI;
 		} else {
-			log.debug(MessageFormat
+			logger.debug(MessageFormat
 					.format("Mapping [{0}] will use \"{1}\" as it is the most used attribute namespace URI in the package [{2}].",
 							mappingName, mostUsedAttributeNamespaceURI,
 							packageName));
@@ -158,8 +161,8 @@ public class MappingConfiguration {
 
 		}
 
-		final Mapping<T, C> mapping = new Mapping<T, C>(log, analyzer,
-				packageInfo, mappingName, defaultElementNamespaceURI,
+		final Mapping<T, C> mapping = new Mapping<T, C>(analyzer, packageInfo,
+				mappingName, defaultElementNamespaceURI,
 				defaultAttributeNamespaceURI);
 
 		if (getExcludesConfiguration() != null) {
@@ -167,7 +170,7 @@ public class MappingConfiguration {
 			for (TypeInfoConfiguration typeInfoConfiguration : excludesConfiguration
 					.getTypeInfoConfigurations()) {
 				final MTypeInfo<T, C> typeInfo = typeInfoConfiguration
-						.findTypeInfo(log, analyzer, packageInfo);
+						.findTypeInfo(analyzer, packageInfo);
 				if (typeInfo != null) {
 					mapping.excludeTypeInfo(typeInfo);
 				}
@@ -175,7 +178,7 @@ public class MappingConfiguration {
 			for (ElementInfoConfiguration elementInfoConfiguration : excludesConfiguration
 					.getElementInfoConfigurations()) {
 				final MElementInfo<T, C> elementInfo = elementInfoConfiguration
-						.findElementInfo(log, analyzer, packageInfo);
+						.findElementInfo(analyzer, packageInfo);
 				if (elementInfo != null) {
 					mapping.excludeElementInfo(elementInfo);
 				}
@@ -183,7 +186,7 @@ public class MappingConfiguration {
 			for (PropertyInfoConfiguration propertyInfoConfiguration : excludesConfiguration
 					.getPropertyInfoConfigurations()) {
 				final MPropertyInfo<T, C> propertyInfo = propertyInfoConfiguration
-						.findPropertyInfo(log, analyzer, packageInfo);
+						.findPropertyInfo(analyzer, packageInfo);
 				if (propertyInfo != null) {
 					mapping.excludePropertyInfo(propertyInfo);
 				}
@@ -191,7 +194,7 @@ public class MappingConfiguration {
 		}
 
 		if (getIncludesConfiguration() == null) {
-			log.trace(MessageFormat
+			logger.trace(MessageFormat
 					.format("Includes configuration for the mapping [{0}] is not provided, including the whole package.",
 							mappingName));
 			mapping.includePackage(packageInfo);
@@ -200,7 +203,7 @@ public class MappingConfiguration {
 			for (TypeInfoConfiguration typeInfoConfiguration : includesConfiguration
 					.getTypeInfoConfigurations()) {
 				final MTypeInfo<T, C> typeInfo = typeInfoConfiguration
-						.findTypeInfo(log, analyzer, packageInfo);
+						.findTypeInfo(analyzer, packageInfo);
 				if (typeInfo != null) {
 					mapping.includeTypeInfo(typeInfo);
 				}
@@ -208,7 +211,7 @@ public class MappingConfiguration {
 			for (ElementInfoConfiguration elementInfoConfiguration : includesConfiguration
 					.getElementInfoConfigurations()) {
 				final MElementInfo<T, C> elementInfo = elementInfoConfiguration
-						.findElementInfo(log, analyzer, packageInfo);
+						.findElementInfo(analyzer, packageInfo);
 				if (elementInfo != null) {
 					mapping.includeElementInfo(elementInfo);
 				}
@@ -216,7 +219,7 @@ public class MappingConfiguration {
 			for (PropertyInfoConfiguration propertyInfoConfiguration : includesConfiguration
 					.getPropertyInfoConfigurations()) {
 				final MPropertyInfo<T, C> propertyInfo = propertyInfoConfiguration
-						.findPropertyInfo(log, analyzer, packageInfo);
+						.findPropertyInfo(analyzer, packageInfo);
 				if (propertyInfo != null) {
 					mapping.includePropertyInfo(propertyInfo);
 				}
