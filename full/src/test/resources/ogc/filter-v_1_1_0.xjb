@@ -1,0 +1,197 @@
+<jaxb:bindings version="1.0" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" 
+	xmlns:jsonix="http://jsonix.highsource.org/customizations"
+	jaxb:extensionBindingPrefixes="xjc jsonix">
+
+	<jaxb:bindings 
+		schemaLocation="filter/1.1.0/filter.xsd" 
+		node="/xs:schema">
+
+		<jaxb:globalBindings
+			fixedAttributeAsConstantProperty="true"
+			typesafeEnumBase="xs:string"
+			typesafeEnumMemberName="generateName" 
+			generateIsSetMethod="true">
+			<xjc:noValidator />
+			<xjc:noValidatingUnmarshaller />
+		</jaxb:globalBindings>
+
+		<jaxb:schemaBindings>
+			<jaxb:package name="net.opengis.filter.v_1_1_0"/>
+		</jaxb:schemaBindings>
+
+		<jsonix:output fileName="${module.name}.standard.js"/>
+		<jsonix:output fileName="${module.name}.compact.js" naming="compact"/>
+		
+		<jsonix:mapping package="net.opengis.filter.v_1_1_0" name="Filter_1_1_0"/>
+
+		<jaxb:bindings node="xs:complexType[@name='BinarySpatialOpType']//xs:sequence/xs:element[@ref='ogc:PropertyName']">
+			<jaxb:property name="PropertyName1"/>
+		</jaxb:bindings>
+		<jaxb:bindings node="xs:complexType[@name='BinarySpatialOpType']//xs:choice/xs:element[@ref='ogc:PropertyName']">
+			<jaxb:property name="PropertyName2"/>
+		</jaxb:bindings>
+	</jaxb:bindings>
+
+	<jaxb:bindings schemaLocation="gml/3.1.1/base/gml.xsd" 
+		node="/xs:schema">
+
+		<jaxb:schemaBindings>
+			<jaxb:package name="net.opengis.gml.v_3_1_1"/>
+		</jaxb:schemaBindings>
+		<jsonix:packageMapping packageName="net.opengis.gml.v_3_1_1" spaceName="GML_3_1_1"/>
+		<jsonix:module>
+			<jsonix:output naming="compact"/>
+			<jsonix:mapping package="org.w3.smil.v_2_0" name="SMIL_2_0"/>
+			<jsonix:mapping package="org.w3.smil.v_2_0.language" name="SMIL_2_0_Language"/>
+		</jsonix:module>
+		<jsonix:module name="GML_3_1_1_SMIL">
+			<jsonix:mapping package="org.w3.smil.v_2_0.language" name="SMIL_2_0_Language" id="GML_3_1_1_SMIL_2_0_Language">
+				<jsonix:includes>
+					<jsonix:dependencies-of-mapping id="GML_3_1_1"/>
+				</jsonix:includes>
+			</jsonix:mapping>
+			<jsonix:mapping package="org.w3.smil.v_2_0" name="SMIL_2_0">
+				<jsonix:includes>
+					<jsonix:dependencies-of-mapping id="GML_3_1_1_SMIL_2_0_Language"/>
+				</jsonix:includes>
+			</jsonix:mapping>
+		</jsonix:module>		
+		<jsonix:module name="GML_3_1_1_GeometryBasic2D" xmlns:gml="http://www.opengis.net/gml">
+			<jsonix:mapping package="net.opengis.gml.v_3_1_1" name="GML_3_1_1" id="GML_3_1_1_GeometryBasic2D"
+				defaultAttributeNamespaceURI="">
+				<jsonix:includes>
+					<jsonix:type name="PolygonType"/>
+					<jsonix:element name="gml:Point"/>
+					<jsonix:property name="PointPropertyType.point"/>
+					<jsonix:property name="EnvelopeType.lowerCorner"/>
+					<jsonix:property name="EnvelopeType.upperCorner"/>
+				</jsonix:includes>
+				<jsonix:excludes>
+					<jsonix:element name="gml:pointRep"/>
+					<jsonix:type name="CoordinatesType"/>
+					<jsonix:type name="EnvelopeType"/>
+					<jsonix:property name="AbstractGeometryType.gid"/>
+				</jsonix:excludes>
+			</jsonix:mapping>
+		</jsonix:module>
+		<jsonix:module name="GML_3_1_1_Filter_1_1_0">
+			<jsonix:mapping package="net.opengis.gml.v_3_1_1" name="GML_3_1_1" id="GML_3_1_1_Filter_1_1_0">
+				<jsonix:includes>
+					<jsonix:dependencies-of-mapping name="Filter_1_1_0"/>
+				</jsonix:includes>
+			</jsonix:mapping>
+		</jsonix:module>
+	</jaxb:bindings>
+
+	<jaxb:bindings 
+		schemaLocation="gml/3.1.1/base/geometryPrimitives.xsd" 
+		node="/xs:schema">
+
+		<jaxb:bindings node="xs:element[@name='_Solid']">
+			<jaxb:factoryMethod name="ASolidElement"/>
+		</jaxb:bindings>
+	</jaxb:bindings>
+
+	<jaxb:bindings 
+		schemaLocation="gml/3.1.1/base/geometryBasic0d1d.xsd" 
+		node="/xs:schema">
+		<jaxb:bindings node="xs:element[@name='_Curve']">
+			<jaxb:factoryMethod name="ACurveElement"/>
+		</jaxb:bindings>
+	</jaxb:bindings>
+
+	<jaxb:bindings 
+		schemaLocation="gml/3.1.1/base/geometryBasic2d.xsd " 
+		node="/xs:schema">
+		<jaxb:bindings node="xs:element[@name='_Surface']">
+			<jaxb:factoryMethod name="ASurfaceElement"/>
+		</jaxb:bindings>
+		<jaxb:bindings node="xs:element[@name='_Ring']">
+			<jaxb:factoryMethod name="ARingElement"/>
+		</jaxb:bindings>
+	</jaxb:bindings>
+
+
+
+
+	<jaxb:bindings 
+		schemaLocation="gml/3.1.1/base/defaultStyle.xsd" 
+		node="/xs:schema">
+		<jaxb:bindings node="xs:element[@name='graphStyle']">
+			<jaxb:factoryMethod name="GraphStylePropertyElement"/>
+		</jaxb:bindings>
+		<jaxb:bindings node="xs:element[@name='topologyStyle']">
+			<jaxb:factoryMethod name="TopologyStylePropertyElement"/>
+		</jaxb:bindings>
+		<jaxb:bindings node="xs:element[@name='labelStyle']">
+			<jaxb:factoryMethod name="LabelStylePropertyElement"/>
+		</jaxb:bindings>
+		<jaxb:bindings node="xs:element[@name='geometryStyle']">
+			<jaxb:factoryMethod name="GeometryStylePropertyElement"/>
+		</jaxb:bindings>
+		<jaxb:bindings node="xs:element[@name='featureStyle']">
+			<jaxb:factoryMethod name="FeatureStylePropertyElement"/>
+		</jaxb:bindings>
+		<jaxb:bindings node="xs:element[@name='_Style']">
+			<jaxb:factoryMethod name="AStyleElement"/>
+		</jaxb:bindings>
+	</jaxb:bindings>
+
+	<jaxb:bindings schemaLocation="gml/3.1.1/base/coverage.xsd" node="/xs:schema">
+		<jaxb:bindings node="xs:simpleType[@name='IncrementOrder']">
+			<jaxb:typesafeEnumClass>
+				<jaxb:typesafeEnumMember name="PLUS_X_PLUS_Y" value="+x+y"/>
+				<jaxb:typesafeEnumMember name="PLUS_X_MINUS_Y" value="+x-y"/>
+				<jaxb:typesafeEnumMember name="MINUS_X_PLUS_Y" value="-x+y"/>
+				<jaxb:typesafeEnumMember name="MINUS_X_MINUS_Y" value="-x-y"/>
+			</jaxb:typesafeEnumClass>
+		</jaxb:bindings>
+	</jaxb:bindings>
+
+
+	<jaxb:bindings 
+		schemaLocation="gml/3.1.1/base/feature.xsd" 
+		node="/xs:schema">
+		<jaxb:bindings node="xs:element[@name='_FeatureCollection']">
+			<jaxb:factoryMethod name="AFeatureCollectionElement"/>
+		</jaxb:bindings>
+	</jaxb:bindings>
+
+	<jaxb:bindings 
+		schemaLocation="gml/3.1.1/smil/smil20.xsd" 
+		node="/xs:schema">
+		<jaxb:schemaBindings>
+			<jaxb:package name="org.w3.smil.v_2_0"/>
+		</jaxb:schemaBindings>
+	</jaxb:bindings>
+
+	<jaxb:bindings 
+		schemaLocation="gml/3.1.1/smil/smil20-language.xsd" 
+		node="/xs:schema">
+		<jaxb:schemaBindings>
+			<jaxb:package name="org.w3.smil.v_2_0.language"/>
+		</jaxb:schemaBindings>
+	</jaxb:bindings>
+
+	<jaxb:bindings schemaLocation="../w3c/1999/xlink.xsd" node="/xs:schema">
+		<jaxb:schemaBindings>
+			<jaxb:package name="org.hisrc.w3c.xlink.v_1_0"/>
+		</jaxb:schemaBindings>
+		<jsonix:mapping package="org.hisrc.w3c.xlink.v_1_0" name="XLink_1_0"/>
+		<jsonix:module name="XLink_1_0_GML_3_1_1">
+			<jsonix:mapping package="org.hisrc.w3c.xlink.v_1_0" name="XLink_1_0">
+				<jsonix:includes>
+					<jsonix:dependencies-of-mapping id="GML_3_1_1"/>
+				</jsonix:includes>
+			</jsonix:mapping>
+		</jsonix:module>
+	</jaxb:bindings>
+
+        <jaxb:bindings scd="x-schema::xlink" xmlns:xlink="http://www.w3.org/1999/xlink">
+		<jaxb:bindings scd="/group::xlink:locatorModel/model::sequence/xlink:title">
+			<jaxb:property name="LocatorTitle"/>
+		</jaxb:bindings>
+	</jaxb:bindings>
+</jaxb:bindings>

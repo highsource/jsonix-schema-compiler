@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.opengis.net/context" xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="1.1.0.2">
+    <!-- This version of context/1.1 was previously labeled as 1.1.1 . -->
+    <annotation>
+        <documentation>
+            Web Map Context version 1.1
+                
+            This 'all-components' schema document has been constructed to satisfy the 'Publication Rules for OGC Schemas' described in the Policy Directives. 
+            Simon Cox 2010-11-15            
+            
+            WMC is an OGC Standard.
+            Copyright (c) 2005,2010 Open Geospatial Consortium.
+            To obtain additional rights of use, visit http://www.opengeospatial.org/legal/ .
+            
+        </documentation>
+    </annotation>
+    
+    <include schemaLocation="./context.xsd"/>
+    <include schemaLocation="./collection.xsd"/>
+    
+</schema>

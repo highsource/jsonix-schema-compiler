@@ -11,6 +11,14 @@
 	</parent>
 	<dependencies>
 		<dependency>
+			<groupId>org.jvnet.jaxb2_commons</groupId>
+			<artifactId>jaxb2-basics-ant</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>jsonix-schema-compiler</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-impl</artifactId>
 			<scope>compile</scope>
@@ -20,13 +28,10 @@
 			<artifactId>jaxb-xjc</artifactId>
 			<scope>compile</scope>
 		</dependency>
+		<!-- Logback -->
 		<dependency>
-			<groupId>org.jvnet.jaxb2_commons</groupId>
-			<artifactId>jaxb2-basics-ant</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.hisrc.jsonix</groupId>
-			<artifactId>jsonix-schema-compiler</artifactId>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
 		</dependency>
 	</dependencies>
 	<build>

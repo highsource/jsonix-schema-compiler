@@ -71,10 +71,10 @@
 	<properties> 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> 
 		<jsonix-scripts.version>2.1.0</jsonix-scripts.version>
-		<jaxb2-basics.version>0.8.5-SNAPSHOT</jaxb2-basics.version>
+		<jaxb2-basics.version>0.9.0</jaxb2-basics.version>
 		<js-codemodel.version>1.1</js-codemodel.version>
 		<jaxb-ri.version>2.2.7</jaxb-ri.version>
-		<maven-jaxb2-plugin.version>0.9.1</maven-jaxb2-plugin.version>
+		<maven-jaxb2-plugin.version>0.10.0</maven-jaxb2-plugin.version>
 		<jgrapht.version>0.9.0</jgrapht.version>
 	</properties> 
 	<dependencies>
@@ -117,6 +117,23 @@
 				<artifactId>jaxb-impl</artifactId>
 				<version>${jaxb-ri.version}</version>
 			</dependency>
+			<!-- SLF4J -->
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>1.7.7</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-simple</artifactId>
+				<version>1.7.7</version>
+			</dependency>
+			<!-- Logback -->
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-classic</artifactId>
+				<version>1.1.2</version>
+			</dependency>
 			<!-- JAXB2 Basics -->
 			<dependency>
 				<groupId>org.jvnet.jaxb2_commons</groupId>
@@ -154,18 +171,18 @@
 			<dependency>
 				<groupId>org.jvnet.ogc</groupId>
 				<artifactId>ows-v_1_1_0-schema</artifactId>
-				<version>1.0.3</version>
+				<version>1.1.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.jvnet.ogc</groupId>
 				<artifactId>wps-v_1_0_0-schema</artifactId>
-				<version>1.0.3</version>
+				<version>1.1.0</version>
 			</dependency>
 			<!-- Legato Testing -->
 			<dependency>
 				<groupId>net.disy.legato</groupId>
 				<artifactId>legato-testing</artifactId>
-				<version>1.1.1</version>
+				<version>2.0.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
@@ -175,21 +192,8 @@
 			<dependency>
 				<groupId>net.disy.legato</groupId>
 				<artifactId>legato-tools</artifactId>
-				<version>1.1.1</version>
+				<version>2.0.0</version>
 			</dependency>
-			<!-- Prototype -->
-			<dependency>
-				<groupId>org.wicketstuff</groupId>
-				<artifactId>prototype</artifactId>
-				<version>1.4.13</version>
-			</dependency>
-			<!-- Hifaces20 -->
-			<!--dependency>
-				<groupId>org.hisrc.hifaces20</groupId>
-				<artifactId>hifaces20-testing</artifactId>
-				<version>0.1.3</version>
-				<scope>test</scope>
-			</dependency-->
 		</dependencies>
 	</dependencyManagement>
 	<build>

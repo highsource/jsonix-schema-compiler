@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.opengis.net/gml" 
+xmlns:gml="http://www.opengis.net/gml"
+xmlns="http://www.w3.org/2001/XMLSchema" 
+elementFormDefault="qualified" version="1.0.0.2">
+  <!-- This version of CommonCRS/1.0.0 profile of gml/3.1.1 was previously versioned as '1.0.1' and '3.1.1 2010-01-28' . -->
+	<annotation>
+		<appinfo source="urn:opengis:specification:gml:schema-xsd:gml:3.1.1">commonCRSsProfile.xsd</appinfo>
+		<documentation>GML 3.1.1 profile for Common CRSs.
+			
+			Copyright (c) 2005,2010 Open Geospatial Consortium.
+			To obtain additional rights of use, visit http://www.opengeospatial.org/legal/ .
+		</documentation>
+	</annotation>
+	<!-- ============================================================== -->
+	<include schemaLocation="coordinateReferenceSystems.xsd"/>
+	<!-- ============================================================== -->
+</schema>
