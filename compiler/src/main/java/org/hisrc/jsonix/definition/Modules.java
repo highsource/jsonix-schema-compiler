@@ -7,20 +7,23 @@ import java.util.Map;
 
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.configuration.AmbiguousPackageMappingException;
+import org.hisrc.jsonix.context.JsonixContext;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Modules<T, C extends T> {
 
-	private final Logger logger = LoggerFactory.getLogger(Modules.class);
+	private final Logger logger;
 	private final Collection<Module<T, C>> modules;
 	private final Map<String, String> packageMappingNameMap = new HashMap<String, String>();
 	private final MModelInfo<T, C> modelInfo;
 
-	public Modules(MModelInfo<T, C> modelInfo, Collection<Module<T, C>> modules) {
+	public Modules(JsonixContext context, MModelInfo<T, C> modelInfo,
+			Collection<Module<T, C>> modules) {
 		Validate.notNull(modelInfo);
 		Validate.noNullElements(modules);
+		this.logger = Validate.notNull(context).getLoggerFactory()
+				.getLogger(Modules.class.getName());
 		this.modelInfo = modelInfo;
 		this.modules = modules;
 

@@ -9,17 +9,16 @@ import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
+import org.hisrc.jsonix.context.JsonixContext;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @XmlRootElement(name = ElementInfoConfiguration.LOCAL_ELEMENT_NAME)
 @XmlType(propOrder = {})
 public class ElementInfoConfiguration {
 
-	private final Logger logger = LoggerFactory
-			.getLogger(ElementInfoConfiguration.class);
+	private final Logger logger;
 
 	public static final String LOCAL_ELEMENT_NAME = "element";
 
@@ -32,6 +31,11 @@ public class ElementInfoConfiguration {
 
 	public void setName(QName name) {
 		this.name = name;
+	}
+
+	public ElementInfoConfiguration(JsonixContext context) {
+		logger = Validate.notNull(context).getLoggerFactory()
+				.getLogger(ElementInfoConfiguration.class.getName());
 	}
 
 	public <T, C extends T> MElementInfo<T, C> findElementInfo(

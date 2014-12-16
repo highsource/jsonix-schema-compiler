@@ -46,6 +46,9 @@ import org.hisrc.jsonix.compilation.ProgramWriter;
 import org.hisrc.jsonix.configuration.ModulesConfiguration;
 import org.hisrc.jsonix.configuration.ModulesConfigurationUnmarshaller;
 import org.hisrc.jsonix.configuration.OutputConfiguration;
+import org.hisrc.jsonix.configuration.PluginCustomizations;
+import org.hisrc.jsonix.context.DefaultJsonixContext;
+import org.hisrc.jsonix.context.JsonixContext;
 import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Modules;
 import org.hisrc.jsonix.definition.Output;
@@ -54,7 +57,6 @@ import org.hisrc.jsonix.naming.StandardNaming;
 import org.jvnet.jaxb2_commons.xjc.model.concrete.XJCCMInfoFactory;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 import org.slf4j.ILoggerFactory;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.NOPLoggerFactory;
 import org.xml.sax.ErrorHandler;
@@ -73,8 +75,9 @@ import com.sun.tools.xjc.outline.Outline;
 
 public class JsonixPlugin extends Plugin {
 
-	private final Logger logger = LoggerFactory.getLogger(JsonixPlugin.class);
-	private final ModulesConfigurationUnmarshaller customizationHandler = new ModulesConfigurationUnmarshaller();
+	// private final Logger logger =
+	// LoggerFactory.getLogger(JsonixPlugin.class);
+	private final PluginCustomizations pluginCustomizations = new PluginCustomizations();
 
 	public static final String OPTION_NAME = "Xjsonix";
 	public static final String OPTION = "-" + OPTION_NAME;
@@ -119,9 +122,10 @@ public class JsonixPlugin extends Plugin {
 	public void onActivated(Options opts) throws BadCommandLineException {
 		final ILoggerFactory iLoggerFactory = LoggerFactory.getILoggerFactory();
 		if (iLoggerFactory instanceof NOPLoggerFactory) {
-			System.err.println("You seem to be using the NOP provider of the SLF4j logging facade. "
-					+ "With this configuration, log messages will be completely suppressed. "
-					+ "Please consider adding a SLF4j provider (for instance slf4j-simple) to enable logging.");
+			System.err
+					.println("You seem to be using the NOP provider of the SLF4j logging facade. "
+							+ "With this configuration, log messages will be completely suppressed. "
+							+ "Please consider adding a SLF4j provider (for instance slf4j-simple) to enable logging.");
 		}
 	}
 
@@ -131,12 +135,12 @@ public class JsonixPlugin extends Plugin {
 
 	@Override
 	public List<String> getCustomizationURIs() {
-		return this.customizationHandler.getCustomizationURIs();
+		return this.pluginCustomizations.getCustomizationURIs();
 	}
 
 	@Override
 	public boolean isCustomizationTagName(String nsUri, String localName) {
-		return this.customizationHandler.isCustomizationTagName(nsUri,
+		return this.pluginCustomizations.isCustomizationTagName(nsUri,
 				localName);
 	}
 
@@ -144,9 +148,15 @@ public class JsonixPlugin extends Plugin {
 	public boolean run(Outline outline, Options opt,
 			final ErrorHandler errorHandler) throws SAXException {
 
+		final JsonixContext context = new DefaultJsonixContext(
+				LoggerFactory.getILoggerFactory());
+
 		final Model model = outline.getModel();
 
-		final ModulesConfiguration modulesConfiguration = this.customizationHandler
+		final ModulesConfigurationUnmarshaller customizationHandler = new ModulesConfigurationUnmarshaller(
+				context);
+
+		final ModulesConfiguration modulesConfiguration = customizationHandler
 				.unmarshal(model, this.defaultOutputConfiguration);
 
 		final MModelInfo<NType, NClass> modelinfo = new XJCCMInfoFactory(model)

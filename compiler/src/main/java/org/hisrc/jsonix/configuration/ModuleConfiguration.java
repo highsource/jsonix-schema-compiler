@@ -11,20 +11,20 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
+import org.hisrc.jsonix.context.JsonixContext;
 import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Output;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @XmlRootElement(name = ModuleConfiguration.LOCAL_ELEMENT_NAME)
 @XmlType(propOrder = {})
 public class ModuleConfiguration {
 
-	private final Logger logger = LoggerFactory
-			.getLogger(ModuleConfiguration.class);
+	private final Logger logger;
 
 	public static final String LOCAL_ELEMENT_NAME = "module";
 
@@ -40,6 +40,11 @@ public class ModuleConfiguration {
 	public static final QName MODULE_NAME = new QName(
 			ModulesConfiguration.NAMESPACE_URI, LOCAL_ELEMENT_NAME,
 			ModulesConfiguration.DEFAULT_PREFIX);
+
+	public ModuleConfiguration(JsonixContext context) {
+		this.logger = Validate.notNull(context).getLoggerFactory().getLogger(
+				ModuleConfiguration.class.getName());
+	}
 
 	@XmlAttribute(name = "name")
 	public String getName() {

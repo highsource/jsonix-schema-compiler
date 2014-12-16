@@ -16,6 +16,8 @@ import org.hisrc.jsonix.compilation.ProgramWriter;
 import org.hisrc.jsonix.configuration.ModulesConfiguration;
 import org.hisrc.jsonix.configuration.ModulesConfigurationUnmarshaller;
 import org.hisrc.jsonix.configuration.OutputConfiguration;
+import org.hisrc.jsonix.context.DefaultJsonixContext;
+import org.hisrc.jsonix.context.JsonixContext;
 import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Modules;
 import org.hisrc.jsonix.definition.Output;
@@ -24,6 +26,7 @@ import org.hisrc.jsonix.naming.StandardNaming;
 import org.hisrc.jsonix.xjc.plugin.JsonixPlugin;
 import org.jvnet.jaxb2_commons.xjc.model.concrete.XJCCMInfoFactory;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXParseException;
 
 import com.sun.codemodel.JCodeModel;
@@ -93,13 +96,17 @@ public class JsonixMain {
 
 	private void execute() {
 
+		final JsonixContext context = new DefaultJsonixContext(
+				LoggerFactory.getILoggerFactory());
+
 		final ConsoleErrorReporter receiver = new ConsoleErrorReporter();
 		final Model model = ModelLoader.load(options, new JCodeModel(),
 				receiver);
 
-		final ModulesConfigurationUnmarshaller customizationHandler = new ModulesConfigurationUnmarshaller();
+		final ModulesConfigurationUnmarshaller configurationUnmarshaller = new ModulesConfigurationUnmarshaller(
+				context);
 
-		final ModulesConfiguration modulesConfiguration = customizationHandler
+		final ModulesConfiguration modulesConfiguration = configurationUnmarshaller
 				.unmarshal(model, this.defaultOutputConfiguration);
 
 		final ErrorReceiver errorReceiver = new ConsoleErrorReporter();

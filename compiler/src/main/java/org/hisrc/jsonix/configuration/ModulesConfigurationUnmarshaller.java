@@ -43,22 +43,25 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.lang3.Validate;
+import org.hisrc.jsonix.context.JsonixContext;
 import org.jvnet.jaxb2_commons.util.CustomizationUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.sun.tools.xjc.model.CPluginCustomization;
 import com.sun.tools.xjc.model.Model;
 
 public class ModulesConfigurationUnmarshaller {
 
-	private final Logger logger = LoggerFactory
-			.getLogger(ModuleConfiguration.class);
-	private final JAXBContext context;
+	private final Logger logger;
+	private final JsonixContext context;
+	private final JAXBContext jaxbContext;
 
-	public ModulesConfigurationUnmarshaller() {
+	public ModulesConfigurationUnmarshaller(JsonixContext context) {
+		this.context = Validate.notNull(context);
+		this.logger = Validate.notNull(context).getLoggerFactory().getLogger(
+				ModuleConfiguration.class.getName());
 		try {
-			context = JAXBContext.newInstance(ModulesConfiguration.class,
+			jaxbContext = JAXBContext.newInstance(ModulesConfiguration.class,
 					ModuleConfiguration.class, MappingConfiguration.class,
 					OutputConfiguration.class, PackageMapping.class,
 					IncludesConfiguration.class, ExcludesConfiguration.class,
@@ -71,7 +74,7 @@ public class ModulesConfigurationUnmarshaller {
 		}
 	}
 
-	private static final List<String> CUSTOMIZATION_URIS = Collections
+	public static final List<String> CUSTOMIZATION_URIS = Collections
 			.singletonList(ModulesConfiguration.NAMESPACE_URI);
 
 	private static final Set<String> CUSTOMIZATION_LOCAL_ELEMENT_NAMES = new HashSet<String>(
@@ -100,7 +103,7 @@ public class ModulesConfigurationUnmarshaller {
 			String description) {
 		try {
 			@SuppressWarnings("unchecked")
-			final T value = (T) context.createUnmarshaller().unmarshal(
+			final T value = (T) jaxbContext.createUnmarshaller().unmarshal(
 					customization.element);
 			return value;
 		} catch (JAXBException jaxbex) {
@@ -114,7 +117,8 @@ public class ModulesConfigurationUnmarshaller {
 			OutputConfiguration defaultOutputConfiguration) {
 		Validate.notNull(model);
 		Validate.notNull(defaultOutputConfiguration);
-		final ModulesConfiguration modulesConfiguration = new ModulesConfiguration();
+		final ModulesConfiguration modulesConfiguration = new ModulesConfiguration(
+				this.context);
 		for (CPluginCustomization customization : CustomizationUtils
 				.findCustomizations(model, PackageMapping.PACKAGE_MAPPING_NAME)) {
 			modulesConfiguration.getMappingConfigurations().add(
@@ -149,7 +153,8 @@ public class ModulesConfigurationUnmarshaller {
 				"package mapping");
 		logger.warn("The [packageMapping] customization is deprecated, please use the [mapping] customization in the future.");
 
-		final MappingConfiguration mappingConfiguration = new MappingConfiguration();
+		final MappingConfiguration mappingConfiguration = new MappingConfiguration(
+				this.context);
 		mappingConfiguration.setName(packageMapping.getSpaceName());
 		mappingConfiguration.setPackage(packageMapping.getPackageName());
 		mappingConfiguration.setDefaultElementNamespaceURI(packageMapping

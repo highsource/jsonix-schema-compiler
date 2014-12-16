@@ -11,6 +11,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
+import org.hisrc.jsonix.context.JsonixContext;
 import org.hisrc.jsonix.definition.Mapping;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
@@ -19,14 +20,12 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.util.PackageInfoQNameAnalyzer;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @XmlRootElement(name = MappingConfiguration.LOCAL_ELEMENT_NAME)
 @XmlType(propOrder = {})
 public class MappingConfiguration {
 
-	private final Logger logger = LoggerFactory
-			.getLogger(MappingConfiguration.class);
+	private final Logger logger;
 
 	public static final String LOCAL_ELEMENT_NAME = "mapping";
 
@@ -37,6 +36,14 @@ public class MappingConfiguration {
 	private String defaultAttributeNamespaceURI;
 	private IncludesConfiguration includesConfiguration;
 	private ExcludesConfiguration excludesConfiguration;
+
+	private final JsonixContext context;
+
+	public MappingConfiguration(JsonixContext context) {
+		this.context = Validate.notNull(context);
+		this.logger = context.getLoggerFactory().getLogger(
+				MappingConfiguration.class.getName());
+	}
 
 	public static final QName MAPPING_NAME = new QName(
 			ModulesConfiguration.NAMESPACE_URI,
@@ -161,8 +168,8 @@ public class MappingConfiguration {
 
 		}
 
-		final Mapping<T, C> mapping = new Mapping<T, C>(analyzer, packageInfo,
-				mappingName, defaultElementNamespaceURI,
+		final Mapping<T, C> mapping = new Mapping<T, C>(context, analyzer,
+				packageInfo, mappingName, defaultElementNamespaceURI,
 				defaultAttributeNamespaceURI);
 
 		if (getExcludesConfiguration() != null) {

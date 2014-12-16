@@ -8,21 +8,25 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
+import org.hisrc.jsonix.context.JsonixContext;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @XmlRootElement(name = PropertyInfoConfiguration.LOCAL_ELEMENT_NAME)
 @XmlType(propOrder = {})
 public class PropertyInfoConfiguration {
 
-	private final Logger logger = LoggerFactory
-			.getLogger(PropertyInfoConfiguration.class);
+	private final Logger logger;
 
 	public static final String LOCAL_ELEMENT_NAME = "property";
 
 	private String name;
+
+	public PropertyInfoConfiguration(JsonixContext context) {
+		this.logger = Validate.notNull(context).getLoggerFactory()
+				.getLogger(PropertyInfoConfiguration.class.getName());
+	}
 
 	@XmlAttribute
 	public String getName() {

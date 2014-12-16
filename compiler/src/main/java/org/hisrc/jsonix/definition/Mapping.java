@@ -22,6 +22,7 @@ import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
 import org.hisrc.jsonix.analysis.PackageInfoVertex;
 import org.hisrc.jsonix.analysis.PropertyInfoVertex;
 import org.hisrc.jsonix.analysis.TypeInfoVertex;
+import org.hisrc.jsonix.context.JsonixContext;
 import org.jgrapht.DirectedGraph;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
@@ -32,11 +33,10 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfoVisitor;
 import org.jvnet.jaxb2_commons.xml.bind.model.util.DefaultTypeInfoVisitor;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Mapping<T, C extends T> {
 
-	private final Logger logger = LoggerFactory.getLogger(Mapping.class);
+	private final Logger logger;
 	private final ModelInfoGraphAnalyzer<T, C> analyzer;
 	private final MPackageInfo packageInfo;
 	private final Collection<MClassInfo<T, C>> classInfos = new HashSet<MClassInfo<T, C>>();
@@ -49,10 +49,12 @@ public class Mapping<T, C extends T> {
 	private final String defaultAttributeNamespaceURI;
 	private final Map<InfoVertex<T, C>, ContainmentType> verticesContainmentMap = new HashMap<InfoVertex<T, C>, ContainmentType>();
 
-	public Mapping(ModelInfoGraphAnalyzer<T, C> analyzer,
-			MPackageInfo packageInfo, String mappingName,
-			String defaultElementNamespaceURI,
+	public Mapping(JsonixContext context,
+			ModelInfoGraphAnalyzer<T, C> analyzer, MPackageInfo packageInfo,
+			String mappingName, String defaultElementNamespaceURI,
 			String defaultAttributeNamespaceURI) {
+		this.logger = Validate.notNull(context).getLoggerFactory()
+				.getLogger(Mapping.class.getName());
 		Validate.notNull(analyzer);
 		Validate.notNull(packageInfo);
 		Validate.notNull(mappingName);

@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.Validate;
+import org.hisrc.jsonix.context.JsonixContext;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.traverse.BreadthFirstIterator;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
@@ -38,9 +39,10 @@ public class ModelInfoGraphAnalyzer<T, C> {
 	private final Map<String, MPropertyInfo<T, C>> propertyInfoMap;
 	private final Map<QName, MElementInfo<T, C>> elementInfoMap;
 
-	public ModelInfoGraphAnalyzer(MModelInfo<T, C> modelInfo) {
+	public ModelInfoGraphAnalyzer(JsonixContext context,
+			MModelInfo<T, C> modelInfo) {
 		final DirectedGraph<InfoVertex<T, C>, DependencyEdge> graph = new ModelInfoGraphBuilder<T, C>(
-				modelInfo).build();
+				context, modelInfo).build();
 
 		this.packageVertexMap = createPackageVertexMap(graph);
 		this.packageInfoMap = createPackageInfoMap(this.packageVertexMap);

@@ -17,6 +17,7 @@ import javax.xml.namespace.QName;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
+import org.hisrc.jsonix.context.JsonixContext;
 import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Modules;
@@ -29,14 +30,12 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @XmlRootElement(name = ModulesConfiguration.LOCAL_ELEMENT_NAME)
 @XmlType(propOrder = {})
 public class ModulesConfiguration {
 
-	private final Logger logger = LoggerFactory
-			.getLogger(ModulesConfiguration.class);
+	private final Logger logger;
 
 	public static final String DEFAULT_PREFIX = "jsonix";
 
@@ -50,6 +49,15 @@ public class ModulesConfiguration {
 	private List<ModuleConfiguration> moduleConfigurations = new LinkedList<ModuleConfiguration>();
 	private List<MappingConfiguration> mappingConfigurations = new LinkedList<MappingConfiguration>();
 	private List<OutputConfiguration> outputConfigurations = new LinkedList<OutputConfiguration>();
+
+	private final JsonixContext context;
+
+	public ModulesConfiguration(JsonixContext context) {
+		this.context = Validate.notNull(context);
+		this.logger = Validate.notNull(context).getLoggerFactory().getLogger(
+				ModulesConfiguration.class.getName());
+
+	}
 
 	public List<ModuleConfiguration> getModuleConfigurations() {
 		return moduleConfigurations;
@@ -81,7 +89,7 @@ public class ModulesConfiguration {
 	public <T, C extends T> Modules<T, C> build(MModelInfo<T, C> modelInfo) {
 
 		final ModelInfoGraphAnalyzer<T, C> analyzer = new ModelInfoGraphAnalyzer<T, C>(
-				modelInfo);
+				context, modelInfo);
 
 		final List<ModuleConfiguration> moduleConfigurations = new LinkedList<ModuleConfiguration>(
 				getModuleConfigurations());
@@ -203,9 +211,11 @@ public class ModulesConfiguration {
 				analyzer.getPackageNames(), moduleConfigurations);
 
 		for (final String packageName : packageNames) {
-			final MappingConfiguration mappingConfiguration = new MappingConfiguration();
+			final MappingConfiguration mappingConfiguration = new MappingConfiguration(
+					context);
 			mappingConfiguration.setPackage(packageName);
-			final ModuleConfiguration moduleConfiguration = new ModuleConfiguration();
+			final ModuleConfiguration moduleConfiguration = new ModuleConfiguration(
+					context);
 			moduleConfiguration.getMappingConfigurations().add(
 					mappingConfiguration);
 			moduleConfigurations.add(moduleConfiguration);
@@ -244,7 +254,8 @@ public class ModulesConfiguration {
 			final List<MappingConfiguration> mappingConfigurations) {
 		// Create one module configuration per mapping configuration
 		for (final MappingConfiguration mappingConfiguration : mappingConfigurations) {
-			final ModuleConfiguration moduleConfiguration = new ModuleConfiguration();
+			final ModuleConfiguration moduleConfiguration = new ModuleConfiguration(
+					this.context);
 			moduleConfiguration.getMappingConfigurations().add(
 					mappingConfiguration);
 			moduleConfigurations.add(moduleConfiguration);
@@ -282,7 +293,7 @@ public class ModulesConfiguration {
 				modules.add(module);
 			}
 		}
-		return new Modules<T, C>(modelInfo, modules);
+		return new Modules<T, C>(context, modelInfo, modules);
 	}
 
 	private <T, C extends T> Map<String, Mapping<T, C>> buildMappings(
