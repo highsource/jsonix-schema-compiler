@@ -26,7 +26,6 @@ import org.hisrc.jsonix.naming.StandardNaming;
 import org.hisrc.jsonix.xjc.plugin.JsonixPlugin;
 import org.jvnet.jaxb2_commons.xjc.model.concrete.XJCCMInfoFactory;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXParseException;
 
 import com.sun.codemodel.JCodeModel;
@@ -96,8 +95,7 @@ public class JsonixMain {
 
 	private void execute() {
 
-		final JsonixContext context = new DefaultJsonixContext(
-				LoggerFactory.getILoggerFactory());
+		final JsonixContext context = new DefaultJsonixContext();
 
 		final ConsoleErrorReporter receiver = new ConsoleErrorReporter();
 		final Model model = ModelLoader.load(options, new JCodeModel(),
@@ -114,8 +112,8 @@ public class JsonixMain {
 		final MModelInfo<NType, NClass> modelInfo = new XJCCMInfoFactory(model)
 				.createModel();
 
-		final Modules<NType, NClass> modules = modulesConfiguration
-				.build(modelInfo);
+		final Modules<NType, NClass> modules = modulesConfiguration.build(
+				context, modelInfo);
 
 		final ModulesCompiler<NType, NClass> modulesCompiler = new ModulesCompiler<NType, NClass>(
 				modules);

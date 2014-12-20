@@ -58,8 +58,8 @@ public class ModulesConfigurationUnmarshaller {
 
 	public ModulesConfigurationUnmarshaller(JsonixContext context) {
 		this.context = Validate.notNull(context);
-		this.logger = Validate.notNull(context).getLoggerFactory().getLogger(
-				ModuleConfiguration.class.getName());
+		this.logger = Validate.notNull(context).getLoggerFactory()
+				.getLogger(ModuleConfiguration.class.getName());
 		try {
 			jaxbContext = JAXBContext.newInstance(ModulesConfiguration.class,
 					ModuleConfiguration.class, MappingConfiguration.class,
@@ -117,8 +117,7 @@ public class ModulesConfigurationUnmarshaller {
 			OutputConfiguration defaultOutputConfiguration) {
 		Validate.notNull(model);
 		Validate.notNull(defaultOutputConfiguration);
-		final ModulesConfiguration modulesConfiguration = new ModulesConfiguration(
-				this.context);
+		final ModulesConfiguration modulesConfiguration = new ModulesConfiguration();
 		for (CPluginCustomization customization : CustomizationUtils
 				.findCustomizations(model, PackageMapping.PACKAGE_MAPPING_NAME)) {
 			modulesConfiguration.getMappingConfigurations().add(
@@ -153,8 +152,7 @@ public class ModulesConfigurationUnmarshaller {
 				"package mapping");
 		logger.warn("The [packageMapping] customization is deprecated, please use the [mapping] customization in the future.");
 
-		final MappingConfiguration mappingConfiguration = new MappingConfiguration(
-				this.context);
+		final MappingConfiguration mappingConfiguration = new MappingConfiguration();
 		mappingConfiguration.setName(packageMapping.getSpaceName());
 		mappingConfiguration.setPackage(packageMapping.getPackageName());
 		mappingConfiguration.setDefaultElementNamespaceURI(packageMapping

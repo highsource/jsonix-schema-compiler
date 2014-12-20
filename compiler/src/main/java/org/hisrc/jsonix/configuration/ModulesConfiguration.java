@@ -35,8 +35,6 @@ import org.slf4j.Logger;
 @XmlType(propOrder = {})
 public class ModulesConfiguration {
 
-	private final Logger logger;
-
 	public static final String DEFAULT_PREFIX = "jsonix";
 
 	public static final String NAMESPACE_URI = "http://jsonix.highsource.org/customizations";
@@ -49,15 +47,6 @@ public class ModulesConfiguration {
 	private List<ModuleConfiguration> moduleConfigurations = new LinkedList<ModuleConfiguration>();
 	private List<MappingConfiguration> mappingConfigurations = new LinkedList<MappingConfiguration>();
 	private List<OutputConfiguration> outputConfigurations = new LinkedList<OutputConfiguration>();
-
-	private final JsonixContext context;
-
-	public ModulesConfiguration(JsonixContext context) {
-		this.context = Validate.notNull(context);
-		this.logger = Validate.notNull(context).getLoggerFactory().getLogger(
-				ModulesConfiguration.class.getName());
-
-	}
 
 	public List<ModuleConfiguration> getModuleConfigurations() {
 		return moduleConfigurations;
@@ -86,7 +75,8 @@ public class ModulesConfiguration {
 		this.outputConfigurations = outputConfigurations;
 	}
 
-	public <T, C extends T> Modules<T, C> build(MModelInfo<T, C> modelInfo) {
+	public <T, C extends T> Modules<T, C> build(JsonixContext context,
+			MModelInfo<T, C> modelInfo) {
 
 		final ModelInfoGraphAnalyzer<T, C> analyzer = new ModelInfoGraphAnalyzer<T, C>(
 				context, modelInfo);
@@ -102,12 +92,12 @@ public class ModulesConfiguration {
 
 		assignDefaultOutputConfigurations(moduleConfigurations);
 
-		assignMappingNamesAndIds(moduleConfigurations);
+		assignMappingNamesAndIds(context, moduleConfigurations);
 
-		return buildModules(modelInfo, analyzer, moduleConfigurations);
+		return buildModules(context, modelInfo, analyzer, moduleConfigurations);
 	}
 
-	private void assignMappingNamesAndIds(
+	private void assignMappingNamesAndIds(JsonixContext context,
 			final List<ModuleConfiguration> moduleConfigurations) {
 		// Generate ids where missing
 		final Map<String, MappingConfiguration> idToMappingConfiguration = new HashMap<String, MappingConfiguration>();
@@ -120,16 +110,20 @@ public class ModulesConfiguration {
 
 				assignMappingName(mappingConfiguration);
 
-				assignMappingId(idToMappingConfiguration,
+				assignMappingId(context, idToMappingConfiguration,
 						nameToMappingConfiguration, mappingConfiguration);
 			}
 		}
 	}
 
 	private void assignMappingId(
+			JsonixContext context,
 			final Map<String, MappingConfiguration> idToMappingConfiguration,
 			final Map<String, List<MappingConfiguration>> nameToMappingConfiguration,
 			final MappingConfiguration mappingConfiguration) {
+		final Logger logger = Validate.notNull(context).getLoggerFactory()
+				.getLogger(ModulesConfiguration.class.getName());
+
 		final String mappingName = mappingConfiguration.getName();
 		String mappingId = mappingConfiguration.getId();
 
@@ -211,11 +205,9 @@ public class ModulesConfiguration {
 				analyzer.getPackageNames(), moduleConfigurations);
 
 		for (final String packageName : packageNames) {
-			final MappingConfiguration mappingConfiguration = new MappingConfiguration(
-					context);
+			final MappingConfiguration mappingConfiguration = new MappingConfiguration();
 			mappingConfiguration.setPackage(packageName);
-			final ModuleConfiguration moduleConfiguration = new ModuleConfiguration(
-					context);
+			final ModuleConfiguration moduleConfiguration = new ModuleConfiguration();
 			moduleConfiguration.getMappingConfigurations().add(
 					mappingConfiguration);
 			moduleConfigurations.add(moduleConfiguration);
@@ -254,8 +246,7 @@ public class ModulesConfiguration {
 			final List<MappingConfiguration> mappingConfigurations) {
 		// Create one module configuration per mapping configuration
 		for (final MappingConfiguration mappingConfiguration : mappingConfigurations) {
-			final ModuleConfiguration moduleConfiguration = new ModuleConfiguration(
-					this.context);
+			final ModuleConfiguration moduleConfiguration = new ModuleConfiguration();
 			moduleConfiguration.getMappingConfigurations().add(
 					mappingConfiguration);
 			moduleConfigurations.add(moduleConfiguration);
@@ -274,15 +265,16 @@ public class ModulesConfiguration {
 		return defaultOutputConfigurations;
 	}
 
-	private <T, C extends T> Modules<T, C> buildModules(
+	private <T, C extends T> Modules<T, C> buildModules(JsonixContext context,
 			MModelInfo<T, C> modelInfo,
 			final ModelInfoGraphAnalyzer<T, C> analyzer,
 			final List<ModuleConfiguration> moduleConfigurations) {
 
-		final List<MappingConfiguration> mappingConfigurations = getTopologicallyOrderedMappingConfigurations(moduleConfigurations);
+		final List<MappingConfiguration> mappingConfigurations = getTopologicallyOrderedMappingConfigurations(
+				context, moduleConfigurations);
 
-		final Map<String, Mapping<T, C>> mappings = buildMappings(modelInfo,
-				analyzer, mappingConfigurations);
+		final Map<String, Mapping<T, C>> mappings = buildMappings(context,
+				modelInfo, analyzer, mappingConfigurations);
 
 		final List<Module<T, C>> modules = new ArrayList<Module<T, C>>(
 				moduleConfigurations.size());
@@ -297,9 +289,12 @@ public class ModulesConfiguration {
 	}
 
 	private <T, C extends T> Map<String, Mapping<T, C>> buildMappings(
-			MModelInfo<T, C> modelInfo,
+			JsonixContext context, MModelInfo<T, C> modelInfo,
 			final ModelInfoGraphAnalyzer<T, C> analyzer,
 			final List<MappingConfiguration> mappingConfigurations) {
+		final Logger logger = Validate.notNull(context).getLoggerFactory()
+				.getLogger(ModulesConfiguration.class.getName());
+
 		final Map<String, Mapping<T, C>> mappings = new HashMap<String, Mapping<T, C>>();
 		for (MappingConfiguration mappingConfiguration : mappingConfigurations) {
 			final String packageName = mappingConfiguration.getPackage();
@@ -312,7 +307,7 @@ public class ModulesConfiguration {
 				// throw new MissingPackageException(packageName);
 			} else {
 				final Mapping<T, C> mapping = mappingConfiguration.build(
-						analyzer, modelInfo, packageInfo, mappings);
+						context, analyzer, modelInfo, packageInfo, mappings);
 				mappings.put(mappingConfiguration.getId(), mapping);
 			}
 		}
@@ -320,8 +315,10 @@ public class ModulesConfiguration {
 	}
 
 	private List<MappingConfiguration> getTopologicallyOrderedMappingConfigurations(
+			JsonixContext context,
 			final List<ModuleConfiguration> moduleConfigurations) {
-		final DirectedGraph<MappingConfiguration, Object> mappingConfigurationDependencyGraph = buildMappingConfigurationDependencyGraph(moduleConfigurations);
+		final DirectedGraph<MappingConfiguration, Object> mappingConfigurationDependencyGraph = buildMappingConfigurationDependencyGraph(
+				context, moduleConfigurations);
 
 		final StrongConnectivityInspector<MappingConfiguration, Object> strongConnectivityInspector = new StrongConnectivityInspector<MappingConfiguration, Object>(
 				mappingConfigurationDependencyGraph);
@@ -349,7 +346,11 @@ public class ModulesConfiguration {
 	}
 
 	private DirectedGraph<MappingConfiguration, Object> buildMappingConfigurationDependencyGraph(
+			JsonixContext context,
 			final List<ModuleConfiguration> moduleConfigurations) {
+		final Logger logger = Validate.notNull(context).getLoggerFactory()
+				.getLogger(ModulesConfiguration.class.getName());
+
 		final DirectedGraph<MappingConfiguration, Object> mappingDependenciesGraph = new DefaultDirectedGraph<MappingConfiguration, Object>(
 				new EdgeFactory<MappingConfiguration, Object>() {
 					public Object createEdge(MappingConfiguration sourceVertex,

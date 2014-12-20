@@ -17,16 +17,9 @@ import org.slf4j.Logger;
 @XmlType(propOrder = {})
 public class TypeInfoConfiguration {
 
-	private final Logger logger;
-
 	public static final String LOCAL_ELEMENT_NAME = "type";
 
 	private String name;
-
-	public TypeInfoConfiguration(JsonixContext context) {
-		this.logger = Validate.notNull(context).getLoggerFactory()
-				.getLogger(TypeInfoConfiguration.class.getName());
-	}
 
 	@XmlAttribute
 	public String getName() {
@@ -37,10 +30,12 @@ public class TypeInfoConfiguration {
 		this.name = name;
 	}
 
-	public <T, C extends T> MTypeInfo<T, C> findTypeInfo(
+	public <T, C extends T> MTypeInfo<T, C> findTypeInfo(JsonixContext context,
 			ModelInfoGraphAnalyzer<T, C> analyzer, MPackageInfo packageInfo) {
 		Validate.notNull(analyzer);
 		Validate.notNull(packageInfo);
+		final Logger logger = Validate.notNull(context).getLoggerFactory()
+				.getLogger(TypeInfoConfiguration.class.getName());
 		final String name = getName();
 		if (name == null) {
 			logger.warn(MessageFormat

@@ -148,8 +148,7 @@ public class JsonixPlugin extends Plugin {
 	public boolean run(Outline outline, Options opt,
 			final ErrorHandler errorHandler) throws SAXException {
 
-		final JsonixContext context = new DefaultJsonixContext(
-				LoggerFactory.getILoggerFactory());
+		final JsonixContext context = new DefaultJsonixContext();
 
 		final Model model = outline.getModel();
 
@@ -162,8 +161,8 @@ public class JsonixPlugin extends Plugin {
 		final MModelInfo<NType, NClass> modelinfo = new XJCCMInfoFactory(model)
 				.createModel();
 
-		final Modules<NType, NClass> modules = modulesConfiguration
-				.build(modelinfo);
+		final Modules<NType, NClass> modules = modulesConfiguration.build(
+				context, modelinfo);
 
 		final ModulesCompiler<NType, NClass> modulesCompiler = new ModulesCompiler<NType, NClass>(
 				modules);

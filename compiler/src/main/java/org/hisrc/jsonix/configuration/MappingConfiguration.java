@@ -25,8 +25,6 @@ import org.slf4j.Logger;
 @XmlType(propOrder = {})
 public class MappingConfiguration {
 
-	private final Logger logger;
-
 	public static final String LOCAL_ELEMENT_NAME = "mapping";
 
 	private String id;
@@ -36,14 +34,6 @@ public class MappingConfiguration {
 	private String defaultAttributeNamespaceURI;
 	private IncludesConfiguration includesConfiguration;
 	private ExcludesConfiguration excludesConfiguration;
-
-	private final JsonixContext context;
-
-	public MappingConfiguration(JsonixContext context) {
-		this.context = Validate.notNull(context);
-		this.logger = context.getLoggerFactory().getLogger(
-				MappingConfiguration.class.getName());
-	}
 
 	public static final QName MAPPING_NAME = new QName(
 			ModulesConfiguration.NAMESPACE_URI,
@@ -116,7 +106,7 @@ public class MappingConfiguration {
 		this.excludesConfiguration = excludesConfiguration;
 	}
 
-	public <T, C extends T> Mapping<T, C> build(
+	public <T, C extends T> Mapping<T, C> build(JsonixContext context,
 			ModelInfoGraphAnalyzer<T, C> analyzer, MModelInfo<T, C> modelInfo,
 			MPackageInfo packageInfo, Map<String, Mapping<T, C>> mappings) {
 		Validate.notNull(modelInfo);
@@ -126,6 +116,9 @@ public class MappingConfiguration {
 		final String packageName = getPackage();
 
 		final String mappingName = getName();
+
+		final Logger logger = context.getLoggerFactory().getLogger(
+				MappingConfiguration.class.getName());
 
 		logger.debug(MessageFormat.format(
 				"Package [{0}] will be mapped by the mapping [{1}].",
@@ -177,7 +170,7 @@ public class MappingConfiguration {
 			for (TypeInfoConfiguration typeInfoConfiguration : excludesConfiguration
 					.getTypeInfoConfigurations()) {
 				final MTypeInfo<T, C> typeInfo = typeInfoConfiguration
-						.findTypeInfo(analyzer, packageInfo);
+						.findTypeInfo(context, analyzer, packageInfo);
 				if (typeInfo != null) {
 					mapping.excludeTypeInfo(typeInfo);
 				}
@@ -185,7 +178,7 @@ public class MappingConfiguration {
 			for (ElementInfoConfiguration elementInfoConfiguration : excludesConfiguration
 					.getElementInfoConfigurations()) {
 				final MElementInfo<T, C> elementInfo = elementInfoConfiguration
-						.findElementInfo(analyzer, packageInfo);
+						.findElementInfo(context, analyzer, packageInfo);
 				if (elementInfo != null) {
 					mapping.excludeElementInfo(elementInfo);
 				}
@@ -193,7 +186,7 @@ public class MappingConfiguration {
 			for (PropertyInfoConfiguration propertyInfoConfiguration : excludesConfiguration
 					.getPropertyInfoConfigurations()) {
 				final MPropertyInfo<T, C> propertyInfo = propertyInfoConfiguration
-						.findPropertyInfo(analyzer, packageInfo);
+						.findPropertyInfo(context, analyzer, packageInfo);
 				if (propertyInfo != null) {
 					mapping.excludePropertyInfo(propertyInfo);
 				}
@@ -210,7 +203,7 @@ public class MappingConfiguration {
 			for (TypeInfoConfiguration typeInfoConfiguration : includesConfiguration
 					.getTypeInfoConfigurations()) {
 				final MTypeInfo<T, C> typeInfo = typeInfoConfiguration
-						.findTypeInfo(analyzer, packageInfo);
+						.findTypeInfo(context, analyzer, packageInfo);
 				if (typeInfo != null) {
 					mapping.includeTypeInfo(typeInfo);
 				}
@@ -218,7 +211,7 @@ public class MappingConfiguration {
 			for (ElementInfoConfiguration elementInfoConfiguration : includesConfiguration
 					.getElementInfoConfigurations()) {
 				final MElementInfo<T, C> elementInfo = elementInfoConfiguration
-						.findElementInfo(analyzer, packageInfo);
+						.findElementInfo(context, analyzer, packageInfo);
 				if (elementInfo != null) {
 					mapping.includeElementInfo(elementInfo);
 				}
@@ -226,7 +219,7 @@ public class MappingConfiguration {
 			for (PropertyInfoConfiguration propertyInfoConfiguration : includesConfiguration
 					.getPropertyInfoConfigurations()) {
 				final MPropertyInfo<T, C> propertyInfo = propertyInfoConfiguration
-						.findPropertyInfo(analyzer, packageInfo);
+						.findPropertyInfo(context, analyzer, packageInfo);
 				if (propertyInfo != null) {
 					mapping.includePropertyInfo(propertyInfo);
 				}

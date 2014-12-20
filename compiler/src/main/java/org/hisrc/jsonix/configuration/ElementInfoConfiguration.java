@@ -18,8 +18,6 @@ import org.slf4j.Logger;
 @XmlType(propOrder = {})
 public class ElementInfoConfiguration {
 
-	private final Logger logger;
-
 	public static final String LOCAL_ELEMENT_NAME = "element";
 
 	private QName name;
@@ -33,15 +31,15 @@ public class ElementInfoConfiguration {
 		this.name = name;
 	}
 
-	public ElementInfoConfiguration(JsonixContext context) {
-		logger = Validate.notNull(context).getLoggerFactory()
-				.getLogger(ElementInfoConfiguration.class.getName());
-	}
-
 	public <T, C extends T> MElementInfo<T, C> findElementInfo(
-			ModelInfoGraphAnalyzer<T, C> analyzer, MPackageInfo packageInfo) {
+			JsonixContext context, ModelInfoGraphAnalyzer<T, C> analyzer,
+			MPackageInfo packageInfo) {
+		Validate.notNull(context);
 		Validate.notNull(analyzer);
 		Validate.notNull(packageInfo);
+		final Logger logger = Validate.notNull(context).getLoggerFactory()
+				.getLogger(ElementInfoConfiguration.class.getName());
+
 		final QName name = getName();
 		if (name == null) {
 			logger.warn(MessageFormat
