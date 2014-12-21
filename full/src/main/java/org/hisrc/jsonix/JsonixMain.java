@@ -1,22 +1,14 @@
 package org.hisrc.jsonix;
 
+import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
-import org.hisrc.jsonix.compilation.ModulesCompiler;
-import org.hisrc.jsonix.configuration.ModulesConfiguration;
-import org.hisrc.jsonix.configuration.ModulesConfigurationUnmarshaller;
-import org.hisrc.jsonix.configuration.OutputConfiguration;
-import org.hisrc.jsonix.context.DefaultJsonixContext;
-import org.hisrc.jsonix.context.JsonixContext;
-import org.hisrc.jsonix.definition.Modules;
-import org.hisrc.jsonix.naming.CompactNaming;
-import org.hisrc.jsonix.naming.StandardNaming;
-import org.hisrc.jsonix.xjc.plugin.JsonixPlugin;
-import org.jvnet.jaxb2_commons.xjc.model.concrete.XJCCMInfoFactory;
-import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
+import org.hisrc.jsonix.args4j.PartialCmdLineParser;
+import org.hisrc.jsonix.compilation.ProgramWriter;
+import org.hisrc.jsonix.execution.JsonixInvoker;
+import org.hisrc.jsonix.settings.Settings;
 
 import com.sun.codemodel.JCodeModel;
 import com.sun.tools.xjc.ConsoleErrorReporter;
@@ -33,8 +25,20 @@ public class JsonixMain {
 
 	public static void main(String[] args) throws Exception {
 
-		final List<String> arguments = new ArrayList<String>(
-				Arrays.asList(args));
+		final List<String> arguments = new ArrayList<String>(args.length);
+
+		final Settings settings = new Settings();
+		final PartialCmdLineParser parser = new PartialCmdLineParser(settings);
+		int position = 0;
+
+		while (position < args.length) {
+			final int consumed = parser.parseArgument(args, position);
+			if (consumed == 0) {
+				arguments.add(args[position++]);
+			} else {
+				position += consumed;
+			}
+		}
 
 		if (!arguments.contains("-extension")) {
 			arguments.add("-extension");
@@ -47,69 +51,42 @@ public class JsonixMain {
 		// TODO
 		System.setProperty("javax.xml.accessExternalDTD", "all");
 
-		if (!arguments.contains(JsonixPlugin.OPTION)) {
-			arguments.add(JsonixPlugin.OPTION);
-		}
-
-		final OutputConfiguration defaultOutputConfiguration;
-		if (arguments.contains(JsonixPlugin.OPTION_COMPACT)) {
-			defaultOutputConfiguration = new OutputConfiguration(
-					CompactNaming.NAMING_NAME,
-					OutputConfiguration.STANDARD_FILE_NAME_PATTERN);
-		} else {
-			defaultOutputConfiguration = new OutputConfiguration(
-					StandardNaming.NAMING_NAME,
-					OutputConfiguration.STANDARD_FILE_NAME_PATTERN);
-		}
-		// Driver.main(arguments.toArray(new String[arguments.size()]));
-
-		Options options = new Options();
+		final Options options = new Options();
 
 		options.parseArguments(arguments.toArray(new String[arguments.size()]));
 
-		final JsonixMain main = new JsonixMain(options,
-				defaultOutputConfiguration);
-		main.execute();
+		new JsonixMain(settings, options).execute();
 	}
 
+	private final Settings settings;
 	private final Options options;
-	private final OutputConfiguration defaultOutputConfiguration;
 
-	public JsonixMain(Options options,
-			OutputConfiguration defaultOutputConfiguration) {
-		Validate.notNull(options);
-		Validate.notNull(defaultOutputConfiguration);
-		this.options = options;
-		this.defaultOutputConfiguration = defaultOutputConfiguration;
+	public JsonixMain(Settings settings, Options options) {
+		this.settings = Validate.notNull(settings);
+		this.options = Validate.notNull(options);
+	}
+
+	public Options getOptions() {
+		return options;
+	}
+
+	public Settings getSettings() {
+		return settings;
 	}
 
 	private void execute() {
 
-		final ConsoleErrorReporter receiver = new ConsoleErrorReporter();
-		final Model model = ModelLoader.load(options, new JCodeModel(),
-				receiver);
-		final JsonixContext context = new DefaultJsonixContext();
+		final ErrorReceiver errorHandler = new ConsoleErrorReporter();
+		final Model model = ModelLoader.load(getOptions(), new JCodeModel(),
+				errorHandler);
 
-		final ModulesConfigurationUnmarshaller configurationUnmarshaller = new ModulesConfigurationUnmarshaller(
-				context);
+		final File targetDirectory = getOptions().targetDir;
 
-		final ModulesConfiguration modulesConfiguration = configurationUnmarshaller
-				.unmarshal(model, this.defaultOutputConfiguration);
+		final ProgramWriter<NType, NClass> programWriter = new TargetDirectoryProgramWriter(
+				targetDirectory, errorHandler);
 
-		final ErrorReceiver errorReceiver = new ConsoleErrorReporter();
+		new JsonixInvoker().execute(settings, model, programWriter);
 
-		final MModelInfo<NType, NClass> modelInfo = new XJCCMInfoFactory(model)
-				.createModel();
-
-		final Modules<NType, NClass> modules = modulesConfiguration.build(
-				context, modelInfo);
-
-		final ModulesCompiler<NType, NClass> modulesCompiler = new ModulesCompiler<NType, NClass>(
-				modules);
-
-		final TargetDirectoryProgramWriter programWriter = new TargetDirectoryProgramWriter(
-				options.targetDir, errorReceiver);
-		modulesCompiler.compile(programWriter);
 	}
 
 }

@@ -53,6 +53,7 @@ import com.sun.tools.xjc.model.Model;
 public class ModulesConfigurationUnmarshaller {
 
 	private final Logger logger;
+	@SuppressWarnings("unused")
 	private final JsonixContext context;
 	private final JAXBContext jaxbContext;
 

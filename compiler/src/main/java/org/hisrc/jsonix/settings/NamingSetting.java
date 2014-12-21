@@ -1,20 +1,19 @@
 package org.hisrc.jsonix.settings;
 
 import org.hisrc.jsonix.naming.CompactNaming;
-import org.hisrc.jsonix.naming.Naming;
 import org.hisrc.jsonix.naming.StandardNaming;
 
 public enum NamingSetting {
 
-	COMPACT(new CompactNaming()), STANDARD(new StandardNaming());
+	COMPACT(CompactNaming.NAMING_NAME), STANDARD(StandardNaming.NAMING_NAME);
 
-	private final Naming naming;
+	private final String name;
 
-	private NamingSetting(Naming naming) {
-		this.naming = naming;
+	private NamingSetting(String naming) {
+		this.name = naming;
 	}
 
-	public Naming getNaming() {
-		return this.naming;
+	public String getName() {
+		return this.name;
 	}
 }

@@ -4,10 +4,33 @@ import org.kohsuke.args4j.Option;
 
 public class Settings {
 
+	private LogLevelSetting logLevel = LogLevelSetting.INFO;
+
 	@Option(name = "-logLevel", aliases = { "-Xjsonix-logLevel" })
-	public LogLevelSetting logLevel = LogLevelSetting.INFO;
+	public void setLogLevel(LogLevelSetting logLevel) {
+		this.logLevel = logLevel;
+	}
+
+	public LogLevelSetting getLogLevel() {
+		return logLevel;
+	}
+
+	private NamingSetting defaultNaming = NamingSetting.STANDARD;
+
+	public NamingSetting getDefaultNaming() {
+		return defaultNaming;
+	}
 
 	@Option(name = "-defaultNaming", aliases = { "-Xjsonix-defaultNaming" })
-	public NamingSetting defaultNaming = NamingSetting.STANDARD;
+	public void setDefaultNaming(NamingSetting defaultNaming) {
+		this.defaultNaming = defaultNaming;
+	}
+
+	@Option(name = "-compact", aliases = { "-Xjsonix-compact" })
+	public void setCompact(boolean value) {
+		if (value) {
+			defaultNaming = NamingSetting.COMPACT;
+		}
+	}
 
 }

@@ -1,6 +1,5 @@
 package org.hisrc.jsonix.context;
 
-import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.settings.LogLevelSetting;
 import org.hisrc.jsonix.slf4j.LevelledLoggerFactoryWrapper;
 import org.slf4j.ILoggerFactory;
@@ -14,7 +13,7 @@ public class DefaultJsonixContext implements JsonixContext {
 		this.loggerFactory = new LevelledLoggerFactoryWrapper(loggerFactory) {
 			@Override
 			protected int getLevel() {
-				return DefaultJsonixContext.this.getLevelInt();
+				return DefaultJsonixContext.this.getLogLevel();
 			}
 		};
 	}
@@ -23,15 +22,14 @@ public class DefaultJsonixContext implements JsonixContext {
 		this(LoggerFactory.getILoggerFactory());
 	}
 
-	private int levelInt = LogLevelSetting.INFO.asInt();
+	private int logLevel = LogLevelSetting.INFO.asInt();
 
-	protected int getLevelInt() {
-		return 1;
+	protected int getLogLevel() {
+		return logLevel;
 	}
 
-	public void setLevel(LogLevelSetting level) {
-		Validate.notNull(level);
-		this.levelInt = level.asInt();
+	public void setLogLevel(int level) {
+		this.logLevel = level;
 	}
 
 	@Override

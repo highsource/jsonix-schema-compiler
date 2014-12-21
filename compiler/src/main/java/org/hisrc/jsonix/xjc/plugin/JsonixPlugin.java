@@ -36,22 +36,25 @@ package org.hisrc.jsonix.xjc.plugin;
 import java.io.IOException;
 import java.util.List;
 
-import org.hisrc.jsonix.configuration.OutputConfiguration;
+import org.hisrc.jsonix.args4j.PartialCmdLineParser;
+import org.hisrc.jsonix.compilation.ProgramWriter;
 import org.hisrc.jsonix.configuration.PluginCustomizations;
 import org.hisrc.jsonix.execution.JsonixInvoker;
-import org.hisrc.jsonix.naming.CompactNaming;
-import org.hisrc.jsonix.naming.StandardNaming;
 import org.hisrc.jsonix.settings.Settings;
+import org.kohsuke.args4j.CmdLineException;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.NOPLoggerFactory;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 
+import com.sun.codemodel.JCodeModel;
 import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.model.Model;
+import com.sun.tools.xjc.model.nav.NClass;
+import com.sun.tools.xjc.model.nav.NType;
 import com.sun.tools.xjc.outline.Outline;
 
 public class JsonixPlugin extends Plugin {
@@ -62,18 +65,15 @@ public class JsonixPlugin extends Plugin {
 
 	public static final String OPTION_NAME = "Xjsonix";
 	public static final String OPTION = "-" + OPTION_NAME;
-	public static final String OPTION_COMPACT = OPTION + "-compact";
 
-	private OutputConfiguration defaultOutputConfiguration = new OutputConfiguration(
-			StandardNaming.NAMING_NAME,
-			OutputConfiguration.STANDARD_FILE_NAME_PATTERN);
+	private Settings settings = new Settings();
 
-	public OutputConfiguration getDefaultOutputConfiguration() {
-		return defaultOutputConfiguration;
+	public Settings getSettings() {
+		return settings;
 	}
 
-	public void setDefaultOutputConfiguration(OutputConfiguration naming) {
-		this.defaultOutputConfiguration = naming;
+	public void setSettings(Settings settings) {
+		this.settings = settings;
 	}
 
 	@Override
@@ -83,19 +83,20 @@ public class JsonixPlugin extends Plugin {
 
 	@Override
 	public String getUsage() {
-		return "TBD";
+		return "  -Xjsonix :  Generates Jsonix mappings.\n" +
+		           "                    See https://github.com/highsource/jsonix";
 	}
 
 	@Override
 	public int parseArgument(Options opt, String[] args, int i)
 			throws BadCommandLineException, IOException {
-		if (OPTION_COMPACT.equals(args[i])) {
-			setDefaultOutputConfiguration(new OutputConfiguration(
-					CompactNaming.NAMING_NAME,
-					OutputConfiguration.STANDARD_FILE_NAME_PATTERN));
-			return 1;
-		} else {
-			return super.parseArgument(opt, args, i);
+
+		final PartialCmdLineParser cmdLineParser = new PartialCmdLineParser(
+				getSettings());
+		try {
+			return cmdLineParser.parseArgument(args, i);
+		} catch (CmdLineException clex) {
+			throw new BadCommandLineException("Error parsing arguments.", clex);
 		}
 	}
 
@@ -130,10 +131,12 @@ public class JsonixPlugin extends Plugin {
 			final ErrorHandler errorHandler) throws SAXException {
 
 		final Model model = outline.getModel();
-		final Settings settings = null;
+		final JCodeModel codeModel = outline.getCodeModel();
 
-		new JsonixInvoker().execute(context, settings, model,
-				new CodeModelProgramWriter(model.codeModel, errorHandler));
+		final ProgramWriter<NType, NClass> programWriter = new CodeModelProgramWriter(
+				codeModel, errorHandler);
+		
+		new JsonixInvoker().execute(getSettings(), model, programWriter);
 
 		return true;
 	}

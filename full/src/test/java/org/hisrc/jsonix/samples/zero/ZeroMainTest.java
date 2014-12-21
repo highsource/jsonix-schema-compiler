@@ -1,6 +1,5 @@
 package org.hisrc.jsonix.samples.zero;
 
-
 import java.io.File;
 import java.net.URL;
 
@@ -17,7 +16,7 @@ public class ZeroMainTest {
 
 		URL schema = getClass().getResource("schema.xsd");
 
-		final String[] arguments = new String[] { "-xmlschema",
+		final String[] arguments = new String[] { "-compact", "-extension", "-npa", "-logLevel", "INFO", "-xmlschema",
 				schema.toExternalForm(), "-d", "target/generated-sources/zero"
 
 		};
