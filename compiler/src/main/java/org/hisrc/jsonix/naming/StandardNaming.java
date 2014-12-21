@@ -1,8 +1,7 @@
 package org.hisrc.jsonix.naming;
 
-
 public class StandardNaming implements Naming {
-	
+
 	public static final Naming INSTANCE = new StandardNaming();
 
 	public static final String TYPE = "type"; // t
@@ -18,8 +17,9 @@ public class StandardNaming implements Naming {
 	public static final String SCOPE = "scope"; // sc
 	public static final String SUBSTITUTION_HEAD = "substitutionHead"; // sh
 	public static final String NAME = "name"; // n
-	public static final String DEFAULT_ELEMENT_NAMESPACE_URI = "defaultElementNamespaceURI"; // ens
-	public static final String DEFAULT_ATTRIBUTE_NAMESPACE_URI = "defaultAttributeNamespaceURI"; // ans
+	public static final String DEPENDENCIES = "dependencies"; // deps
+	public static final String DEFAULT_ELEMENT_NAMESPACE_URI = "defaultElementNamespaceURI"; // dens
+	public static final String DEFAULT_ATTRIBUTE_NAMESPACE_URI = "defaultAttributeNamespaceURI"; // dans
 	public static final String TYPE_INFOS = "typeInfos"; // tis
 	public static final String ELEMENT_INFOS = "elementInfos"; // eis
 	public static final String LOCAL_PART = "localPart"; // lp
@@ -203,6 +203,11 @@ public class StandardNaming implements Naming {
 	@Override
 	public String localPart() {
 		return LOCAL_PART;
+	}
+
+	@Override
+	public String dependencies() {
+		return DEPENDENCIES;
 	}
 
 	@Override

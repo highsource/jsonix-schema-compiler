@@ -3,6 +3,8 @@ package org.hisrc.jsonix.naming;
 public interface Naming {
 	
 	String name();
+	
+	String dependencies();
 
 	String defaultElementNamespaceURI();
 	String defaultAttributeNamespaceURI();

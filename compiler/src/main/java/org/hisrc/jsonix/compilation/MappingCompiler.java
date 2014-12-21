@@ -33,6 +33,8 @@
 
 package org.hisrc.jsonix.compilation;
 
+import java.util.Collection;
+
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -44,6 +46,7 @@ import org.hisrc.jscm.codemodel.expression.JSAssignmentExpression;
 import org.hisrc.jscm.codemodel.expression.JSMemberExpression;
 import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
 import org.hisrc.jsonix.definition.Mapping;
+import org.hisrc.jsonix.definition.MappingDependency;
 import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Modules;
 import org.hisrc.jsonix.definition.Output;
@@ -53,6 +56,7 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MClassTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MEnumConstantInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 
@@ -126,6 +130,12 @@ public class MappingCompiler<T, C extends T> {
 					codeModel.string(this.defaultAttributeNamespaceURI));
 		}
 
+		final JSArrayLiteral dependencies = codeModel.array();
+		compileDependencies(dependencies);
+		if (!dependencies.getElements().isEmpty()) {
+			mappingBody.append(naming.dependencies(), dependencies);
+		}
+		
 		final JSArrayLiteral typeInfos = codeModel.array();
 		mappingBody.append(naming.typeInfos(), typeInfos);
 
@@ -136,7 +146,22 @@ public class MappingCompiler<T, C extends T> {
 		compileEnumLeafInfos(typeInfos);
 		compileElementInfos(elementInfos);
 
+
 		return mappingBody;
+	}
+
+	private void compileDependencies(JSArrayLiteral dependencies) {
+		final Collection<MappingDependency<T, C>> mappingDependencies = mapping
+				.getDirectDependencies();
+		for (final MappingDependency<T, C> mappingDependency : mappingDependencies) {
+			final MPackageInfo dependencyPackageInfo = mappingDependency
+					.getPackageInfo();
+			final String dependencyPackageName = dependencyPackageInfo
+					.getPackageName();
+			final String dependencyMappingName = modules
+					.getMappingName(dependencyPackageName);
+			dependencies.append(getCodeModel().string(dependencyMappingName));
+		}
 	}
 
 	private void compileClassInfos(JSArrayLiteral typeInfos) {

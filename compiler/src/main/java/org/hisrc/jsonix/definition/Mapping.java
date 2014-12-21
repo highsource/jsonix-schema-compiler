@@ -43,6 +43,7 @@ public class Mapping<T, C extends T> {
 	private final Collection<MPropertyInfo<T, C>> propertyInfos = new HashSet<MPropertyInfo<T, C>>();
 	private final Collection<MEnumLeafInfo<T, C>> enumLeafInfos = new HashSet<MEnumLeafInfo<T, C>>();
 	private final Collection<MElementInfo<T, C>> elementInfos = new HashSet<MElementInfo<T, C>>();
+	private final Collection<InfoVertex<T, C>> infoVertices = new HashSet<InfoVertex<T, C>>();
 	private final String packageName;
 	private final String mappingName;
 	private final String defaultElementNamespaceURI;
@@ -135,6 +136,40 @@ public class Mapping<T, C extends T> {
 		}
 	}
 
+	public Collection<MappingDependency<T, C>> getDirectDependencies() {
+		final Map<MPackageInfo, MappingDependency<T, C>> dependencies = new HashMap<MPackageInfo, MappingDependency<T, C>>();
+		final DirectedGraph<InfoVertex<T, C>, DependencyEdge> graph = analyzer
+				.getGraph();
+		final Collection<InfoVertex<T, C>> vertices = new HashSet<InfoVertex<T, C>>(
+				getInfoVertices());
+		for (InfoVertex<T, C> sourceVertex : vertices) {
+			final Set<DependencyEdge> edges = graph
+					.outgoingEdgesOf(sourceVertex);
+			for (DependencyEdge edge : edges) {
+				if (edge.getType() == DependencyType.HARD) {
+					final InfoVertex<T, C> targetVertex = graph
+							.getEdgeTarget(edge);
+					final MPackageInfo packageInfo = targetVertex
+							.getPackageInfo();
+					// If this another package (not this package and not the
+					// built-in package)
+					if (packageInfo != null
+							&& !this.packageInfo.equals(packageInfo)) {
+						MappingDependency<T, C> dependency = dependencies
+								.get(packageInfo);
+						if (dependency == null) {
+							dependency = new MappingDependency<T, C>(
+									packageInfo);
+							dependencies.put(packageInfo, dependency);
+						}
+						dependency.addInfoVertex(targetVertex);
+					}
+				}
+			}
+		}
+		return dependencies.values();
+	}
+
 	public void excludePropertyInfo(MPropertyInfo<T, C> propertyInfo) {
 		Validate.notNull(propertyInfo);
 		final PropertyInfoVertex<T, C> vertex = new PropertyInfoVertex<T, C>(
@@ -170,6 +205,7 @@ public class Mapping<T, C extends T> {
 				new LinkedList<InfoVertex<T, C>>());
 		deques.put(ContainmentType.INCLUDED_AS_SOFT_DEPENDENCY,
 				new LinkedList<InfoVertex<T, C>>());
+
 		deques.get(ContainmentType.INCLUDED_EXPLICITLY).add(initialVertex);
 
 		for (Map.Entry<ContainmentType, Deque<InfoVertex<T, C>>> dequeEntry : deques
@@ -195,7 +231,6 @@ public class Mapping<T, C extends T> {
 										currentSourceContainmentType,
 										sourceContainmentType));
 					} else {
-
 						logger.trace(MessageFormat
 								.format("Including the vertex [{0}] with the containment type [{1}].",
 										sourceVertex, dequeContainmentType));
@@ -360,6 +395,7 @@ public class Mapping<T, C extends T> {
 		Validate.notNull(elementInfo);
 		if (this.packageInfo.equals(elementInfo.getPackageInfo())) {
 			this.elementInfos.add(elementInfo);
+			this.infoVertices.add(new ElementInfoVertex<T, C>(elementInfo));
 		}
 	}
 
@@ -367,6 +403,8 @@ public class Mapping<T, C extends T> {
 		Validate.notNull(classInfo);
 		if (this.packageInfo.equals(classInfo.getPackageInfo())) {
 			this.classInfos.add(classInfo);
+			this.infoVertices.add(new TypeInfoVertex<T, C>(classInfo
+					.getPackageInfo(), classInfo));
 		}
 	}
 
@@ -374,6 +412,8 @@ public class Mapping<T, C extends T> {
 		Validate.notNull(enumLeafInfo);
 		if (this.packageInfo.equals(enumLeafInfo.getPackageInfo())) {
 			this.enumLeafInfos.add(enumLeafInfo);
+			this.infoVertices.add(new TypeInfoVertex<T, C>(enumLeafInfo
+					.getPackageInfo(), enumLeafInfo));
 		}
 	}
 
@@ -382,7 +422,12 @@ public class Mapping<T, C extends T> {
 		if (this.packageInfo.equals(propertyInfo.getClassInfo()
 				.getPackageInfo())) {
 			this.propertyInfos.add(propertyInfo);
+			this.infoVertices.add(new PropertyInfoVertex<T, C>(propertyInfo));
 		}
+	}
+
+	private Collection<InfoVertex<T, C>> getInfoVertices() {
+		return infoVertices;
 	}
 
 	public MPackageInfo getPackageInfo() {

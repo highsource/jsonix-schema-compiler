@@ -21,6 +21,7 @@ public class CompactNaming implements Naming {
 	public static final String SCOPE = "sc";
 	public static final String SUBSTITUTION_HEAD = "sh";
 	public static final String NAME = "n";
+	public static final String DEPENDENCIES = "deps";
 	public static final String DEFAULT_ELEMENT_NAMESPACE_URI = "dens";
 	public static final String DEFAULT_ATTRIBUTE_NAMESPACE_URI = "dans";
 	public static final String NAMESPACE_URI = "ns";
@@ -206,6 +207,11 @@ public class CompactNaming implements Naming {
 	@Override
 	public String localPart() {
 		return LOCAL_PART;
+	}
+	
+	@Override
+	public String dependencies() {
+		return DEPENDENCIES;
 	}
 
 	@Override
