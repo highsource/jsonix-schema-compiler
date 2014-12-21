@@ -9,6 +9,7 @@ import org.hisrc.jsonix.args4j.PartialCmdLineParser;
 import org.hisrc.jsonix.compilation.ProgramWriter;
 import org.hisrc.jsonix.execution.JsonixInvoker;
 import org.hisrc.jsonix.settings.Settings;
+import org.hisrc.jsonix.xjc.plugin.JsonixPlugin;
 
 import com.sun.codemodel.JCodeModel;
 import com.sun.tools.xjc.ConsoleErrorReporter;
@@ -38,6 +39,10 @@ public class JsonixMain {
 			} else {
 				position += consumed;
 			}
+		}
+
+		if (!arguments.contains(JsonixPlugin.OPTION)) {
+			arguments.add(JsonixPlugin.OPTION);
 		}
 
 		if (!arguments.contains("-extension")) {
