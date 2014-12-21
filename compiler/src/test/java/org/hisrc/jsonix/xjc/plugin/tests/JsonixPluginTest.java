@@ -31,7 +31,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.hisrc.jsonix.xjc.plugin.test;
+package org.hisrc.jsonix.xjc.plugin.tests;
 
 import java.io.File;
 import java.net.URL;

@@ -1,32 +1,22 @@
 package org.hisrc.jsonix;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
-import org.hisrc.jscm.codemodel.JSProgram;
-import org.hisrc.jscm.codemodel.writer.CodeWriter;
 import org.hisrc.jsonix.compilation.ModulesCompiler;
-import org.hisrc.jsonix.compilation.ProgramWriter;
 import org.hisrc.jsonix.configuration.ModulesConfiguration;
 import org.hisrc.jsonix.configuration.ModulesConfigurationUnmarshaller;
 import org.hisrc.jsonix.configuration.OutputConfiguration;
 import org.hisrc.jsonix.context.DefaultJsonixContext;
 import org.hisrc.jsonix.context.JsonixContext;
-import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Modules;
-import org.hisrc.jsonix.definition.Output;
 import org.hisrc.jsonix.naming.CompactNaming;
 import org.hisrc.jsonix.naming.StandardNaming;
 import org.hisrc.jsonix.xjc.plugin.JsonixPlugin;
 import org.jvnet.jaxb2_commons.xjc.model.concrete.XJCCMInfoFactory;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
-import org.xml.sax.SAXParseException;
 
 import com.sun.codemodel.JCodeModel;
 import com.sun.tools.xjc.ConsoleErrorReporter;
@@ -95,11 +85,10 @@ public class JsonixMain {
 
 	private void execute() {
 
-		final JsonixContext context = new DefaultJsonixContext();
-
 		final ConsoleErrorReporter receiver = new ConsoleErrorReporter();
 		final Model model = ModelLoader.load(options, new JCodeModel(),
 				receiver);
+		final JsonixContext context = new DefaultJsonixContext();
 
 		final ModulesConfigurationUnmarshaller configurationUnmarshaller = new ModulesConfigurationUnmarshaller(
 				context);
@@ -118,45 +107,9 @@ public class JsonixMain {
 		final ModulesCompiler<NType, NClass> modulesCompiler = new ModulesCompiler<NType, NClass>(
 				modules);
 
-		modulesCompiler.compile(new ProgramWriter<NType, NClass>() {
-
-			@Override
-			public void writeProgram(Module<NType, NClass> module,
-					JSProgram program, Output output) {
-				try {
-					writePrograms(options.targetDir, output.getDirectory(),
-							output.getFileName(), program);
-				} catch (IOException ioex) {
-					errorReceiver.error(new SAXParseException(
-							MessageFormat
-									.format("Could not create the code for the module [{0}].",
-											module.getName()), null, ioex));
-				}
-			}
-		});
+		final TargetDirectoryProgramWriter programWriter = new TargetDirectoryProgramWriter(
+				options.targetDir, errorReceiver);
+		modulesCompiler.compile(programWriter);
 	}
 
-	private File writePrograms(final File targetDir, final String directory,
-			final String fileName, JSProgram... programs) throws IOException {
-		Validate.notNull(fileName);
-
-		final File dir = new File(targetDir, directory);
-		dir.mkdirs();
-		final File file = new File(dir, fileName);
-		final FileWriter fileWriter = new FileWriter(file);
-		try {
-			// final StringWriter stringWriter = new StringWriter();
-			final CodeWriter codeWriter = new CodeWriter(fileWriter);
-			for (JSProgram program : programs) {
-				codeWriter.program(program);
-				codeWriter.lineTerminator();
-			}
-		} finally {
-			try {
-				fileWriter.close();
-			} catch (IOException ignored) {
-			}
-		}
-		return file;
-	}
 }

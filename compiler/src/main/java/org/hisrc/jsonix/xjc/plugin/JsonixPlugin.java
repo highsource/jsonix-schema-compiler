@@ -34,43 +34,24 @@
 package org.hisrc.jsonix.xjc.plugin;
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.text.MessageFormat;
 import java.util.List;
 
-import org.apache.commons.lang3.Validate;
-import org.hisrc.jscm.codemodel.JSProgram;
-import org.hisrc.jscm.codemodel.writer.CodeWriter;
-import org.hisrc.jsonix.compilation.ModulesCompiler;
-import org.hisrc.jsonix.compilation.ProgramWriter;
-import org.hisrc.jsonix.configuration.ModulesConfiguration;
-import org.hisrc.jsonix.configuration.ModulesConfigurationUnmarshaller;
 import org.hisrc.jsonix.configuration.OutputConfiguration;
 import org.hisrc.jsonix.configuration.PluginCustomizations;
-import org.hisrc.jsonix.context.DefaultJsonixContext;
-import org.hisrc.jsonix.context.JsonixContext;
-import org.hisrc.jsonix.definition.Module;
-import org.hisrc.jsonix.definition.Modules;
-import org.hisrc.jsonix.definition.Output;
+import org.hisrc.jsonix.execution.JsonixInvoker;
 import org.hisrc.jsonix.naming.CompactNaming;
 import org.hisrc.jsonix.naming.StandardNaming;
-import org.jvnet.jaxb2_commons.xjc.model.concrete.XJCCMInfoFactory;
-import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
+import org.hisrc.jsonix.settings.Settings;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.NOPLoggerFactory;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
-import com.sun.codemodel.JPackage;
-import com.sun.codemodel.fmt.JTextFile;
 import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.model.Model;
-import com.sun.tools.xjc.model.nav.NClass;
-import com.sun.tools.xjc.model.nav.NType;
 import com.sun.tools.xjc.outline.Outline;
 
 public class JsonixPlugin extends Plugin {
@@ -148,63 +129,13 @@ public class JsonixPlugin extends Plugin {
 	public boolean run(Outline outline, Options opt,
 			final ErrorHandler errorHandler) throws SAXException {
 
-		final JsonixContext context = new DefaultJsonixContext();
-
 		final Model model = outline.getModel();
+		final Settings settings = null;
 
-		final ModulesConfigurationUnmarshaller customizationHandler = new ModulesConfigurationUnmarshaller(
-				context);
-
-		final ModulesConfiguration modulesConfiguration = customizationHandler
-				.unmarshal(model, this.defaultOutputConfiguration);
-
-		final MModelInfo<NType, NClass> modelinfo = new XJCCMInfoFactory(model)
-				.createModel();
-
-		final Modules<NType, NClass> modules = modulesConfiguration.build(
-				context, modelinfo);
-
-		final ModulesCompiler<NType, NClass> modulesCompiler = new ModulesCompiler<NType, NClass>(
-				modules);
-
-		modulesCompiler.compile(new ProgramWriter<NType, NClass>() {
-
-			@Override
-			public void writeProgram(Module<NType, NClass> module,
-					JSProgram program, Output output) {
-				try {
-					final JPackage _package = model.codeModel._package(output
-							.getOutputPackageName());
-					_package.addResourceFile(createTextFile(
-							output.getFileName(), program));
-				} catch (IOException ioex) {
-					try {
-						errorHandler.error(new SAXParseException(
-								MessageFormat
-										.format("Could not create the code for the module [{0}].",
-												module.getName()), null, ioex));
-					} catch (SAXException ignored) {
-
-					}
-				}
-			}
-		});
+		new JsonixInvoker().execute(context, settings, model,
+				new CodeModelProgramWriter(model.codeModel, errorHandler));
 
 		return true;
-	}
-
-	private JTextFile createTextFile(String fileName, JSProgram... programs)
-			throws IOException {
-		Validate.notNull(fileName);
-		final JTextFile textFile = new JTextFile(fileName);
-		final StringWriter stringWriter = new StringWriter();
-		final CodeWriter codeWriter = new CodeWriter(stringWriter);
-		for (JSProgram program : programs) {
-			codeWriter.program(program);
-			codeWriter.lineTerminator();
-		}
-		textFile.setContents(stringWriter.toString());
-		return textFile;
 	}
 
 }
