@@ -12,7 +12,7 @@
 		<jsonix:mapping package="foo" name="Foo"/>
 	</jaxb:bindings>
 
-        <jaxb:bindings scd="x-schema::xlink" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <jaxb:bindings scd="x-schema::xlink" xmlns:xlink="http://www.w3.org/1999/xlink">
 		<jaxb:bindings scd="/group::xlink:locatorModel/model::sequence/xlink:title">
 			<jaxb:property name="LocatorTitle"/>
 		</jaxb:bindings>
@@ -35,5 +35,5 @@
 			packageName="net.opengis.wps.v_1_0_0"
 			spaceName="WPS_1_0_0"/>
 	</jaxb:bindings>
-
+	
 </jaxb:bindings>
