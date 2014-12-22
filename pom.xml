@@ -3,7 +3,7 @@
 	<groupId>org.hisrc.jsonix</groupId>
 	<artifactId>jsonix-schema-compiler-project</artifactId>
 	<packaging>pom</packaging>
-	<version>2.2.1-SNAPSHOT</version>
+	<version>2.3.0</version>
 	<name>Jsonix Schema Compiler Project</name>
 	<url>https://github.com/highsource/jsonix-schema-compiler</url>
 	<parent>
@@ -70,15 +70,6 @@
 			</modules>
 		</profile>
 	</profiles>
-	<mailingLists>
-		<mailingList>
-			<name>User List</name>
-			<subscribe>jsonix-users-request@lists.sourceforge.net</subscribe>
-			<unsubscribe>jsonix-users-request@lists.sourceforge.net</unsubscribe>
-			<post>jsonix-users@lists.sourceforge.net</post>
-			<archive>http://sourceforge.net/mailarchive/forum.php?forum_name=jsonix-users</archive>
-		</mailingList>
-	</mailingLists>
 	<properties> 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> 
 		<jsonix-scripts.version>2.1.0</jsonix-scripts.version>
