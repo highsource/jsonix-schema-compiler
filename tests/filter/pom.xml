@@ -23,11 +23,6 @@
 			<artifactId>jaxb-runtime</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>net.disy.legato</groupId>
-			<artifactId>legato-testing</artifactId>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 	<build>
 		<resources>
