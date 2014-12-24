@@ -1,0 +1,1 @@
+java -jar lib/jsonix-schema-compiler-full-${jsonix-schema-compiler.version}.jar -d target/generated-sources/jsonix src/main/resources/purchaseorder.xsd -b src/main/resources/bindings.xjb -Xjsonix-compact

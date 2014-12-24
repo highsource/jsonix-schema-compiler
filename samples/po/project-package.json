@@ -1,0 +1,19 @@
+{
+	"name": "${project.artifactId}-npm",
+	"version": "${project.version}",
+	"engines": [
+		"node >= 0.8.0"
+	],
+	"main": "src/main/javascript/index.js",
+	"dependencies": {
+		"jsonix": "x.x.x",
+		"jsonix-schema-compiler": "x.x.x"
+	},
+	"devDependencies" : {
+		"nodeunit" : "~0.8.6"
+	},
+	"scripts": {
+		"postinstall" : "java -jar node_modules/jsonix-schema-compiler/lib/jsonix-schema-compiler-full.jar -d target/generated-sources/jsonix src/main/resources/purchaseorder.xsd -b src/main/resources/bindings.xjb",
+		"test": "nodeunit src/test/javascript/tests.js" 
+	}
+}
