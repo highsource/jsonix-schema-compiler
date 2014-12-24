@@ -56,6 +56,19 @@ public class JsonixMain {
 		// TODO
 		System.setProperty("javax.xml.accessExternalDTD", "all");
 
+		File targetDirectory = settings.getTargetDirectory();
+
+		if (targetDirectory == null) {
+			targetDirectory = new File(".");
+		}
+
+		if (!targetDirectory.exists()) {
+			targetDirectory.mkdirs();
+		}
+		
+		arguments.add("-d");
+		arguments.add(targetDirectory.getAbsolutePath());
+
 		final Options options = new Options();
 
 		options.parseArguments(arguments.toArray(new String[arguments.size()]));
@@ -87,7 +100,6 @@ public class JsonixMain {
 
 		final File targetDirectory = getOptions().targetDir;
 
-		targetDirectory.mkdirs();
 
 		final ProgramWriter<NType, NClass> programWriter = new TargetDirectoryProgramWriter(
 				targetDirectory, errorHandler);
