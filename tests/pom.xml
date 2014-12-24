@@ -7,7 +7,6 @@
 		<groupId>org.hisrc.jsonix</groupId>
 		<artifactId>jsonix-schema-compiler-project</artifactId>
 		<version>2.3.1-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<modules>
 		<module>filter</module>
