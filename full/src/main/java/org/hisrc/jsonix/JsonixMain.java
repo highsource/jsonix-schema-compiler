@@ -87,6 +87,8 @@ public class JsonixMain {
 
 		final File targetDirectory = getOptions().targetDir;
 
+		targetDirectory.mkdirs();
+
 		final ProgramWriter<NType, NClass> programWriter = new TargetDirectoryProgramWriter(
 				targetDirectory, errorHandler);
 
