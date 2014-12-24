@@ -1,8 +1,21 @@
 package org.hisrc.jsonix.settings;
 
+import java.io.File;
+
 import org.kohsuke.args4j.Option;
 
 public class Settings {
+	
+	private File targetDirectory;
+	
+	public File getTargetDirectory() {
+		return targetDirectory;
+	}
+	
+	@Option(name = "-d")
+	public void setTargetDirectory(File targetDirectory) {
+		this.targetDirectory = targetDirectory;
+	}
 
 	private LogLevelSetting logLevel = LogLevelSetting.INFO;
 
