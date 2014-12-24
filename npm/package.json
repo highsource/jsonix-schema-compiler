@@ -1,0 +1,37 @@
+{
+	"name" : "jsonix-schema-compiler",
+	"version" : "2.3.1",
+	"description" : "Jsonix Schema Compiler generates Jsonix mappings from XML Schemas",
+	"keywords" : [
+			"json", "xml", "unmarshal", "unmarshalling", "marshal",
+			"marshalling", "parse", "parsing", "serialize", "serializing",
+			"javascript objects", "dom", "util", "utility", "jaxb",
+			"jsonix", "jsonix-schema-compiler",
+			"xs", "xsd", "xml schema", "wsdl", "dtd", "relax ng", "relaxng", "relax ng compact", "relaxng compact"
+	],
+	"homepage" : "https://github.com/highsource/jsonix-schema-compiler",
+	"bugs" : {
+		"url" : "http://github.com/highsource/jsonix-schema-compiler/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/highsource/jsonix-schema-compiler.git"
+	},
+	"licenses" : [ {
+		"type" : "BSD-3-Clause",
+		"url" : "http://github.com/highsource/jsonix-schema-compiler/raw/master/LICENSE"
+	} ],
+	"author" : {
+		"name" : "Alexey Valikov",
+		"url" : "http://github.com/highsource"
+	},
+	"contributors" : [ {
+		"name" : "Conrad Pankoff",
+		"url" : "https://github.com/deoxxa"
+	} ],
+	"main" : "jsonix-schema-compiler.js",
+	"repository" : {
+		"type" : "git",
+		"url" : "http://github.com/highsource/jsonix-schema-compiler.git"
+	}
+}
