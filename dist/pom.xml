@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>jsonix-schema-compiler-dist</artifactId>
 	<packaging>pom</packaging>
-	<name>Jsonix Schema Compiler - Distribution</name>
+	<name>Jsonix Schema Compiler Distribution</name>
 	<parent>
 		<groupId>org.hisrc.jsonix</groupId>
 		<artifactId>jsonix-schema-compiler-project</artifactId>
