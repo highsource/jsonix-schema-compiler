@@ -15,11 +15,40 @@
 		</dependency>
 	</dependencies>
 	<build>
+		<resources>
+			<resource>
+				<directory>${baseDir}</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>project-package.json</include>
+				</includes>
+				<targetPath>${baseDir}</targetPath>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-package.json</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}</outputDirectory>
+							<resources>					
+								<resource>
+									<directory>src/main/npm</directory>
+									<filtering>true</filtering>
+								</resource>
+							</resources>							
+						</configuration>						
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.8</version>
 				<executions>
 					<execution>
 						<id>unpack</id>
@@ -56,6 +85,20 @@
 							<executable>npm</executable>
 							<arguments>
 								<argument>install</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>publish</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>npm</executable>
+							<arguments>
+								<argument>publish</argument>
+								<argument>.</argument>
 							</arguments>
 						</configuration>
 					</execution>
