@@ -1,5 +1,5 @@
 var Jsonix = require('jsonix').Jsonix;
-var PO = require('../../../target/generated-sources/jsonix/PurchaseOrder.std').PO;
+var PO = require('../../../target/generated-sources/xjc/PurchaseOrder.std').PO;
 
 module.exports = {
 	"UnmarshalFile": function(test) {
