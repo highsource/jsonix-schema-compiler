@@ -74,6 +74,30 @@ public class JsonixPluginTest {
 		com.sun.codemodel.CodeWriter cw = options.createCodeWriter();
 		model.codeModel.build(cw);
 	}
+	
+	@Test
+	public void compilesWFS_V_2_0() throws Exception {
+
+		new File("target/generated-sources/wfs-v_2_0").mkdirs();
+
+		URL schema = getClass().getResource("/ogc/wfs/2.0/wfs.xsd");
+		URL binding = getClass().getResource("/ogc/wfs-v_2_0.xjb");
+		final String[] arguments = new String[] { "-xmlschema",
+				schema.toExternalForm(), "-b", binding.toExternalForm(), "-d",
+				"target/generated-sources/wfs-v_2_0", "-extension",
+				"-Xjsonix"
+
+		};
+
+		Options options = new Options();
+		options.parseArguments(arguments);
+		ConsoleErrorReporter receiver = new ConsoleErrorReporter();
+		Model model = ModelLoader.load(options, new JCodeModel(), receiver);
+		model.generateCode(options, receiver);
+		com.sun.codemodel.CodeWriter cw = options.createCodeWriter();
+		model.codeModel.build(cw);
+	}
+
 
 	@Test
 	public void compilesContext_V_1_1_0() throws Exception {
