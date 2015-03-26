@@ -16,7 +16,7 @@ java -jar node_modules/jsonix-schema-compiler/lib/jsonix-schema-compiler-full.ja
 Typical usage is as follows:
 
 * Make your package depend on `jsonix-schema-compiler`.
-* Invoke the Jsonix Schema Compiler in the `scripts/postinstall`
+* Invoke the Jsonix Schema Compiler in `scripts/prepublish`.
 
 ## Example
 
@@ -32,7 +32,7 @@ Typical usage is as follows:
 	...
 	"scripts": {
 		...
-		"postinstall" : "java -jar node_modules/jsonix-schema-compiler/lib/jsonix-schema-compiler-full.jar schema.xsd"
+		"prepublish" : "java -jar node_modules/jsonix-schema-compiler/lib/jsonix-schema-compiler-full.jar schema.xsd"
 		...
 	}
 	...
