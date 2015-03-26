@@ -34,6 +34,8 @@
 package org.hisrc.jsonix.compilation;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -135,7 +137,7 @@ public class MappingCompiler<T, C extends T> {
 		if (!dependencies.getElements().isEmpty()) {
 			mappingBody.append(naming.dependencies(), dependencies);
 		}
-		
+
 		final JSArrayLiteral typeInfos = codeModel.array();
 		mappingBody.append(naming.typeInfos(), typeInfos);
 
@@ -146,13 +148,13 @@ public class MappingCompiler<T, C extends T> {
 		compileEnumLeafInfos(typeInfos);
 		compileElementInfos(elementInfos);
 
-
 		return mappingBody;
 	}
 
 	private void compileDependencies(JSArrayLiteral dependencies) {
 		final Collection<MappingDependency<T, C>> mappingDependencies = mapping
 				.getDirectDependencies();
+		final Set<String> mappingDependencyNames = new LinkedHashSet<String>();
 		for (final MappingDependency<T, C> mappingDependency : mappingDependencies) {
 			final MPackageInfo dependencyPackageInfo = mappingDependency
 					.getPackageInfo();
@@ -160,7 +162,10 @@ public class MappingCompiler<T, C extends T> {
 					.getPackageName();
 			final String dependencyMappingName = modules
 					.getMappingName(dependencyPackageName);
-			dependencies.append(getCodeModel().string(dependencyMappingName));
+			mappingDependencyNames.add(dependencyMappingName);
+		}
+		for (final String mappingDependencyName : mappingDependencyNames) {
+			dependencies.append(getCodeModel().string(mappingDependencyName));
 		}
 	}
 
