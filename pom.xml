@@ -49,6 +49,7 @@
 	</organization>
 	<modules>
 		<module>compiler</module>
+		<module>plugin</module>
 		<module>full</module>
 		<module>npm</module>
 	</modules>
