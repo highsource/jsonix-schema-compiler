@@ -1,6 +1,7 @@
 package org.hisrc.jsonix.configuration;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
 
 import org.apache.commons.lang3.Validate;
 
@@ -12,10 +13,13 @@ public class AmbiguousPackageMappingException extends ConfigurationException {
 
 	public AmbiguousPackageMappingException(String packageName,
 			String... mappingNames) {
-		super(MessageFormat.format(
-				"Package [{0}] is mapped using different mapping names [{1}].",
-				Validate.notNull(packageName),
-				Validate.noNullElements(mappingNames).toString()));
+		super(
+				MessageFormat
+						.format("Package [{0}] is mapped using different mapping names [{1}].",
+								Validate.notNull(packageName),
+								Arrays.asList(
+										Validate.noNullElements(mappingNames))
+										.toString()));
 		this.packageName = packageName;
 		this.mappingNames = mappingNames;
 	}
