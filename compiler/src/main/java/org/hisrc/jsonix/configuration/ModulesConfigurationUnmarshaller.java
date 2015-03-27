@@ -59,7 +59,7 @@ public class ModulesConfigurationUnmarshaller {
 
 	public ModulesConfigurationUnmarshaller(JsonixContext context) {
 		this.context = Validate.notNull(context);
-		this.logger = Validate.notNull(context).getLoggerFactory()
+		this.logger = this.context.getLoggerFactory()
 				.getLogger(ModuleConfiguration.class.getName());
 		try {
 			jaxbContext = JAXBContext.newInstance(ModulesConfiguration.class,
