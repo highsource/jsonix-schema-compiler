@@ -97,7 +97,7 @@ public class JsonixMain {
 		final ErrorReceiver errorHandler = new ConsoleErrorReporter();
 		final Model model = ModelLoader.load(getOptions(), new JCodeModel(),
 				errorHandler);
-
+		
 		final File targetDirectory = getOptions().targetDir;
 
 

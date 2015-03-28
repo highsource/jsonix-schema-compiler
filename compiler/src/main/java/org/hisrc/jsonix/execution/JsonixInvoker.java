@@ -10,6 +10,7 @@ import org.hisrc.jsonix.definition.Modules;
 import org.hisrc.jsonix.settings.Settings;
 import org.jvnet.jaxb2_commons.xjc.model.concrete.XJCCMInfoFactory;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
+import org.slf4j.Logger;
 
 import com.sun.tools.xjc.model.Model;
 import com.sun.tools.xjc.model.nav.NClass;
@@ -23,6 +24,14 @@ public class JsonixInvoker {
 		final DefaultJsonixContext context = new DefaultJsonixContext();
 
 		context.setLogLevel(settings.getLogLevel().asInt());
+
+		final Logger logger = context.getLoggerFactory().getLogger(
+				JsonixInvoker.class.getName());
+
+		if (model == null) {
+			logger.error("The model is null, there was probably a problem parsing schemas.");
+			return;
+		}
 
 		final ModulesConfigurationUnmarshaller customizationHandler = new ModulesConfigurationUnmarshaller(
 				context);

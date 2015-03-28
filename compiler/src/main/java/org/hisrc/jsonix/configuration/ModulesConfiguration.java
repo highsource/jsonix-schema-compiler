@@ -298,17 +298,24 @@ public class ModulesConfiguration {
 		final Map<String, Mapping<T, C>> mappings = new HashMap<String, Mapping<T, C>>();
 		for (MappingConfiguration mappingConfiguration : mappingConfigurations) {
 			final String packageName = mappingConfiguration.getPackage();
-			final MPackageInfo packageInfo = analyzer.getPackageInfoMap().get(
-					packageName);
-			if (packageInfo == null) {
-				logger.warn(MessageFormat.format(
-						"Package name [{0}] could not be found.",
-						Validate.notNull(packageName)));
-				// throw new MissingPackageException(packageName);
+			if (packageName == null) {
+				// TODO @XmlLocation
+				logger.warn("At least one of the mapping configurations is missing the required [package] attribute.");
 			} else {
-				final Mapping<T, C> mapping = mappingConfiguration.build(
-						context, analyzer, modelInfo, packageInfo, mappings);
-				mappings.put(mappingConfiguration.getId(), mapping);
+				final MPackageInfo packageInfo = analyzer.getPackageInfoMap()
+						.get(packageName);
+
+				if (packageInfo == null) {
+					logger.warn(MessageFormat.format(
+							"Package name [{0}] could not be found.",
+							Validate.notNull(packageName)));
+					// throw new MissingPackageException(packageName);
+				} else {
+					final Mapping<T, C> mapping = mappingConfiguration
+							.build(context, analyzer, modelInfo, packageInfo,
+									mappings);
+					mappings.put(mappingConfiguration.getId(), mapping);
+				}
 			}
 		}
 		return mappings;
