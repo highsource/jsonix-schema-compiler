@@ -18,7 +18,7 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfoVisitor;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTyped;
 import org.jvnet.jaxb2_commons.xml.bind.model.MValuePropertyInfo;
 
-public final class PropertyInfoGraphBuilder<T, C> implements
+public final class PropertyInfoGraphBuilder<T, C extends T> implements
 		MPropertyInfoVisitor<T, C, PropertyInfoVertex<T, C>> {
 
 	private final ModelInfoGraphBuilder<T, C> modelInfoGraphBuilder;

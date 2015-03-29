@@ -6,7 +6,7 @@ import org.apache.commons.lang3.Validate;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 
-public class TypeInfoVertex<T, C> extends InfoVertex<T,C> {
+public class TypeInfoVertex<T, C extends T> extends InfoVertex<T,C> {
 
 	private final MPackageInfo packageInfo;
 	private final MTypeInfo<T, C> typeInfo;

@@ -14,7 +14,7 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfoVisitor;
 import org.jvnet.jaxb2_commons.xml.bind.model.MWildcardTypeInfo;
 
-public class TypeInfoGraphBuilder<T, C> implements
+public class TypeInfoGraphBuilder<T, C extends T> implements
 		MTypeInfoVisitor<T, C, TypeInfoVertex<T, C>> {
 
 	private final ModelInfoGraphBuilder<T, C> modelInfoGraphBuilder;

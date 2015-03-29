@@ -16,7 +16,7 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 import org.slf4j.Logger;
 
-public class ModelInfoGraphBuilder<T, C> {
+public class ModelInfoGraphBuilder<T, C extends T> {
 
 	private final Logger logger;
 	private final MModelInfo<T, C> modelInfo;

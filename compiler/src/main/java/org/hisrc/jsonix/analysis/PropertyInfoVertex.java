@@ -7,7 +7,7 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
 
-public class PropertyInfoVertex<T, C> extends InfoVertex<T,C> {
+public class PropertyInfoVertex<T, C extends T> extends InfoVertex<T,C> {
 
 	private final MPackageInfo packageInfo;
 	private final MClassInfo<T, C> classInfo;

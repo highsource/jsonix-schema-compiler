@@ -21,7 +21,7 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 
-public class ModelInfoGraphAnalyzer<T, C> {
+public class ModelInfoGraphAnalyzer<T, C extends T> {
 
 	private final DirectedGraph<InfoVertex<T, C>, DependencyEdge> graph;
 

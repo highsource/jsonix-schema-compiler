@@ -9,7 +9,7 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 
-public class ElementInfoVertex<T, C> extends InfoVertex<T,C> {
+public class ElementInfoVertex<T, C extends T> extends InfoVertex<T,C> {
 
 	private final MPackageInfo packageInfo;
 	private final MElementInfo<T, C> elementInfo;

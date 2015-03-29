@@ -1,6 +1,6 @@
 package org.hisrc.jsonix.analysis;
 
-public class DefaultInfoVertexVisitor<T, C, V> implements InfoVertexVisitor<T, C, V> {
+public class DefaultInfoVertexVisitor<T, C extends T, V> implements InfoVertexVisitor<T, C, V> {
 
 	@Override
 	public V visitPackageInfoVertex(PackageInfoVertex<T, C> vertex) {

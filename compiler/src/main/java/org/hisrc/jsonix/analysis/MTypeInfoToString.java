@@ -15,9 +15,9 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MList;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfoVisitor;
 import org.jvnet.jaxb2_commons.xml.bind.model.MWildcardTypeInfo;
 
-public class MTypeInfoToString<T, C> implements MTypeInfoVisitor<T, C, String> {
+public class MTypeInfoToString<T, C extends T> implements MTypeInfoVisitor<T, C, String> {
 
-	public static <X, Y> MTypeInfoVisitor<X, Y, String> instance() {
+	public static <X, Y extends X> MTypeInfoVisitor<X, Y, String> instance() {
 		@SuppressWarnings("unchecked")
 		final MTypeInfoVisitor<X, Y, String> instance = (MTypeInfoVisitor<X, Y, String>) INSTANCE;
 		return instance;

@@ -1,6 +1,6 @@
 package org.hisrc.jsonix.analysis;
 
-public interface InfoVertexVisitor<T, C, V> {
+public interface InfoVertexVisitor<T, C extends T, V> {
 
 	public V visitPackageInfoVertex(PackageInfoVertex<T, C> vertex);
 
