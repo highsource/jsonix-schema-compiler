@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -68,6 +69,7 @@ public class MappingCompiler<T, C extends T> {
 	private final JSCodeModel codeModel;
 	public final String mappingName;
 
+	private final String targetNamespaceURI;
 	private final String defaultElementNamespaceURI;
 	private final String defaultAttributeNamespaceURI;
 
@@ -87,6 +89,7 @@ public class MappingCompiler<T, C extends T> {
 		this.modules = modules;
 		this.mapping = mapping;
 		this.mappingName = mapping.getMappingName();
+		this.targetNamespaceURI = mapping.getTargetNamespaceURI();
 		this.defaultElementNamespaceURI = mapping
 				.getDefaultElementNamespaceURI();
 		this.defaultAttributeNamespaceURI = mapping
@@ -121,6 +124,11 @@ public class MappingCompiler<T, C extends T> {
 		final JSObjectLiteral mappingBody = codeModel.object();
 
 		mappingBody.append(naming.name(), codeModel.string(this.mappingName));
+
+		if (!(this.targetNamespaceURI.equals(this.defaultElementNamespaceURI))) {
+			mappingBody.append(naming.targetNamespaceURI(),
+					codeModel.string(this.targetNamespaceURI));
+		}
 
 		if (!StringUtils.isEmpty(this.defaultElementNamespaceURI)) {
 			mappingBody.append(naming.defaultElementNamespaceURI(),
@@ -183,9 +191,39 @@ public class MappingCompiler<T, C extends T> {
 
 	private JSObjectLiteral compileClassInfo(MClassInfo<T, C> classInfo) {
 		final JSObjectLiteral classInfoMapping = this.codeModel.object();
-		classInfoMapping.append(naming.localName(), this.codeModel
-				.string(classInfo
-						.getContainerLocalName(DEFAULT_SCOPED_NAME_DELIMITER)));
+		final String localName = classInfo
+				.getContainerLocalName(DEFAULT_SCOPED_NAME_DELIMITER);
+		classInfoMapping.append(naming.localName(),
+				this.codeModel.string(localName));
+		final String targetNamespace = mapping.getTargetNamespaceURI();
+		final QName defaultTypeName = new QName(targetNamespace, localName);
+		final QName typeName = classInfo.getTypeName();
+
+		if (!defaultTypeName.equals(typeName)) {
+			final JSAssignmentExpression typeNameExpression;
+			if (typeName == null) {
+				typeNameExpression = getCodeModel()._null();
+			} else if (defaultTypeName.getNamespaceURI().equals(
+					typeName.getNamespaceURI())) {
+				typeNameExpression = getCodeModel().string(
+						typeName.getLocalPart());
+			} else {
+				final JSObjectLiteral typeNameObject = getCodeModel().object();
+				typeNameObject.append(naming.namespaceURI(), getCodeModel()
+						.string(typeName.getNamespaceURI()));
+				typeNameObject.append(naming.localPart(), getCodeModel()
+						.string(typeName.getLocalPart()));
+				if (!XMLConstants.DEFAULT_NS_PREFIX
+						.equals(typeName.getPrefix())) {
+					typeNameObject.append(naming.prefix(), getCodeModel()
+							.string(typeName.getPrefix()));
+				}
+				typeNameExpression = typeNameObject;
+			}
+			classInfoMapping.append(naming.typeName(), typeNameExpression);
+
+		}
+
 		final MClassTypeInfo<T, C> baseTypeInfo = classInfo.getBaseTypeInfo();
 		if (baseTypeInfo != null) {
 			classInfoMapping.append(naming.baseTypeInfo(),

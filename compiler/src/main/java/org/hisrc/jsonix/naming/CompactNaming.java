@@ -1,6 +1,5 @@
 package org.hisrc.jsonix.naming;
 
-
 public class CompactNaming implements Naming {
 
 	public static final Naming INSTANCE = new CompactNaming();
@@ -15,6 +14,7 @@ public class CompactNaming implements Naming {
 	public static final String ELEMENT_NAME = "en";
 	public static final String ATTRIBUTE_NAME = "an";
 	public static final String LOCAL_NAME = "ln";
+	public static final String TYPE_NAME = "tn";
 	public static final String LOCAL_PART = "lp";
 	public static final String BASE_TYPE_INFO = "bti";
 	public static final String PROPERTY_INFOS = "ps";
@@ -22,6 +22,7 @@ public class CompactNaming implements Naming {
 	public static final String SUBSTITUTION_HEAD = "sh";
 	public static final String NAME = "n";
 	public static final String DEPENDENCIES = "deps";
+	public static final String TARGET_NAMESPACE_URI = "tns";
 	public static final String DEFAULT_ELEMENT_NAMESPACE_URI = "dens";
 	public static final String DEFAULT_ATTRIBUTE_NAMESPACE_URI = "dans";
 	public static final String NAMESPACE_URI = "ns";
@@ -71,6 +72,11 @@ public class CompactNaming implements Naming {
 	@Override
 	public String localName() {
 		return LOCAL_NAME;
+	}
+
+	@Override
+	public String typeName() {
+		return TYPE_NAME;
 	}
 
 	@Override
@@ -194,6 +200,7 @@ public class CompactNaming implements Naming {
 	public String value() {
 		return VALUE;
 	}
+
 	@Override
 	public String namespaceURI() {
 		return NAMESPACE_URI;
@@ -208,10 +215,15 @@ public class CompactNaming implements Naming {
 	public String localPart() {
 		return LOCAL_PART;
 	}
-	
+
 	@Override
 	public String dependencies() {
 		return DEPENDENCIES;
+	}
+
+	@Override
+	public String targetNamespaceURI() {
+		return TARGET_NAMESPACE_URI;
 	}
 
 	@Override

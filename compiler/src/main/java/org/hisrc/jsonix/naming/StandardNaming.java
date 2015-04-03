@@ -9,6 +9,7 @@ public class StandardNaming implements Naming {
 	public static final String LIST = "list"; // li
 	public static final String CLASS_INFO = "classInfo"; // ci
 	public static final String LOCAL_NAME = "localName"; // ln
+	public static final String TYPE_NAME = "typeName";	// tn
 	public static final String BASE_TYPE_INFO = "baseTypeInfo"; // base
 	public static final String PROPERTY_INFOS = "propertyInfos"; // ps
 	public static final String ENUM_INFO = "enumInfo"; // ei
@@ -18,6 +19,7 @@ public class StandardNaming implements Naming {
 	public static final String SUBSTITUTION_HEAD = "substitutionHead"; // sh
 	public static final String NAME = "name"; // n
 	public static final String DEPENDENCIES = "dependencies"; // deps
+	public static final String TARGET_NAMESPACE_URI = "targetNamespace"; // dens
 	public static final String DEFAULT_ELEMENT_NAMESPACE_URI = "defaultElementNamespaceURI"; // dens
 	public static final String DEFAULT_ATTRIBUTE_NAMESPACE_URI = "defaultAttributeNamespaceURI"; // dans
 	public static final String TYPE_INFOS = "typeInfos"; // tis
@@ -65,6 +67,11 @@ public class StandardNaming implements Naming {
 	@Override
 	public String localName() {
 		return LOCAL_NAME;
+	}
+	
+	@Override
+	public String typeName() {
+		return TYPE_NAME;
 	}
 
 	// classInfo properties
@@ -208,6 +215,11 @@ public class StandardNaming implements Naming {
 	@Override
 	public String dependencies() {
 		return DEPENDENCIES;
+	}
+	
+	@Override
+	public String targetNamespaceURI() {
+		return TARGET_NAMESPACE_URI;
 	}
 
 	@Override

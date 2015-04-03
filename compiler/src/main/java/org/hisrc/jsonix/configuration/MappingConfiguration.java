@@ -30,6 +30,7 @@ public class MappingConfiguration {
 	private String id;
 	private String name;
 	private String _package;
+	private String targetNamespaceURI;
 	private String defaultElementNamespaceURI;
 	private String defaultAttributeNamespaceURI;
 	private IncludesConfiguration includesConfiguration;
@@ -65,6 +66,15 @@ public class MappingConfiguration {
 
 	public void setPackage(String _package) {
 		this._package = _package;
+	}
+
+	@XmlAttribute(name = "targetNamespace")
+	public String getTargetNamespaceURI() {
+		return targetNamespaceURI;
+	}
+
+	public void setTargetNamespaceURI(String targetNamespaceURI) {
+		this.targetNamespaceURI = targetNamespaceURI;
 	}
 
 	@XmlAttribute(name = "defaultElementNamespaceURI")
@@ -132,16 +142,22 @@ public class MappingConfiguration {
 		final String mostUsedElementNamespaceURI = draftMostUsedElementNamespaceURI == null ? ""
 				: draftMostUsedElementNamespaceURI;
 
+		final String targetNamespaceURI;
+		if (this.targetNamespaceURI != null) {
+			targetNamespaceURI = this.targetNamespaceURI;
+		} else {
+			logger.debug(MessageFormat
+					.format("Mapping [{0}] will use \"{1}\" as the target namespace as it is the most used element namespace URI in the package [{2}].",
+							mappingName, mostUsedElementNamespaceURI,
+							packageName));
+			targetNamespaceURI = mostUsedElementNamespaceURI;
+		}
+
 		final String defaultElementNamespaceURI;
 		if (this.defaultElementNamespaceURI != null) {
 			defaultElementNamespaceURI = this.defaultElementNamespaceURI;
 		} else {
-			logger.debug(MessageFormat
-					.format("Mapping [{0}] will use \"{1}\" as it is the most used element namespace URI in the package [{2}].",
-							mappingName, mostUsedElementNamespaceURI,
-							packageName));
-			defaultElementNamespaceURI = mostUsedElementNamespaceURI;
-
+			defaultElementNamespaceURI = targetNamespaceURI;
 		}
 
 		final String draftMostUsedAttributeNamespaceURI = qnameAnalyzer
@@ -158,12 +174,11 @@ public class MappingConfiguration {
 							mappingName, mostUsedAttributeNamespaceURI,
 							packageName));
 			defaultAttributeNamespaceURI = mostUsedAttributeNamespaceURI;
-
 		}
 
 		final Mapping<T, C> mapping = new Mapping<T, C>(context, analyzer,
-				packageInfo, mappingName, defaultElementNamespaceURI,
-				defaultAttributeNamespaceURI);
+				packageInfo, mappingName, targetNamespaceURI,
+				defaultElementNamespaceURI, defaultAttributeNamespaceURI);
 
 		if (getExcludesConfiguration() != null) {
 			final ExcludesConfiguration excludesConfiguration = getExcludesConfiguration();
