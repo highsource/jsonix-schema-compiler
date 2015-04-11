@@ -268,4 +268,11 @@
 		</xs:sequence>
 	</xs:complexType>
 
+	<xs:complexType name="complexTypeWithElementAndAttributeWithDefaultValues">
+		<xs:sequence>
+			<xs:element name="elementWithDefaultValue" type="xs:string" minOccurs="0" maxOccurs="1" default="test"/>
+		</xs:sequence>
+		<xs:attribute name="attributeWithDefaultValue" type="xs:string" default="test"/>
+	</xs:complexType>
+
 </xs:schema>
