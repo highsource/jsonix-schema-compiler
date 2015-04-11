@@ -3,7 +3,7 @@
 	<groupId>org.hisrc.jsonix</groupId>
 	<artifactId>jsonix-schema-compiler-project</artifactId>
 	<packaging>pom</packaging>
-	<version>2.3.3-SNAPSHOT</version>
+	<version>2.3.3</version>
 	<name>Jsonix Schema Compiler Project</name>
 	<url>https://github.com/highsource/jsonix-schema-compiler</url>
 	<parent>
@@ -85,7 +85,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> 
 		<jsonix-schema-compiler.version>${project.version}</jsonix-schema-compiler.version>
 		<jsonix-scripts.version>2.1.0</jsonix-scripts.version>
-		<jaxb2-basics.version>0.9.4-SNAPSHOT</jaxb2-basics.version>
+		<jaxb2-basics.version>0.9.4</jaxb2-basics.version>
 		<js-codemodel.version>1.1</js-codemodel.version>
 		<jaxb.version>2.2.11</jaxb.version>
 		<maven-jaxb2-plugin.version>0.12.3</maven-jaxb2-plugin.version>
