@@ -261,6 +261,11 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-
+      
+	<xs:complexType name="complexTypeWithNillableElement">
+		<xs:sequence>
+			<xs:element name="nillableElement" type="xs:string" nillable="true" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
 
 </xs:schema>
