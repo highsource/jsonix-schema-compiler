@@ -46,6 +46,7 @@ public class Mapping<T, C extends T> {
 	private final Collection<InfoVertex<T, C>> infoVertices = new HashSet<InfoVertex<T, C>>();
 	private final String packageName;
 	private final String mappingName;
+	private final String schemaId;
 	private final String targetNamespaceURI;
 	private final String defaultElementNamespaceURI;
 	private final String defaultAttributeNamespaceURI;
@@ -53,8 +54,7 @@ public class Mapping<T, C extends T> {
 
 	public Mapping(JsonixContext context,
 			ModelInfoGraphAnalyzer<T, C> analyzer, MPackageInfo packageInfo,
-			String mappingName,
-			String targetNamespaceURI,
+			String mappingName, String schemaId, String targetNamespaceURI,
 			String defaultElementNamespaceURI,
 			String defaultAttributeNamespaceURI) {
 		this.logger = Validate.notNull(context).getLoggerFactory()
@@ -62,12 +62,14 @@ public class Mapping<T, C extends T> {
 		Validate.notNull(analyzer);
 		Validate.notNull(packageInfo);
 		Validate.notNull(mappingName);
+		Validate.notNull(schemaId);
 		Validate.notNull(defaultElementNamespaceURI);
 		Validate.notNull(defaultAttributeNamespaceURI);
 		this.analyzer = analyzer;
 		this.packageInfo = packageInfo;
 		this.packageName = packageInfo.getPackageName();
 		this.mappingName = mappingName;
+		this.schemaId = schemaId;
 		this.targetNamespaceURI = targetNamespaceURI;
 		this.defaultElementNamespaceURI = defaultElementNamespaceURI;
 		this.defaultAttributeNamespaceURI = defaultAttributeNamespaceURI;
@@ -444,6 +446,10 @@ public class Mapping<T, C extends T> {
 
 	public String getMappingName() {
 		return mappingName;
+	}
+
+	public String getSchemaId() {
+		return this.schemaId;
 	}
 
 	public String getTargetNamespaceURI() {

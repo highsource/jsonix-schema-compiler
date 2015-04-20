@@ -158,6 +158,7 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
 	}
 
 	public JSAssignmentExpression visitEnumLeafInfo(MEnumLeafInfo<T, C> info) {
+		// TODO why not create type info declaration???
 		return info.getBaseTypeInfo().acceptTypeInfoVisitor(this);
 	}
 
@@ -189,12 +190,14 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
 		if (name != null) {
 			return this.codeModel.string(name);
 		} else {
+			// TODO unsupported builtin
 			return null;
 		}
 	}
 
 	public JSAssignmentExpression visitWildcardTypeInfo(
 			MWildcardTypeInfo<T, C> info) {
+		// TODO ????
 		return null;
 	}
 

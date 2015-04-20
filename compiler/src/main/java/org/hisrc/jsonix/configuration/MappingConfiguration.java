@@ -30,6 +30,7 @@ public class MappingConfiguration {
 	private String id;
 	private String name;
 	private String _package;
+	private String schemaId;
 	private String targetNamespaceURI;
 	private String defaultElementNamespaceURI;
 	private String defaultAttributeNamespaceURI;
@@ -66,6 +67,15 @@ public class MappingConfiguration {
 
 	public void setPackage(String _package) {
 		this._package = _package;
+	}
+
+	@XmlAttribute(name = "schemaId")
+	public String getSchemaId() {
+		return schemaId;
+	}
+
+	public void setSchemaId(String schemaId) {
+		this.schemaId = schemaId;
 	}
 
 	@XmlAttribute(name = "targetNamespace")
@@ -176,8 +186,20 @@ public class MappingConfiguration {
 			defaultAttributeNamespaceURI = mostUsedAttributeNamespaceURI;
 		}
 
+		final String schemaId;
+		if (this.schemaId != null) {
+			schemaId = this.schemaId;
+		} else {
+			schemaId = targetNamespaceURI
+					+ (targetNamespaceURI.endsWith("#") ? "" : "#");
+			logger.debug(MessageFormat
+					.format("Mapping [{0}] will use schema id \"{1}\" based on the target namespace URI for the package [{2}].",
+							mappingName, schemaId, packageName));
+
+		}
+
 		final Mapping<T, C> mapping = new Mapping<T, C>(context, analyzer,
-				packageInfo, mappingName, targetNamespaceURI,
+				packageInfo, mappingName, schemaId, targetNamespaceURI,
 				defaultElementNamespaceURI, defaultAttributeNamespaceURI);
 
 		if (getExcludesConfiguration() != null) {

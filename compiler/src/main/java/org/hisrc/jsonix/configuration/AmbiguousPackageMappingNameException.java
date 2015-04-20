@@ -5,13 +5,13 @@ import java.util.Arrays;
 
 import org.apache.commons.lang3.Validate;
 
-public class AmbiguousPackageMappingException extends ConfigurationException {
+public class AmbiguousPackageMappingNameException extends ConfigurationException {
 
 	private static final long serialVersionUID = 277619834810758946L;
 	private final String packageName;
 	private final String[] mappingNames;
 
-	public AmbiguousPackageMappingException(String packageName,
+	public AmbiguousPackageMappingNameException(String packageName,
 			String... mappingNames) {
 		super(
 				MessageFormat
