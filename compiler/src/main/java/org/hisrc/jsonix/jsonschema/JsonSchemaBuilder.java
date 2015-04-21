@@ -315,6 +315,7 @@ public class JsonSchemaBuilder implements JsonObjectBuildable {
 		return this;
 	}
 
+	// TODO addAnyOf for collection
 	public JsonSchemaBuilder addAnyOf(JsonSchemaBuilder schema) {
 		Validate.notNull(schema);
 		if (this.anyOf == null) {
