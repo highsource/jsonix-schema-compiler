@@ -1,6 +1,12 @@
 package org.hisrc.jsonix.compilation.jsc;
 
+import org.apache.commons.lang3.Validate;
+import org.hisrc.jsonix.compilation.MappingCompiler;
+import org.hisrc.jsonix.definition.Mapping;
+import org.hisrc.jsonix.definition.Module;
+import org.hisrc.jsonix.definition.Modules;
 import org.hisrc.jsonix.jsonschema.JsonSchemaBuilder;
+import org.hisrc.jsonschema.model.v4.keyword.Keywords;
 import org.jvnet.jaxb2_commons.xml.bind.model.MBuiltinLeafInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassRef;
@@ -9,25 +15,53 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MID;
 import org.jvnet.jaxb2_commons.xml.bind.model.MIDREF;
 import org.jvnet.jaxb2_commons.xml.bind.model.MIDREFS;
 import org.jvnet.jaxb2_commons.xml.bind.model.MList;
+import org.jvnet.jaxb2_commons.xml.bind.model.MPackagedTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfoVisitor;
 import org.jvnet.jaxb2_commons.xml.bind.model.MWildcardTypeInfo;
 
 public class JsonSchemaRefTypeInfoCompilerVisitor<T, C extends T> implements
 		MTypeInfoVisitor<T, C, JsonSchemaBuilder> {
 
+	private final JsonSchemaMappingCompiler<T, C> mappingCompiler;
+	private final Modules<T, C> modules;
+	private final Module<T, C> module;
+	private final Mapping<T, C> mapping;
+
+	public JsonSchemaRefTypeInfoCompilerVisitor(
+			JsonSchemaMappingCompiler<T, C> mappingCompiler) {
+		Validate.notNull(mappingCompiler);
+		this.mappingCompiler = mappingCompiler;
+		this.modules = mappingCompiler.getModules();
+		this.module = mappingCompiler.getModule();
+		this.mapping = mappingCompiler.getMapping();
+	}
+
+	public JsonSchemaMappingCompiler<T, C> getMappingCompiler() {
+		return mappingCompiler;
+	}
+
+	public Modules<T, C> getModules() {
+		return modules;
+	}
+
+	public Mapping<T, C> getMapping() {
+		return mapping;
+	}
+
 	@Override
 	public JsonSchemaBuilder visitClassInfo(MClassInfo<T, C> info) {
-		throw new UnsupportedOperationException();
+		return createTypeInfoSchemaRef(info);
 	}
 
 	@Override
 	public JsonSchemaBuilder visitClassRef(MClassRef<T, C> info) {
-		throw new UnsupportedOperationException();
+		return createTypeInfoSchemaRef(info);
 	}
 
 	@Override
 	public JsonSchemaBuilder visitList(MList<T, C> info) {
-		throw new UnsupportedOperationException();
+		return new JsonSchemaBuilder().addType("array").addItem(
+				info.getItemTypeInfo().acceptTypeInfoVisitor(this));
 	}
 
 	@Override
@@ -52,11 +86,26 @@ public class JsonSchemaRefTypeInfoCompilerVisitor<T, C extends T> implements
 
 	@Override
 	public JsonSchemaBuilder visitEnumLeafInfo(MEnumLeafInfo<T, C> info) {
-		throw new UnsupportedOperationException();
+		return createTypeInfoSchemaRef(info);
 	}
 
 	@Override
 	public JsonSchemaBuilder visitWildcardTypeInfo(MWildcardTypeInfo<T, C> info) {
 		throw new UnsupportedOperationException();
+	}
+
+	private JsonSchemaBuilder createTypeInfoSchemaRef(
+			MPackagedTypeInfo<T, C> info) {
+
+		final String typeInfoSchemaId = getModules().getSchemaId(
+				info.getPackageInfo().getPackageName());
+		final String mappingSchemaId = typeInfoSchemaId.equals(getMapping()
+				.getSchemaId()) ? "" : typeInfoSchemaId;
+		final String typeInfoRef = mappingSchemaId
+				+ "/"
+				+ Keywords.definitions
+				+ "/"
+				+ info.getContainerLocalName(MappingCompiler.DEFAULT_SCOPED_NAME_DELIMITER);
+		return new JsonSchemaBuilder().addRef(typeInfoRef);
 	}
 }

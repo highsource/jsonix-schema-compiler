@@ -28,12 +28,20 @@ public class JsonSchemaMappingCompiler<T, C extends T> {
 		this.mapping = mapping;
 	}
 
-	public JsonSchemaBuilder compile() {
-		throw new UnsupportedOperationException();
+	public Modules<T, C> getModules() {
+		return modules;
+	}
+
+	public Module<T, C> getModule() {
+		return module;
 	}
 
 	public Mapping<T, C> getMapping() {
 		return mapping;
+	}
+
+	public JsonSchemaBuilder compile() {
+		throw new UnsupportedOperationException();
 	}
 
 	public JsonSchemaBuilder createTypeInfoSchemaRef(MTypeInfo<T, C> typeInfo) {
