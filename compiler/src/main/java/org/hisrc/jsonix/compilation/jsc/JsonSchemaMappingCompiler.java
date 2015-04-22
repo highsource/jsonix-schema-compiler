@@ -1,7 +1,5 @@
 package org.hisrc.jsonix.compilation.jsc;
 
-import javax.json.JsonBuilderFactory;
-
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.definition.Module;
@@ -11,21 +9,23 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 
 public class JsonSchemaMappingCompiler<T, C extends T> {
 
-	private final JsonBuilderFactory builderFactory;
+	private JsonSchemaModuleCompiler<T, C> moduleCompiler;
 	private final Modules<T, C> modules;
 	private final Module<T, C> module;
 	private final Mapping<T, C> mapping;
 
-	public JsonSchemaMappingCompiler(JsonBuilderFactory builderFactory,
-			Modules<T, C> modules, Module<T, C> module, Mapping<T, C> mapping) {
-		Validate.notNull(builderFactory);
-		Validate.notNull(modules);
-		Validate.notNull(module);
+	public JsonSchemaMappingCompiler(
+			JsonSchemaModuleCompiler<T, C> moduleCompiler, Mapping<T, C> mapping) {
+		Validate.notNull(moduleCompiler);
 		Validate.notNull(mapping);
-		this.builderFactory = builderFactory;
-		this.modules = modules;
-		this.module = module;
+		this.moduleCompiler = moduleCompiler;
+		this.modules = moduleCompiler.getModules();
+		this.module = moduleCompiler.getModule();
 		this.mapping = mapping;
+	}
+
+	public JsonSchemaModuleCompiler<T, C> getModuleCompiler() {
+		return moduleCompiler;
 	}
 
 	public Modules<T, C> getModules() {
@@ -45,6 +45,8 @@ public class JsonSchemaMappingCompiler<T, C extends T> {
 	}
 
 	public JsonSchemaBuilder createTypeInfoSchemaRef(MTypeInfo<T, C> typeInfo) {
-		throw new UnsupportedOperationException();
+		return typeInfo
+				.acceptTypeInfoVisitor(new JsonSchemaRefTypeInfoCompilerVisitor<T, C>(
+						this));
 	}
 }

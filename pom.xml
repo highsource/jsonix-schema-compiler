@@ -87,7 +87,6 @@
 		<jsonix-scripts.version>2.1.0</jsonix-scripts.version>
 		<jaxb2-basics.version>0.9.4</jaxb2-basics.version>
 		<js-codemodel.version>1.1</js-codemodel.version>
-		<jsonschema-model.version>1.0.0-SNAPSHOT</jsonschema-model.version>
 		<jaxb.version>2.2.11</jaxb.version>
 		<maven-jaxb2-plugin.version>0.12.3</maven-jaxb2-plugin.version>
 		<jgrapht.version>0.9.0</jgrapht.version>
@@ -124,17 +123,22 @@
 				<artifactId>jsonix-scripts</artifactId>
 				<version>${jsonix-scripts.version}</version>
 			</dependency>
+			<!-- JSON -->
+			<dependency>
+				<groupId>org.glassfish</groupId>
+				<artifactId>javax.json</artifactId>
+				<version>1.0.4</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.json</groupId>
+				<artifactId>javax.json-api</artifactId>
+				<version>1.0</version>
+			</dependency>
 			<!-- JS CodeModel -->
 			<dependency>
 				<groupId>org.hisrc.jscm</groupId>
 				<artifactId>js-codemodel</artifactId>
 				<version>${js-codemodel.version}</version>
-			</dependency>
-			<!-- JsonSchema Model -->
-			<dependency>
-				<groupId>org.hisrc.jsonschema.model</groupId>
-				<artifactId>jsonschema-model</artifactId>
-				<version>${jsonschema-model.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>junit</groupId>

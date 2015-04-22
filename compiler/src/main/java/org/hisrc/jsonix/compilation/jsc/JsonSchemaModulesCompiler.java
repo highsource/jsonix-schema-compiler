@@ -19,6 +19,10 @@ public class JsonSchemaModulesCompiler<T, C extends T> {
 		this.modules = modules;
 	}
 
+	public Modules<T, C> getModules() {
+		return modules;
+	}
+
 	public void compile(JsonSchemaWriter<T, C> writer) {
 		final JsonProvider provider = JsonProvider.provider();
 		final JsonBuilderFactory builderFactory = provider
@@ -28,7 +32,7 @@ public class JsonSchemaModulesCompiler<T, C extends T> {
 			if (!module.isEmpty()) {
 				for (Output output : module.getOutputs()) {
 					final JsonSchemaModuleCompiler<T, C> moduleCompiler = new JsonSchemaModuleCompiler<T, C>(
-							builderFactory, modules, module);
+							this, module);
 					final JsonSchemaBuilder schemaBuilder = moduleCompiler
 							.compile();
 					final JsonObject schema = schemaBuilder
@@ -38,4 +42,5 @@ public class JsonSchemaModulesCompiler<T, C extends T> {
 			}
 		}
 	}
+
 }

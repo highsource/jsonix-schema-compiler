@@ -14,7 +14,7 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 
 import org.apache.commons.lang3.Validate;
-import org.hisrc.json.util.JsonBuilderUtils;
+import org.hisrc.jsonix.json.util.JsonBuilderUtils;
 import org.hisrc.jsonix.json.util.JsonObjectBuildable;
 
 public class JsonSchemaBuilder implements JsonObjectBuildable {

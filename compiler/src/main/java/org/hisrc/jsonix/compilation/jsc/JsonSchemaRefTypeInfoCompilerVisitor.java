@@ -1,12 +1,16 @@
 package org.hisrc.jsonix.compilation.jsc;
 
+import java.text.MessageFormat;
+import java.util.Map;
+
+import javax.xml.namespace.QName;
+
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.compilation.MappingCompiler;
 import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Modules;
 import org.hisrc.jsonix.jsonschema.JsonSchemaBuilder;
-import org.hisrc.jsonschema.model.v4.keyword.Keywords;
 import org.jvnet.jaxb2_commons.xml.bind.model.MBuiltinLeafInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassRef;
@@ -26,6 +30,7 @@ public class JsonSchemaRefTypeInfoCompilerVisitor<T, C extends T> implements
 	private final Modules<T, C> modules;
 	private final Module<T, C> module;
 	private final Mapping<T, C> mapping;
+	private final Map<QName, String> typeNameSchemaRefs;
 
 	public JsonSchemaRefTypeInfoCompilerVisitor(
 			JsonSchemaMappingCompiler<T, C> mappingCompiler) {
@@ -34,6 +39,7 @@ public class JsonSchemaRefTypeInfoCompilerVisitor<T, C extends T> implements
 		this.modules = mappingCompiler.getModules();
 		this.module = mappingCompiler.getModule();
 		this.mapping = mappingCompiler.getMapping();
+		this.typeNameSchemaRefs = XmlSchemaJsonSchemaConstants.TYPE_NAME_SCHEMA_REFS;
 	}
 
 	public JsonSchemaMappingCompiler<T, C> getMappingCompiler() {
@@ -42,6 +48,10 @@ public class JsonSchemaRefTypeInfoCompilerVisitor<T, C extends T> implements
 
 	public Modules<T, C> getModules() {
 		return modules;
+	}
+
+	public Module<T, C> getModule() {
+		return module;
 	}
 
 	public Mapping<T, C> getMapping() {
@@ -66,22 +76,35 @@ public class JsonSchemaRefTypeInfoCompilerVisitor<T, C extends T> implements
 
 	@Override
 	public JsonSchemaBuilder visitID(MID<T, C> info) {
-		throw new UnsupportedOperationException();
+		return new JsonSchemaBuilder()
+				.addRef(XmlSchemaJsonSchemaConstants.ID_TYPE_INFO_SCHEMA_REF);
 	}
 
 	@Override
 	public JsonSchemaBuilder visitIDREF(MIDREF<T, C> info) {
-		throw new UnsupportedOperationException();
+		return new JsonSchemaBuilder()
+				.addRef(XmlSchemaJsonSchemaConstants.IDREF_TYPE_INFO_SCHEMA_REF);
 	}
 
 	@Override
 	public JsonSchemaBuilder visitIDREFS(MIDREFS<T, C> info) {
-		throw new UnsupportedOperationException();
+		return new JsonSchemaBuilder()
+				.addRef(XmlSchemaJsonSchemaConstants.IDREFS_TYPE_INFO_SCHEMA_REF);
 	}
 
 	@Override
 	public JsonSchemaBuilder visitBuiltinLeafInfo(MBuiltinLeafInfo<T, C> info) {
-		throw new UnsupportedOperationException();
+		final QName typeName = info.getTypeName();
+		final String $ref = this.typeNameSchemaRefs.get(typeName);
+		final JsonSchemaBuilder schemaBuilder = new JsonSchemaBuilder();
+		if ($ref != null) {
+			return schemaBuilder.addRef($ref);
+		} else {
+			return schemaBuilder
+					.addDescription(MessageFormat
+							.format("WARNING, the type [{0}] is not supported, using the lax schema {}.",
+									typeName));
+		}
 	}
 
 	@Override
@@ -91,7 +114,8 @@ public class JsonSchemaRefTypeInfoCompilerVisitor<T, C extends T> implements
 
 	@Override
 	public JsonSchemaBuilder visitWildcardTypeInfo(MWildcardTypeInfo<T, C> info) {
-		throw new UnsupportedOperationException();
+		return new JsonSchemaBuilder()
+				.addRef(JsonixJsonSchemaConstants.WILDCARD_TYPE_INFO_SCHEMA_REF);
 	}
 
 	private JsonSchemaBuilder createTypeInfoSchemaRef(
@@ -100,10 +124,10 @@ public class JsonSchemaRefTypeInfoCompilerVisitor<T, C extends T> implements
 		final String typeInfoSchemaId = getModules().getSchemaId(
 				info.getPackageInfo().getPackageName());
 		final String mappingSchemaId = typeInfoSchemaId.equals(getMapping()
-				.getSchemaId()) ? "" : typeInfoSchemaId;
+				.getSchemaId()) ? "#" : typeInfoSchemaId;
 		final String typeInfoRef = mappingSchemaId
 				+ "/"
-				+ Keywords.definitions
+				+ JsonSchemaKeywords.definitions
 				+ "/"
 				+ info.getContainerLocalName(MappingCompiler.DEFAULT_SCOPED_NAME_DELIMITER);
 		return new JsonSchemaBuilder().addRef(typeInfoRef);

@@ -3,8 +3,6 @@ package org.hisrc.jsonix.compilation.jsc;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.json.JsonBuilderFactory;
-
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.definition.Module;
@@ -13,18 +11,29 @@ import org.hisrc.jsonix.jsonschema.JsonSchemaBuilder;
 
 public class JsonSchemaModuleCompiler<T, C extends T> {
 
-	private final JsonBuilderFactory builderFactory;
+	private final JsonSchemaModulesCompiler<T, C> modulesCompiler;
 	private final Modules<T, C> modules;
 	private final Module<T, C> module;
 
-	public JsonSchemaModuleCompiler(JsonBuilderFactory builderFactory,
-			Modules<T, C> modules, Module<T, C> module) {
-		Validate.notNull(builderFactory);
-		Validate.notNull(modules);
+	public JsonSchemaModuleCompiler(
+			JsonSchemaModulesCompiler<T, C> modulesCompiler, Module<T, C> module) {
+		Validate.notNull(modulesCompiler);
 		Validate.notNull(module);
-		this.builderFactory = builderFactory;
-		this.modules = modules;
+		this.modulesCompiler = modulesCompiler;
+		this.modules = modulesCompiler.getModules();
 		this.module = module;
+	}
+
+	public JsonSchemaModulesCompiler<T, C> getModulesCompiler() {
+		return modulesCompiler;
+	}
+
+	public Modules<T, C> getModules() {
+		return modules;
+	}
+
+	public Module<T, C> getModule() {
+		return module;
 	}
 
 	public JsonSchemaBuilder compile() {
@@ -33,7 +42,7 @@ public class JsonSchemaModuleCompiler<T, C extends T> {
 		for (Mapping<T, C> mapping : this.module.getMappings()) {
 			if (!mapping.isEmpty()) {
 				final JsonSchemaMappingCompiler<T, C> mappingCompiler = new JsonSchemaMappingCompiler<T, C>(
-						builderFactory, modules, module, mapping);
+						this, mapping);
 
 				final JsonSchemaBuilder mappingSchemaBuilder = mappingCompiler
 						.compile();

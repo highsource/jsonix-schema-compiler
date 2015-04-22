@@ -44,8 +44,12 @@
 			<artifactId>js-codemodel</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.hisrc.jsonschema.model</groupId>
-			<artifactId>jsonschema-model</artifactId>
+			<groupId>org.glassfish</groupId>
+			<artifactId>javax.json</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.json</groupId>
+			<artifactId>javax.json-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
