@@ -31,5 +31,7 @@ public class XmlSchemaJsonSchemaConstants {
 			+ JsonSchemaKeywords.definitions + "/" + "IDREFS";
 	public static final String IDREF_TYPE_INFO_SCHEMA_REF = SCHEMA_ID + "/"
 			+ JsonSchemaKeywords.definitions + "/" + "IDREF";
+	public static final String STRING_TYPE_INFO_SCHEMA_REF = SCHEMA_ID + "/"
+			+ JsonSchemaKeywords.definitions + "/" + "string";
 
 }
