@@ -2,6 +2,8 @@ package org.hisrc.jsonix.execution;
 
 import org.hisrc.jsonix.compilation.ModulesCompiler;
 import org.hisrc.jsonix.compilation.ProgramWriter;
+import org.hisrc.jsonix.compilation.jsc.JsonSchemaModulesCompiler;
+import org.hisrc.jsonix.compilation.jsc.JsonStructureWriter;
 import org.hisrc.jsonix.configuration.ModulesConfiguration;
 import org.hisrc.jsonix.configuration.ModulesConfigurationUnmarshaller;
 import org.hisrc.jsonix.configuration.OutputConfiguration;
@@ -19,7 +21,8 @@ import com.sun.tools.xjc.model.nav.NType;
 public class JsonixInvoker {
 
 	public void execute(Settings settings, Model model,
-			ProgramWriter<NType, NClass> programWriter) {
+			ProgramWriter<NType, NClass> programWriter,
+			JsonStructureWriter<NType, NClass> jsonStructureWriter) {
 
 		final DefaultJsonixContext context = new DefaultJsonixContext();
 
@@ -53,5 +56,9 @@ public class JsonixInvoker {
 				modules);
 
 		modulesCompiler.compile(programWriter);
+
+		final JsonSchemaModulesCompiler<NType, NClass> jsonSchemaModulesCompiler = new JsonSchemaModulesCompiler<NType, NClass>(
+				modules);
+		jsonSchemaModulesCompiler.compile(jsonStructureWriter);
 	}
 }

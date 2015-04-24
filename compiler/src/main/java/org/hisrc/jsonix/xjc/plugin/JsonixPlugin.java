@@ -38,6 +38,7 @@ import java.util.List;
 
 import org.hisrc.jsonix.args4j.PartialCmdLineParser;
 import org.hisrc.jsonix.compilation.ProgramWriter;
+import org.hisrc.jsonix.compilation.jsc.JsonStructureWriter;
 import org.hisrc.jsonix.configuration.PluginCustomizations;
 import org.hisrc.jsonix.execution.JsonixInvoker;
 import org.hisrc.jsonix.settings.Settings;
@@ -83,8 +84,8 @@ public class JsonixPlugin extends Plugin {
 
 	@Override
 	public String getUsage() {
-		return "  -Xjsonix :  Generates Jsonix mappings.\n" +
-		           "                    See https://github.com/highsource/jsonix";
+		return "  -Xjsonix :  Generates Jsonix mappings.\n"
+				+ "                    See https://github.com/highsource/jsonix";
 	}
 
 	@Override
@@ -135,8 +136,12 @@ public class JsonixPlugin extends Plugin {
 
 		final ProgramWriter<NType, NClass> programWriter = new CodeModelProgramWriter(
 				codeModel, errorHandler);
-		
-		new JsonixInvoker().execute(getSettings(), model, programWriter);
+
+		final JsonStructureWriter<NType, NClass> jsonStructureWriter = new CodeModelJsonStructureWriter(
+				codeModel, errorHandler);
+
+		new JsonixInvoker().execute(getSettings(), model, programWriter,
+				jsonStructureWriter);
 
 		return true;
 	}

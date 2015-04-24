@@ -26,12 +26,14 @@ public class XmlSchemaJsonSchemaConstants {
 	}
 
 	public static final String ID_TYPE_INFO_SCHEMA_REF = SCHEMA_ID + "/"
-			+ JsonSchemaKeywords.definitions + "/" + "ID";
+			+ JsonSchemaKeywords.definitions + "/" + XmlSchemaConstants.ID.getLocalPart();
 	public static final String IDREFS_TYPE_INFO_SCHEMA_REF = SCHEMA_ID + "/"
-			+ JsonSchemaKeywords.definitions + "/" + "IDREFS";
+			+ JsonSchemaKeywords.definitions + "/" + XmlSchemaConstants.IDREFS.getLocalPart();
 	public static final String IDREF_TYPE_INFO_SCHEMA_REF = SCHEMA_ID + "/"
-			+ JsonSchemaKeywords.definitions + "/" + "IDREF";
+			+ JsonSchemaKeywords.definitions + "/"  + XmlSchemaConstants.IDREF.getLocalPart();
 	public static final String STRING_TYPE_INFO_SCHEMA_REF = SCHEMA_ID + "/"
-			+ JsonSchemaKeywords.definitions + "/" + "string";
+			+ JsonSchemaKeywords.definitions + "/" + XmlSchemaConstants.STRING.getLocalPart();
+	public static final String QNAME_TYPE_INFO_SCHEMA_REF = SCHEMA_ID + "/"
+			+ JsonSchemaKeywords.definitions + "/" + XmlSchemaConstants.QNAME.getLocalPart();
 
 }

@@ -23,7 +23,7 @@ public class JsonSchemaModulesCompiler<T, C extends T> {
 		return modules;
 	}
 
-	public void compile(JsonSchemaWriter<T, C> writer) {
+	public void compile(JsonStructureWriter<T, C> writer) {
 		final JsonProvider provider = JsonProvider.provider();
 		final JsonBuilderFactory builderFactory = provider
 				.createBuilderFactory(null);
@@ -37,7 +37,7 @@ public class JsonSchemaModulesCompiler<T, C extends T> {
 							.compile();
 					final JsonObject schema = schemaBuilder
 							.build(builderFactory);
-					writer.writeJsonSchema(module, schema, output);
+					writer.writeJsonStructure(module, schema, output);
 				}
 			}
 		}

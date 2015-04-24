@@ -10,4 +10,5 @@ public class JsonixJsonSchemaConstants {
 
 	public static final String WILDCARD_TYPE_INFO_SCHEMA_REF = SCHEMA_ID + "/"
 			+ JsonSchemaKeywords.definitions + "/" + "wildcard";
-}
+	public static final String DOM_TYPE_INFO_SCHEMA_REF = SCHEMA_ID + "/"
+			+ JsonSchemaKeywords.definitions + "/" + "dome";}

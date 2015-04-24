@@ -5,6 +5,7 @@ import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Modules;
 import org.hisrc.jsonix.jsonschema.JsonSchemaBuilder;
+import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 
 public class JsonSchemaMappingCompiler<T, C extends T> {
@@ -41,7 +42,17 @@ public class JsonSchemaMappingCompiler<T, C extends T> {
 	}
 
 	public JsonSchemaBuilder compile() {
-		throw new UnsupportedOperationException();
+		final JsonSchemaBuilder schema = new JsonSchemaBuilder();
+		final JsonSchemaClassInfoCompiler<T, C> classInfoCompiler = new JsonSchemaClassInfoCompiler<T, C>(
+				this);
+		for (MClassInfo<T, C> classInfo : mapping.getClassInfos()) {
+			final JsonSchemaBuilder classInfoSchema = classInfoCompiler
+					.compile(classInfo);
+			// TODO constant
+			schema.addDefinition(classInfo.getContainerLocalName("."),
+					classInfoSchema);
+		}
+		return schema;
 	}
 
 	public JsonSchemaBuilder createTypeInfoSchemaRef(MTypeInfo<T, C> typeInfo) {
