@@ -1,7 +1,8 @@
 package org.hisrc.jsonix.compilation.jsc;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 
@@ -58,24 +59,28 @@ public class JsonSchemaClassInfoCompiler<T, C extends T> implements
 			typeInfoSchemaBuilder = classInfoSchemaBuilder;
 		}
 
-		final List<JsonSchemaBuilder> propertyInfoSchemaBuilders = compilePropertyInfos(classInfo);
-		for (JsonSchemaBuilder propertyInfoSchemaBuilder : propertyInfoSchemaBuilders) {
-			classInfoSchemaBuilder.addItem(propertyInfoSchemaBuilder);
+		// TODO move to the builder
+		final Map<String, JsonSchemaBuilder> propertyInfoSchemaBuilders = compilePropertyInfos(classInfo);
+		for (Entry<String, JsonSchemaBuilder> entry : propertyInfoSchemaBuilders
+				.entrySet()) {
+			classInfoSchemaBuilder
+					.addProperty(entry.getKey(), entry.getValue());
 		}
 
 		return typeInfoSchemaBuilder;
 	}
 
-	private List<JsonSchemaBuilder> compilePropertyInfos(
+	private Map<String, JsonSchemaBuilder> compilePropertyInfos(
 			MClassInfo<T, C> classInfo) {
-		final List<JsonSchemaBuilder> propertyInfoSchemaBuilders = new ArrayList<JsonSchemaBuilder>(
+		final Map<String, JsonSchemaBuilder> propertyInfoSchemaBuilders = new LinkedHashMap<String, JsonSchemaBuilder>(
 				classInfo.getProperties().size());
 		for (MPropertyInfo<T, C> propertyInfo : classInfo.getProperties()) {
 			if (mapping.getPropertyInfos().contains(propertyInfo)) {
 				propertyInfoSchemaBuilders
-						.add(propertyInfo
-								.acceptPropertyInfoVisitor(new JsonSchemaPropertyInfoCompilerVisitor<T, C>(
-										this)));
+						.put(propertyInfo.getPrivateName(),
+								propertyInfo
+										.acceptPropertyInfoVisitor(new JsonSchemaPropertyInfoCompilerVisitor<T, C>(
+												this)));
 			}
 		}
 		return propertyInfoSchemaBuilders;
