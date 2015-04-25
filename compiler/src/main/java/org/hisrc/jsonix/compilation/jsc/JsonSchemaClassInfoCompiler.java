@@ -44,20 +44,20 @@ public class JsonSchemaClassInfoCompiler<T, C extends T> implements
 		// TODO addId ?
 		// ...
 		final MClassTypeInfo<T, C> baseTypeInfo = classInfo.getBaseTypeInfo();
-		final JsonSchemaBuilder typeInfoSchemaBuilder;
+		final JsonSchemaBuilder typeInfoSchema;
 		if (baseTypeInfo != null) {
-			final JsonSchemaBuilder baseTypeInfoSchemaBuilder = mappingCompiler
+			final JsonSchemaBuilder baseTypeInfoSchema = mappingCompiler
 					.createTypeInfoSchemaRef(baseTypeInfo);
-			typeInfoSchemaBuilder = new JsonSchemaBuilder();
-			typeInfoSchemaBuilder.addAllOf(baseTypeInfoSchemaBuilder);
-			typeInfoSchemaBuilder.addAllOf(classInfoSchema);
+			typeInfoSchema = new JsonSchemaBuilder();
+			typeInfoSchema.addAllOf(baseTypeInfoSchema);
+			typeInfoSchema.addAllOf(classInfoSchema);
 		} else {
-			typeInfoSchemaBuilder = classInfoSchema;
+			typeInfoSchema = classInfoSchema;
 		}
 
 		// TODO move to the builder
-		final Map<String, JsonSchemaBuilder> propertyInfoSchemaBuilders = compilePropertyInfos(classInfo);
-		for (Entry<String, JsonSchemaBuilder> entry : propertyInfoSchemaBuilders
+		final Map<String, JsonSchemaBuilder> propertyInfoSchemas = compilePropertyInfos(classInfo);
+		for (Entry<String, JsonSchemaBuilder> entry : propertyInfoSchemas
 				.entrySet()) {
 			classInfoSchema.addProperty(entry.getKey(), entry.getValue());
 		}
@@ -74,22 +74,22 @@ public class JsonSchemaClassInfoCompiler<T, C extends T> implements
 											typeName.getNamespaceURI()));
 		}
 
-		return typeInfoSchemaBuilder;
+		return typeInfoSchema;
 	}
 
 	private Map<String, JsonSchemaBuilder> compilePropertyInfos(
 			MClassInfo<T, C> classInfo) {
-		final Map<String, JsonSchemaBuilder> propertyInfoSchemaBuilders = new LinkedHashMap<String, JsonSchemaBuilder>(
+		final Map<String, JsonSchemaBuilder> propertyInfoSchemas = new LinkedHashMap<String, JsonSchemaBuilder>(
 				classInfo.getProperties().size());
 		for (MPropertyInfo<T, C> propertyInfo : classInfo.getProperties()) {
 			if (mapping.getPropertyInfos().contains(propertyInfo)) {
-				propertyInfoSchemaBuilders
+				propertyInfoSchemas
 						.put(propertyInfo.getPrivateName(),
 								propertyInfo
 										.acceptPropertyInfoVisitor(new JsonSchemaPropertyInfoCompilerVisitor<T, C>(
 												this)));
 			}
 		}
-		return propertyInfoSchemaBuilders;
+		return propertyInfoSchemas;
 	}
 }

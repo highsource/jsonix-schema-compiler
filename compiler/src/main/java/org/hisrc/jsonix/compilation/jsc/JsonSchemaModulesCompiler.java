@@ -1,7 +1,6 @@
 package org.hisrc.jsonix.compilation.jsc;
 
 import javax.json.JsonBuilderFactory;
-import javax.json.JsonObject;
 import javax.json.spi.JsonProvider;
 
 import org.apache.commons.lang3.Validate;
@@ -33,11 +32,9 @@ public class JsonSchemaModulesCompiler<T, C extends T> {
 				for (Output output : module.getOutputs()) {
 					final JsonSchemaModuleCompiler<T, C> moduleCompiler = new JsonSchemaModuleCompiler<T, C>(
 							this, module);
-					final JsonSchemaBuilder schemaBuilder = moduleCompiler
-							.compile();
-					final JsonObject schema = schemaBuilder
-							.build(builderFactory);
-					writer.writeJsonStructure(module, schema, output);
+					final JsonSchemaBuilder schema = moduleCompiler.compile();
+					writer.writeJsonStructure(module,
+							schema.build(builderFactory), output);
 				}
 			}
 		}

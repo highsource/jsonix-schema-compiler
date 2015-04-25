@@ -224,8 +224,8 @@ public class JsonSchemaPropertyInfoCompilerVisitor<T, C extends T> implements
 	}
 
 	private void addPropertyInfoSchema(MPropertyInfo<T, C> propertyInfo,
-			JsonSchemaBuilder schemaBuilder) {
-		schemaBuilder.addTitle(propertyInfo.getPrivateName());
+			JsonSchemaBuilder schema) {
+		schema.addTitle(propertyInfo.getPrivateName());
 	}
 
 	private void addWrappableSchema(MWrappable info, JsonSchemaBuilder schema) {
@@ -336,15 +336,15 @@ public class JsonSchemaPropertyInfoCompilerVisitor<T, C extends T> implements
 
 	private JsonSchemaBuilder createPossiblyCollectionTypeSchema(
 			boolean collection, final JsonSchemaBuilder itemTypeSchema) {
-		final JsonSchemaBuilder typeSchemaBuilder;
+		final JsonSchemaBuilder typeSchema;
 		if (collection) {
-			typeSchemaBuilder = new JsonSchemaBuilder();
-			typeSchemaBuilder.addType(JsonSchemaConstants.ARRAY_TYPE).addItem(
+			typeSchema = new JsonSchemaBuilder();
+			typeSchema.addType(JsonSchemaConstants.ARRAY_TYPE).addItem(
 					itemTypeSchema);
 		} else {
-			typeSchemaBuilder = itemTypeSchema;
+			typeSchema = itemTypeSchema;
 		}
-		return typeSchemaBuilder;
+		return typeSchema;
 	}
 
 	private JsonSchemaBuilder createTypeSchema(MTypeInfo<T, C> typeInfo) {

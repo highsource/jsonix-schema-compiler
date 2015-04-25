@@ -96,11 +96,11 @@ public class JsonSchemaRefTypeInfoCompilerVisitor<T, C extends T> implements
 	public JsonSchemaBuilder visitBuiltinLeafInfo(MBuiltinLeafInfo<T, C> info) {
 		final QName typeName = info.getTypeName();
 		final String $ref = this.typeNameSchemaRefs.get(typeName);
-		final JsonSchemaBuilder schemaBuilder = new JsonSchemaBuilder();
+		final JsonSchemaBuilder schema = new JsonSchemaBuilder();
 		if ($ref != null) {
-			return schemaBuilder.addRef($ref);
+			return schema.addRef($ref);
 		} else {
-			return schemaBuilder
+			return schema
 					.addDescription(MessageFormat
 							.format("WARNING, the type [{0}] is not supported, using the lax schema {}.",
 									typeName));

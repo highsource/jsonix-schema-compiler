@@ -37,28 +37,28 @@ public class JsonSchemaModuleCompiler<T, C extends T> {
 	}
 
 	public JsonSchemaBuilder compile() {
-		final List<JsonSchemaBuilder> mappingSchemaBuilders = new ArrayList<JsonSchemaBuilder>(
+		final List<JsonSchemaBuilder> mappingSchemas = new ArrayList<JsonSchemaBuilder>(
 				this.module.getMappings().size());
 		for (Mapping<T, C> mapping : this.module.getMappings()) {
 			if (!mapping.isEmpty()) {
 				final JsonSchemaMappingCompiler<T, C> mappingCompiler = new JsonSchemaMappingCompiler<T, C>(
 						this, mapping);
 
-				final JsonSchemaBuilder mappingSchemaBuilder = mappingCompiler
+				final JsonSchemaBuilder mappingSchema = mappingCompiler
 						.compile();
 
-				mappingSchemaBuilders.add(mappingSchemaBuilder);
+				mappingSchemas.add(mappingSchema);
 			}
 		}
 
-		if (mappingSchemaBuilders.size() == 1) {
-			return mappingSchemaBuilders.get(0);
+		if (mappingSchemas.size() == 1) {
+			return mappingSchemas.get(0);
 		} else {
-			final JsonSchemaBuilder schemaBuilder = new JsonSchemaBuilder();
-			for (JsonSchemaBuilder mappingSchemaBuilder : mappingSchemaBuilders) {
-				schemaBuilder.addAnyOf(mappingSchemaBuilder);
+			final JsonSchemaBuilder schema = new JsonSchemaBuilder();
+			for (JsonSchemaBuilder mappingSchema : mappingSchemas) {
+				schema.addAnyOf(mappingSchema);
 			}
-			return schemaBuilder;
+			return schema;
 		}
 	}
 
