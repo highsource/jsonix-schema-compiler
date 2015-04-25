@@ -1,4 +1,4 @@
-package org.hisrc.jsonix.compilation.jsc;
+package org.hisrc.jsonix.compilation.jsonschema;
 
 import org.hisrc.jsonix.jsonschema.JsonSchemaBuilder;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;

@@ -1,4 +1,4 @@
-package org.hisrc.jsonix.compilation.jsc;
+package org.hisrc.jsonix.compilation.jsonschema;
 
 import java.util.ArrayList;
 import java.util.List;

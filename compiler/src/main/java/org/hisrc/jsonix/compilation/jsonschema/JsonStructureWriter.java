@@ -1,4 +1,4 @@
-package org.hisrc.jsonix.compilation.jsc;
+package org.hisrc.jsonix.compilation.jsonschema;
 
 import javax.json.JsonStructure;
 

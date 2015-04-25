@@ -38,7 +38,7 @@ import java.util.List;
 
 import org.hisrc.jsonix.args4j.PartialCmdLineParser;
 import org.hisrc.jsonix.compilation.ProgramWriter;
-import org.hisrc.jsonix.compilation.jsc.JsonStructureWriter;
+import org.hisrc.jsonix.compilation.jsonschema.JsonStructureWriter;
 import org.hisrc.jsonix.configuration.PluginCustomizations;
 import org.hisrc.jsonix.execution.JsonixInvoker;
 import org.hisrc.jsonix.settings.Settings;

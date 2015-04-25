@@ -1,4 +1,4 @@
-package org.hisrc.jsonix.compilation.jsc;
+package org.hisrc.jsonix.compilation.jsonschema;
 
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.definition.Mapping;

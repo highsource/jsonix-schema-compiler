@@ -2,8 +2,8 @@ package org.hisrc.jsonix.execution;
 
 import org.hisrc.jsonix.compilation.ModulesCompiler;
 import org.hisrc.jsonix.compilation.ProgramWriter;
-import org.hisrc.jsonix.compilation.jsc.JsonSchemaModulesCompiler;
-import org.hisrc.jsonix.compilation.jsc.JsonStructureWriter;
+import org.hisrc.jsonix.compilation.jsonschema.JsonSchemaModulesCompiler;
+import org.hisrc.jsonix.compilation.jsonschema.JsonStructureWriter;
 import org.hisrc.jsonix.configuration.JsonSchemaConfiguration;
 import org.hisrc.jsonix.configuration.ModulesConfiguration;
 import org.hisrc.jsonix.configuration.ModulesConfigurationUnmarshaller;
