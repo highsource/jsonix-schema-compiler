@@ -14,6 +14,8 @@ public class JsonixJsonSchemaConstants {
 
 	public static String TYPE_TYPE_PROPERTY_NAME = "typeType";
 
+	public static String PROPERTIES_ORDER_PROPERTY_NAME = "propertiesOrder";
+
 	public static String PROPERTY_TYPE_PROPERTY_NAME = "propertyType";
 
 	public static String ELEMENT_NAME_PROPERTY_NAME = "elementName";
@@ -27,4 +29,6 @@ public class JsonixJsonSchemaConstants {
 	public static String LOCAL_PART_PROPERTY_NAME = "localPart";
 
 	public static String NAMESPACE_URI_PROPERTY_NAME = "namespaceURI";
+
+	public static String SCOPE_PROPERTY_NAME = "scope";
 }

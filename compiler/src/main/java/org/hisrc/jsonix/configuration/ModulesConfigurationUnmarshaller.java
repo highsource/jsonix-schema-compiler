@@ -116,7 +116,7 @@ public class ModulesConfigurationUnmarshaller {
 	}
 
 	public ModulesConfiguration unmarshal(Model model,
-			OutputConfiguration defaultOutputConfiguration, 
+			OutputConfiguration defaultOutputConfiguration,
 			JsonSchemaConfiguration defaultJsonSchemaConfiguration) {
 		Validate.notNull(model);
 		Validate.notNull(defaultOutputConfiguration);
@@ -142,7 +142,8 @@ public class ModulesConfigurationUnmarshaller {
 					unmarshalOutputConfiguration(customization));
 		}
 		for (CPluginCustomization customization : CustomizationUtils
-				.findCustomizations(model, JsonSchemaConfiguration.JSON_SCHEMA_NAME)) {
+				.findCustomizations(model,
+						JsonSchemaConfiguration.JSON_SCHEMA_NAME)) {
 			modulesConfiguration.getJsonSchemaConfigurations().add(
 					unmarshalJsonSchemaConfiguration(customization));
 		}

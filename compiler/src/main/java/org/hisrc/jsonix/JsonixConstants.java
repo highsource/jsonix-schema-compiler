@@ -2,6 +2,8 @@ package org.hisrc.jsonix;
 
 public class JsonixConstants {
 
+	// TODO move to constants
+	public static final String DEFAULT_SCOPED_NAME_DELIMITER = ".";
 	private JsonixConstants() {
 	}
 

@@ -12,7 +12,7 @@ import javax.json.spi.JsonProvider;
 import javax.json.stream.JsonGenerator;
 
 import org.apache.commons.lang3.Validate;
-import org.hisrc.jsonix.compilation.jsc.JsonStructureWriter;
+import org.hisrc.jsonix.compilation.jsonschema.JsonStructureWriter;
 import org.hisrc.jsonix.definition.Module;
 import org.xml.sax.SAXParseException;
 

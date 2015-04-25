@@ -57,7 +57,7 @@ public class ModuleConfiguration {
 		this.mappingConfigurations = mappingConfigurations;
 	}
 
-	@XmlElement(name = "output")
+	@XmlElement(name = OutputConfiguration.LOCAL_ELEMENT_NAME)
 	public List<OutputConfiguration> getOutputConfigurations() {
 		return outputConfigurations;
 	}
