@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<jaxb:bindings
+	version="2.1"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:jsonix="http://jsonix.highsource.org/customizations"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+
+	jaxb:extensionBindingPrefixes="jsonix">
+
+	<jaxb:bindings schemaLocation="../schemas/purchaseorder.xsd" node="/xs:schema">
+		<jaxb:schemaBindings>
+			<jaxb:package name="org.hisrc.jsonix.demos.po"/>
+		</jaxb:schemaBindings>
+
+		<jsonix:module name="PurchaseOrder">
+			<jsonix:mapping name="PO" package="org.hisrc.jsonix.demos.po" schemaId="https://cdn.rawgit.com/highsource/jsonix-schema-compiler/master/demos/po-npm/mappings/PurchaseOrder.jsonschema#"/>
+			<jsonix:output naming="standard" fileName="${module.name}.standard.js"/>
+			<jsonix:output naming="compact" fileName="${module.name}.compact.js"/>
+			<jsonix:jsonSchema fileName="${module.name}.jsonschema"/>
+		</jsonix:module>		
+	</jaxb:bindings>
+
+</jaxb:bindings>
