@@ -15,7 +15,7 @@ public class JsonSchemaModuleCompiler<T, C extends T> {
 	private final JsonSchemaModulesCompiler<T, C> modulesCompiler;
 	private final Modules<T, C> modules;
 	private final Module<T, C> module;
-	private final JsonSchema jsonSchema;
+//	private final JsonSchema jsonSchema;
 
 	public JsonSchemaModuleCompiler(
 			JsonSchemaModulesCompiler<T, C> modulesCompiler, Module<T, C> module, JsonSchema jsonSchema) {
@@ -25,7 +25,7 @@ public class JsonSchemaModuleCompiler<T, C extends T> {
 		this.modulesCompiler = modulesCompiler;
 		this.modules = modulesCompiler.getModules();
 		this.module = module;
-		this.jsonSchema = jsonSchema;
+//		this.jsonSchema = jsonSchema;
 	}
 
 	public JsonSchemaModulesCompiler<T, C> getModulesCompiler() {

@@ -5,12 +5,11 @@ public class JsonixJsonSchemaConstants {
 	private JsonixJsonSchemaConstants() {
 	}
 
-	public static final String SCHEMA_ID = "todo:_jsonix_schema_id";
-
-	public static final String WILDCARD_TYPE_INFO_SCHEMA_REF = SCHEMA_ID + "/"
-			+ JsonSchemaKeywords.definitions + "/" + "wildcard";
-	public static final String DOM_TYPE_INFO_SCHEMA_REF = SCHEMA_ID + "/"
-			+ JsonSchemaKeywords.definitions + "/" + "dome";
+	public static final String CALENDAR_TYPE_INFO_SCHEMA_REF = "https://cdn.rawgit.com/highsource/jsonix/master/jsonschemas/jsonix/Jsonix.jsonschema#/definitions/calendar";
+	// TODO Better schema?
+	public static final String WILDCARD_TYPE_INFO_SCHEMA_REF = "https://cdn.rawgit.com/highsource/jsonix/master/jsonschemas/jsonix/Jsonix.jsonschema#/definitions/wildcard";
+	// TODO Better schema?
+	public static final String DOM_TYPE_INFO_SCHEMA_REF = "https://cdn.rawgit.com/highsource/jsonix/master/jsonschemas/jsonix/Jsonix.jsonschema#/definitions/dom";
 
 	public static String TYPE_TYPE_PROPERTY_NAME = "typeType";
 

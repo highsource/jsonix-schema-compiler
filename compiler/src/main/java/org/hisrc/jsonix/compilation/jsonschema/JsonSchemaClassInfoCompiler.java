@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.Validate;
+import org.hisrc.jsonix.JsonixConstants;
 import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.jsonschema.JsonSchemaBuilder;
 import org.hisrc.jsonix.naming.StandardNaming;
@@ -18,9 +18,6 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
 
 public class JsonSchemaClassInfoCompiler<T, C extends T> implements
 		JsonSchemaTypeInfoCompiler<MClassInfo<T, C>, T, C> {
-
-	// TODO move to constants
-	public static final String DEFAULT_SCOPED_NAME_DELIMITER = ".";
 
 	private final JsonSchemaMappingCompiler<T, C> mappingCompiler;
 	private final Mapping<T, C> mapping;
@@ -41,7 +38,7 @@ public class JsonSchemaClassInfoCompiler<T, C extends T> implements
 		final JsonSchemaBuilder classInfoSchema = new JsonSchemaBuilder();
 		classInfoSchema.addType("object");
 		final String localName = classInfo
-				.getContainerLocalName(DEFAULT_SCOPED_NAME_DELIMITER);
+				.getContainerLocalName(JsonixConstants.DEFAULT_SCOPED_NAME_DELIMITER);
 		classInfoSchema.addTitle(localName);
 		final MClassTypeInfo<T, C> baseTypeInfo = classInfo.getBaseTypeInfo();
 		final JsonSchemaBuilder typeInfoSchema;
@@ -55,15 +52,11 @@ public class JsonSchemaClassInfoCompiler<T, C extends T> implements
 			typeInfoSchema = classInfoSchema;
 		}
 
-		// TODO move to the builder
 		final Map<String, JsonSchemaBuilder> propertyInfoSchemas = compilePropertyInfos(classInfo);
 		final List<String> propertiesOrder = new ArrayList<String>(
 				propertyInfoSchemas.size());
-		for (Entry<String, JsonSchemaBuilder> entry : propertyInfoSchemas
-				.entrySet()) {
-			propertiesOrder.add(entry.getKey());
-			classInfoSchema.addProperty(entry.getKey(), entry.getValue());
-		}
+		propertiesOrder.addAll(propertyInfoSchemas.keySet());
+		classInfoSchema.addProperties(propertyInfoSchemas);
 		typeInfoSchema.add(JsonixJsonSchemaConstants.TYPE_TYPE_PROPERTY_NAME,
 				StandardNaming.CLASS_INFO);
 		final QName typeName = classInfo.getTypeName();

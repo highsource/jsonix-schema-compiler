@@ -49,7 +49,10 @@ public class JsonSchemaMappingCompiler<T, C extends T> {
 
 	public JsonSchemaBuilder compile() {
 		final JsonSchemaBuilder schema = new JsonSchemaBuilder();
-		schema.addId(mapping.getSchemaId());
+		final String schemaId = mapping.getSchemaId();
+		if (!schemaId.isEmpty()) {
+			schema.addId(schemaId);
+		}
 		addElementInfos(schema);
 		addClassInfoSchemas(schema);
 		addElementLeafInfoSchemas(schema);
@@ -94,7 +97,6 @@ public class JsonSchemaMappingCompiler<T, C extends T> {
 		for (MEnumLeafInfo<T, C> enumLeafInfo : mapping.getEnumLeafInfos()) {
 			final JsonSchemaBuilder enumLeafInfoSchema = enumLeafInfoCompiler
 					.compile(enumLeafInfo);
-			// TODO constant
 			schema.addDefinition(
 					enumLeafInfo
 							.getContainerLocalName(JsonixConstants.DEFAULT_SCOPED_NAME_DELIMITER),

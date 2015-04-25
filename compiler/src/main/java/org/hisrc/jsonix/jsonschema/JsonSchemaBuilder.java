@@ -253,6 +253,16 @@ public class JsonSchemaBuilder implements JsonObjectBuildable {
 		return this;
 	}
 
+	public JsonSchemaBuilder addProperties(
+			Map<String, JsonSchemaBuilder> properties) {
+		Validate.notNull(properties);
+		if (this.properties == null) {
+			this.properties = new LinkedHashMap<String, JsonSchemaBuilder>();
+		}
+		this.properties.putAll(properties);
+		return this;
+	}
+
 	public JsonSchemaBuilder addPatternProperty(String pattern,
 			JsonSchemaBuilder schema) {
 		Validate.notNull(pattern);

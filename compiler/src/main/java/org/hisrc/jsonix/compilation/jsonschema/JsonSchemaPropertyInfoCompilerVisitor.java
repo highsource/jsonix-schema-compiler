@@ -310,7 +310,6 @@ public class JsonSchemaPropertyInfoCompilerVisitor<T, C extends T> implements
 			MElementTypeInfo<T, C> elementTypeInfo) {
 		final JsonSchemaBuilder schema = new JsonSchemaBuilder();
 		addElementNameSchema(elementTypeInfo.getElementName(), schema);
-		// TODO constant
 		schema.addType(JsonSchemaConstants.OBJECT_TYPE);
 		schema.addProperty(
 				JsonixConstants.NAME_PROPERTY_NAME,

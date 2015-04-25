@@ -41,7 +41,7 @@ public class JsonSchemaEnumLeafInfoCompiler<T, C extends T> implements
 		for (MEnumConstantInfo<T, C> enumConstant : enumLeafInfo.getConstants()) {
 			final JsonSchemaBuilder enumConstantSchema = createEnumConstant(
 					enumLeafInfo, enumConstant);
-			// TODO
+			// TODO generate enums
 			if (enumConstantSchema != null) {
 				typeInfoSchema.addEnum(enumConstantSchema);
 			}
