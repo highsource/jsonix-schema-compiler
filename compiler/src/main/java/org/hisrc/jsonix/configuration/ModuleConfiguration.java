@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
 import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
+import org.hisrc.jsonix.definition.JsonSchema;
 import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Output;
@@ -31,6 +32,7 @@ public class ModuleConfiguration {
 	private String name;
 	private List<MappingConfiguration> mappingConfigurations = new LinkedList<MappingConfiguration>();
 	private List<OutputConfiguration> outputConfigurations = new LinkedList<OutputConfiguration>();
+	private List<JsonSchemaConfiguration> jsonSchemaConfigurations = new LinkedList<JsonSchemaConfiguration>();
 
 	public static final QName MODULE_NAME = new QName(
 			ModulesConfiguration.NAMESPACE_URI, LOCAL_ELEMENT_NAME,
@@ -63,6 +65,16 @@ public class ModuleConfiguration {
 	public void setOutputConfigurations(
 			List<OutputConfiguration> outputConfigurations) {
 		this.outputConfigurations = outputConfigurations;
+	}
+
+	@XmlElement(name = JsonSchemaConfiguration.LOCAL_ELEMENT_NAME)
+	public List<JsonSchemaConfiguration> getJsonSchemaConfigurations() {
+		return jsonSchemaConfigurations;
+	}
+
+	public void setJsonSchemaConfigurations(
+			List<JsonSchemaConfiguration> jsonSchemaConfigurations) {
+		this.jsonSchemaConfigurations = jsonSchemaConfigurations;
 	}
 
 	public <T, C extends T> Module<T, C> build(
@@ -104,7 +116,17 @@ public class ModuleConfiguration {
 				outputs.add(output);
 			}
 		}
-		return new Module<T, C>(moduleName, moduleMappings, outputs);
+		final List<JsonSchema> jsonSchemas = new ArrayList<JsonSchema>(
+				this.jsonSchemaConfigurations.size());
+		for (JsonSchemaConfiguration jsonSchemaConfiguration : this.jsonSchemaConfigurations) {
+			final JsonSchema jsonSchema = jsonSchemaConfiguration
+					.build(moduleName);
+			if (jsonSchema != null) {
+				jsonSchemas.add(jsonSchema);
+			}
+		}
+		return new Module<T, C>(moduleName, moduleMappings, outputs,
+				jsonSchemas);
 	}
 
 	private <T, C extends T> String createModuleName(

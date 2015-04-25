@@ -13,7 +13,6 @@ import javax.json.stream.JsonGenerator;
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.compilation.jsc.JsonStructureWriter;
 import org.hisrc.jsonix.definition.Module;
-import org.hisrc.jsonix.definition.Output;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -39,12 +38,10 @@ public class CodeModelJsonStructureWriter implements
 
 	@Override
 	public void writeJsonStructure(Module<NType, NClass> module,
-			JsonStructure structure, Output output) {
+			JsonStructure structure, String fileName) {
 		try {
-			final JPackage _package = codeModel._package(output
-					.getOutputPackageName());
-			_package.addResourceFile(createTextFile(output.getFileName(),
-					structure));
+			final JPackage _package = codeModel._package("");
+			_package.addResourceFile(createTextFile(fileName, structure));
 		} catch (IOException ioex) {
 			try {
 				errorHandler.error(new SAXParseException(MessageFormat.format(

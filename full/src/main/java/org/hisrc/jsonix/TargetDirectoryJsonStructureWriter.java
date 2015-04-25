@@ -14,7 +14,6 @@ import javax.json.stream.JsonGenerator;
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.compilation.jsc.JsonStructureWriter;
 import org.hisrc.jsonix.definition.Module;
-import org.hisrc.jsonix.definition.Output;
 import org.xml.sax.SAXParseException;
 
 import com.sun.tools.xjc.ErrorReceiver;
@@ -36,10 +35,9 @@ public class TargetDirectoryJsonStructureWriter implements
 
 	@Override
 	public void writeJsonStructure(Module<NType, NClass> module,
-			JsonStructure schema, Output output) {
+			JsonStructure schema, String fileName) {
 		try {
-			writeStructure(targetDirectory, output.getDirectory(),
-					output.getFileName(), schema);
+			writeStructure(targetDirectory, "", fileName, schema);
 		} catch (IOException ioex) {
 			errorReceiver.error(new SAXParseException(MessageFormat.format(
 					"Could not create the code for the module [{0}].",

@@ -47,6 +47,7 @@ public class ModulesConfiguration {
 	private List<ModuleConfiguration> moduleConfigurations = new LinkedList<ModuleConfiguration>();
 	private List<MappingConfiguration> mappingConfigurations = new LinkedList<MappingConfiguration>();
 	private List<OutputConfiguration> outputConfigurations = new LinkedList<OutputConfiguration>();
+	private List<JsonSchemaConfiguration> jsonSchemaConfigurations = new LinkedList<JsonSchemaConfiguration>();
 
 	public List<ModuleConfiguration> getModuleConfigurations() {
 		return moduleConfigurations;
@@ -75,6 +76,15 @@ public class ModulesConfiguration {
 		this.outputConfigurations = outputConfigurations;
 	}
 
+	public List<JsonSchemaConfiguration> getJsonSchemaConfigurations() {
+		return jsonSchemaConfigurations;
+	}
+
+	public void setJsonSchemaConfigurations(
+			List<JsonSchemaConfiguration> jsonSchemaConfigurations) {
+		this.jsonSchemaConfigurations = jsonSchemaConfigurations;
+	}
+
 	public <T, C extends T> Modules<T, C> build(JsonixContext context,
 			MModelInfo<T, C> modelInfo) {
 
@@ -91,6 +101,7 @@ public class ModulesConfiguration {
 				moduleConfigurations);
 
 		assignDefaultOutputConfigurations(moduleConfigurations);
+		assignDefaultJsonSchemaConfigurations(moduleConfigurations);
 
 		assignMappingNamesAndIds(context, moduleConfigurations);
 
@@ -225,6 +236,17 @@ public class ModulesConfiguration {
 		}
 	}
 
+	private void assignDefaultJsonSchemaConfigurations(
+			final List<ModuleConfiguration> moduleConfigurations) {
+		final List<JsonSchemaConfiguration> defaultJsonSchemaConfigurations = createDefaultJsonSchemaConfigurations();
+		for (final ModuleConfiguration moduleConfiguration : moduleConfigurations) {
+			if (moduleConfiguration.getJsonSchemaConfigurations().isEmpty()) {
+				moduleConfiguration.getJsonSchemaConfigurations().addAll(
+						defaultJsonSchemaConfigurations);
+			}
+		}
+	}
+
 	private Set<String> findUnmappedPackageNames(
 			final Set<String> allPackageNames,
 			final List<ModuleConfiguration> moduleConfigurations) {
@@ -263,6 +285,15 @@ public class ModulesConfiguration {
 					StandardNaming.NAMING_NAME));
 		}
 		return defaultOutputConfigurations;
+	}
+
+	private List<JsonSchemaConfiguration> createDefaultJsonSchemaConfigurations() {
+		final List<JsonSchemaConfiguration> defaultJsonSchemaConfigurations = getJsonSchemaConfigurations();
+
+		if (defaultJsonSchemaConfigurations.isEmpty()) {
+			defaultJsonSchemaConfigurations.add(new JsonSchemaConfiguration());
+		}
+		return defaultJsonSchemaConfigurations;
 	}
 
 	private <T, C extends T> Modules<T, C> buildModules(JsonixContext context,

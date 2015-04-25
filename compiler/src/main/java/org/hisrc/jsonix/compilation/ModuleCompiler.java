@@ -18,10 +18,10 @@ public class ModuleCompiler<T, C extends T> {
 
 	private final JSCodeModel codeModel;
 
-	private Output output;
-	private Modules<T, C> modules;
-	private Module<T, C> module;
+	private final Modules<T, C> modules;
+	private final Module<T, C> module;
 	private final String moduleName;
+	private final Output output;
 
 	public ModuleCompiler(JSCodeModel codeModel, Modules<T, C> modules,
 			Module<T, C> module, Output output) {

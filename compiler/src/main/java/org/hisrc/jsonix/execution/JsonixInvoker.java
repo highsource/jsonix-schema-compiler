@@ -4,6 +4,7 @@ import org.hisrc.jsonix.compilation.ModulesCompiler;
 import org.hisrc.jsonix.compilation.ProgramWriter;
 import org.hisrc.jsonix.compilation.jsc.JsonSchemaModulesCompiler;
 import org.hisrc.jsonix.compilation.jsc.JsonStructureWriter;
+import org.hisrc.jsonix.configuration.JsonSchemaConfiguration;
 import org.hisrc.jsonix.configuration.ModulesConfiguration;
 import org.hisrc.jsonix.configuration.ModulesConfigurationUnmarshaller;
 import org.hisrc.jsonix.configuration.OutputConfiguration;
@@ -43,8 +44,12 @@ public class JsonixInvoker {
 				settings.getDefaultNaming().getName(),
 				OutputConfiguration.STANDARD_FILE_NAME_PATTERN);
 
+		final JsonSchemaConfiguration defaultJsonSchemaConfiguration = new JsonSchemaConfiguration(
+				JsonSchemaConfiguration.STANDARD_FILE_NAME_PATTERN);
+
 		final ModulesConfiguration modulesConfiguration = customizationHandler
-				.unmarshal(model, defaultOutputConfiguration);
+				.unmarshal(model, defaultOutputConfiguration,
+						defaultJsonSchemaConfiguration);
 
 		final MModelInfo<NType, NClass> modelinfo = new XJCCMInfoFactory(model)
 				.createModel();

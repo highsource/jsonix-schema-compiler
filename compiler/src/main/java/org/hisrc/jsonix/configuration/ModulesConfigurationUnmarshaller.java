@@ -59,14 +59,14 @@ public class ModulesConfigurationUnmarshaller {
 
 	public ModulesConfigurationUnmarshaller(JsonixContext context) {
 		this.context = Validate.notNull(context);
-		this.logger = this.context.getLoggerFactory()
-				.getLogger(ModuleConfiguration.class.getName());
+		this.logger = this.context.getLoggerFactory().getLogger(
+				ModuleConfiguration.class.getName());
 		try {
 			jaxbContext = JAXBContext.newInstance(ModulesConfiguration.class,
 					ModuleConfiguration.class, MappingConfiguration.class,
-					OutputConfiguration.class, PackageMapping.class,
-					IncludesConfiguration.class, ExcludesConfiguration.class,
-					TypeInfoConfiguration.class,
+					OutputConfiguration.class, JsonSchemaConfiguration.class,
+					PackageMapping.class, IncludesConfiguration.class,
+					ExcludesConfiguration.class, TypeInfoConfiguration.class,
 					ElementInfoConfiguration.class,
 					PropertyInfoConfiguration.class,
 					DependenciesOfMappingConfiguration.class);
@@ -84,6 +84,7 @@ public class ModulesConfigurationUnmarshaller {
 					ModuleConfiguration.LOCAL_ELEMENT_NAME,
 					MappingConfiguration.LOCAL_ELEMENT_NAME,
 					OutputConfiguration.LOCAL_ELEMENT_NAME,
+					JsonSchemaConfiguration.LOCAL_ELEMENT_NAME,
 					IncludesConfiguration.LOCAL_ELEMENT_NAME,
 					ExcludesConfiguration.LOCAL_ELEMENT_NAME,
 					DependenciesOfMappingConfiguration.LOCAL_ELEMENT_NAME,
@@ -115,7 +116,8 @@ public class ModulesConfigurationUnmarshaller {
 	}
 
 	public ModulesConfiguration unmarshal(Model model,
-			OutputConfiguration defaultOutputConfiguration) {
+			OutputConfiguration defaultOutputConfiguration, 
+			JsonSchemaConfiguration defaultJsonSchemaConfiguration) {
 		Validate.notNull(model);
 		Validate.notNull(defaultOutputConfiguration);
 		final ModulesConfiguration modulesConfiguration = new ModulesConfiguration();
@@ -138,6 +140,11 @@ public class ModulesConfigurationUnmarshaller {
 				.findCustomizations(model, OutputConfiguration.OUTPUT_NAME)) {
 			modulesConfiguration.getOutputConfigurations().add(
 					unmarshalOutputConfiguration(customization));
+		}
+		for (CPluginCustomization customization : CustomizationUtils
+				.findCustomizations(model, JsonSchemaConfiguration.JSON_SCHEMA_NAME)) {
+			modulesConfiguration.getJsonSchemaConfigurations().add(
+					unmarshalJsonSchemaConfiguration(customization));
 		}
 
 		if (modulesConfiguration.getOutputConfigurations().isEmpty()) {
@@ -176,5 +183,10 @@ public class ModulesConfigurationUnmarshaller {
 	private OutputConfiguration unmarshalOutputConfiguration(
 			CPluginCustomization customization) {
 		return unmarshal(customization, "output configuration");
+	}
+
+	private JsonSchemaConfiguration unmarshalJsonSchemaConfiguration(
+			CPluginCustomization customization) {
+		return unmarshal(customization, "JSON Schema configuration");
 	}
 }

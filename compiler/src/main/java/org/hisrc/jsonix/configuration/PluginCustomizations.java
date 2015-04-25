@@ -50,6 +50,7 @@ public class PluginCustomizations {
 					ModuleConfiguration.LOCAL_ELEMENT_NAME,
 					MappingConfiguration.LOCAL_ELEMENT_NAME,
 					OutputConfiguration.LOCAL_ELEMENT_NAME,
+					JsonSchemaConfiguration.LOCAL_ELEMENT_NAME,
 					IncludesConfiguration.LOCAL_ELEMENT_NAME,
 					ExcludesConfiguration.LOCAL_ELEMENT_NAME,
 					DependenciesOfMappingConfiguration.LOCAL_ELEMENT_NAME,
