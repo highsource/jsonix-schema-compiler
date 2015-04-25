@@ -43,6 +43,7 @@ public class JsonSchemaMappingCompiler<T, C extends T> {
 
 	public JsonSchemaBuilder compile() {
 		final JsonSchemaBuilder schema = new JsonSchemaBuilder();
+		schema.addId(mapping.getSchemaId());
 		final JsonSchemaClassInfoCompiler<T, C> classInfoCompiler = new JsonSchemaClassInfoCompiler<T, C>(
 				this);
 		for (MClassInfo<T, C> classInfo : mapping.getClassInfos()) {

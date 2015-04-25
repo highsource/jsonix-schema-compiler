@@ -1,5 +1,6 @@
 package org.hisrc.jsonix.compilation.jsc;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -45,13 +46,14 @@ public class JsonSchemaPropertyInfoCompilerVisitor<T, C extends T> implements
 		final JsonSchemaBuilder schema = new JsonSchemaBuilder();
 		addPropertyInfoSchema(info, schema);
 		addPropertyInfoTypeSchema(StandardNaming.ELEMENT, schema);
-		addWrappableSchema(info, schema);
 		addElementNameSchema(info.getElementName(), schema);
+		addWrappableSchema(info, schema);
+
 		final JsonSchemaBuilder itemTypeSchema = createTypeSchema(info
 				.getTypeInfo());
 		final JsonSchemaBuilder typeSchema = createPossiblyCollectionTypeSchema(
 				info.isCollection(), itemTypeSchema);
-		schema.addAnyOf(typeSchema);
+		schema.addAllOf(typeSchema);
 		return schema;
 	}
 
@@ -62,39 +64,43 @@ public class JsonSchemaPropertyInfoCompilerVisitor<T, C extends T> implements
 		addPropertyInfoSchema(info, schema);
 		addPropertyInfoTypeSchema(StandardNaming.ELEMENTS, schema);
 		addWrappableSchema(info, schema);
+
 		final JsonSchemaBuilder itemTypeSchema = createElementTypeInfosSchema(info);
 		final JsonSchemaBuilder typeSchema = createPossiblyCollectionTypeSchema(
 				info.isCollection(), itemTypeSchema);
-		schema.addAnyOf(typeSchema);
+		schema.addAllOf(typeSchema);
 		return schema;
 	}
 
 	@Override
 	public JsonSchemaBuilder visitElementRefPropertyInfo(
 			MElementRefPropertyInfo<T, C> info) {
+
 		final JsonSchemaBuilder schema = new JsonSchemaBuilder();
 		addPropertyInfoSchema(info, schema);
 		addPropertyInfoTypeSchema(StandardNaming.ELEMENT_REF, schema);
-		addWrappableSchema(info, schema);
 		addElementNameSchema(info.getElementName(), schema);
+		addWrappableSchema(info, schema);
 
-		final JsonSchemaBuilder itemTypeSchema = new JsonSchemaBuilder();
+		final List<JsonSchemaBuilder> itemTypeSchemas = new ArrayList<JsonSchemaBuilder>(
+				3);
 		if (info.isMixed()) {
-			itemTypeSchema
-					.addAnyOf(new JsonSchemaBuilder()
+			itemTypeSchemas
+					.add(new JsonSchemaBuilder()
 							.addType(XmlSchemaJsonSchemaConstants.STRING_TYPE_INFO_SCHEMA_REF));
 		}
 		if (info.isDomAllowed()) {
-			itemTypeSchema
-					.addAnyOf(new JsonSchemaBuilder()
+			itemTypeSchemas
+					.add(new JsonSchemaBuilder()
 							.addType(JsonixJsonSchemaConstants.DOM_TYPE_INFO_SCHEMA_REF));
 		}
 		if (info.isTypedObjectAllowed()) {
-			itemTypeSchema.addAnyOf(createElementRefSchema(info));
+			itemTypeSchemas.add(createElementRefSchema(info));
 		}
 		final JsonSchemaBuilder typeSchema = createPossiblyCollectionTypeSchema(
-				info.isCollection(), itemTypeSchema);
-		schema.addAnyOf(typeSchema);
+				info.isCollection(),
+				createPossiblyAnyOfTypeSchema(itemTypeSchemas));
+		schema.addAllOf(typeSchema);
 		return schema;
 	}
 
@@ -106,23 +112,25 @@ public class JsonSchemaPropertyInfoCompilerVisitor<T, C extends T> implements
 		addPropertyInfoTypeSchema(StandardNaming.ELEMENT_REFS, schema);
 		addWrappableSchema(info, schema);
 
-		final JsonSchemaBuilder itemTypeSchema = new JsonSchemaBuilder();
+		final List<JsonSchemaBuilder> itemTypeSchemas = new ArrayList<JsonSchemaBuilder>(
+				2 + info.getElementTypeInfos().size());
 		if (info.isMixed()) {
-			itemTypeSchema
-					.addAnyOf(new JsonSchemaBuilder()
+			itemTypeSchemas
+					.add(new JsonSchemaBuilder()
 							.addType(XmlSchemaJsonSchemaConstants.STRING_TYPE_INFO_SCHEMA_REF));
 		}
 		if (info.isDomAllowed()) {
-			itemTypeSchema
-					.addAnyOf(new JsonSchemaBuilder()
+			itemTypeSchemas
+					.add(new JsonSchemaBuilder()
 							.addType(JsonixJsonSchemaConstants.DOM_TYPE_INFO_SCHEMA_REF));
 		}
 		if (info.isTypedObjectAllowed()) {
-			itemTypeSchema.addAnyOf(createElementRefsSchema(info));
+			itemTypeSchemas.addAll(createElementRefsSchema(info));
 		}
 		final JsonSchemaBuilder typeSchema = createPossiblyCollectionTypeSchema(
-				info.isCollection(), itemTypeSchema);
-		schema.addAnyOf(typeSchema);
+				info.isCollection(),
+				createPossiblyAnyOfTypeSchema(itemTypeSchemas));
+		schema.addAllOf(typeSchema);
 		return schema;
 	}
 
@@ -132,30 +140,34 @@ public class JsonSchemaPropertyInfoCompilerVisitor<T, C extends T> implements
 		final JsonSchemaBuilder schema = new JsonSchemaBuilder();
 		addPropertyInfoSchema(info, schema);
 		addPropertyInfoTypeSchema(StandardNaming.VALUE, schema);
+
 		final JsonSchemaBuilder itemTypeSchema = createTypeSchema(info
 				.getTypeInfo());
 		final JsonSchemaBuilder typeSchema = createPossiblyCollectionTypeSchema(
 				info.isCollection(), itemTypeSchema);
-		schema.addAnyOf(typeSchema);
+		schema.addAllOf(typeSchema);
 		return schema;
 	}
 
 	@Override
 	public JsonSchemaBuilder visitAnyElementPropertyInfo(
 			MAnyElementPropertyInfo<T, C> info) {
+
 		final JsonSchemaBuilder schema = new JsonSchemaBuilder();
 		addPropertyInfoSchema(info, schema);
 		addPropertyInfoTypeSchema(StandardNaming.ANY_ELEMENT, schema);
 
-		final JsonSchemaBuilder itemTypeSchema = new JsonSchemaBuilder();
+		final List<JsonSchemaBuilder> itemTypeSchemas = new ArrayList<JsonSchemaBuilder>(
+				3);
+
 		if (info.isMixed()) {
-			itemTypeSchema
-					.addAnyOf(new JsonSchemaBuilder()
+			itemTypeSchemas
+					.add(new JsonSchemaBuilder()
 							.addType(XmlSchemaJsonSchemaConstants.STRING_TYPE_INFO_SCHEMA_REF));
 		}
 		if (info.isDomAllowed()) {
-			itemTypeSchema
-					.addAnyOf(new JsonSchemaBuilder()
+			itemTypeSchemas
+					.add(new JsonSchemaBuilder()
 							.addType(JsonixJsonSchemaConstants.DOM_TYPE_INFO_SCHEMA_REF));
 		}
 		if (info.isTypedObjectAllowed()) {
@@ -167,11 +179,12 @@ public class JsonSchemaPropertyInfoCompilerVisitor<T, C extends T> implements
 									.addRef(XmlSchemaJsonSchemaConstants.QNAME_TYPE_INFO_SCHEMA_REF))
 					.addProperty(JsonixConstants.VALUE_PROPERTY_NAME,
 							new JsonSchemaBuilder());
-			itemTypeSchema.addAnyOf(anyElementSchema);
+			itemTypeSchemas.add(anyElementSchema);
 		}
 		final JsonSchemaBuilder typeSchema = createPossiblyCollectionTypeSchema(
-				info.isCollection(), itemTypeSchema);
-		schema.addAnyOf(typeSchema);
+				info.isCollection(),
+				createPossiblyAnyOfTypeSchema(itemTypeSchemas));
+		schema.addAllOf(typeSchema);
 		return schema;
 	}
 
@@ -186,7 +199,7 @@ public class JsonSchemaPropertyInfoCompilerVisitor<T, C extends T> implements
 				.getTypeInfo());
 		final JsonSchemaBuilder typeSchema = createPossiblyCollectionTypeSchema(
 				info.isCollection(), itemTypeSchema);
-		schema.addAnyOf(typeSchema);
+		schema.addAllOf(typeSchema);
 		return schema;
 	}
 
@@ -200,44 +213,56 @@ public class JsonSchemaPropertyInfoCompilerVisitor<T, C extends T> implements
 				JsonSchemaConstants.OBJECT_TYPE).addAdditionalProperties(
 				new JsonSchemaBuilder()
 						.addType(JsonSchemaConstants.STRING_TYPE));
-		schema.addAnyOf(typeSchema);
+		schema.addAllOf(typeSchema);
 		return schema;
 	}
 
 	private void addPropertyInfoTypeSchema(String string,
 			JsonSchemaBuilder schema) {
-		// TODO
-
+		schema.add(JsonixJsonSchemaConstants.PROPERTY_TYPE_PROPERTY_NAME,
+				string);
 	}
 
 	private void addPropertyInfoSchema(MPropertyInfo<T, C> propertyInfo,
 			JsonSchemaBuilder schemaBuilder) {
 		schemaBuilder.addTitle(propertyInfo.getPrivateName());
-		// TODO
-		// if (propertyInfo.isCollection()) {
-		// options.append(naming.collection(), this.codeModel._boolean(true));
-		// }
 	}
 
-	private void addWrappableSchema(MWrappable info,
-			JsonSchemaBuilder schemaBuilder) {
+	private void addWrappableSchema(MWrappable info, JsonSchemaBuilder schema) {
 		final QName wrapperElementName = info.getWrapperElementName();
 		if (wrapperElementName != null) {
-			// TODO add wrapper element name
-			// options.append(naming.wrapperElementName(), mappingCompiler
-			// .createElementNameExpression(wrapperElementName));
+			addNameSchema(
+					schema,
+					JsonixJsonSchemaConstants.WRAPPER_ELEMENT_NAME_PROPERTY_NAME,
+					wrapperElementName);
 		}
 	}
 
+	private void addNameSchema(JsonSchemaBuilder schema, final String key,
+			final QName name) {
+		schema.add(key, createNameSchema(name));
+	}
+
+	private JsonSchemaBuilder createNameSchema(final QName elementName) {
+		return new JsonSchemaBuilder().add(
+				JsonixJsonSchemaConstants.LOCAL_PART_PROPERTY_NAME,
+				elementName.getLocalPart()).add(
+				JsonixJsonSchemaConstants.NAMESPACE_URI_PROPERTY_NAME,
+				elementName.getNamespaceURI());
+	}
+
 	private void addElementNameSchema(QName elementName,
-			JsonSchemaBuilder schemaBuilder) {
-		// TODO add element name
+			JsonSchemaBuilder schema) {
+		addNameSchema(schema,
+				JsonixJsonSchemaConstants.ELEMENT_NAME_PROPERTY_NAME,
+				elementName);
 	}
 
 	private void addAttributeNameSchema(QName attributeName,
 			JsonSchemaBuilder schema) {
-		// TODO Auto-generated method stub
-
+		addNameSchema(schema,
+				JsonixJsonSchemaConstants.ATTRIBUTE_NAME_PROPERTY_NAME,
+				attributeName);
 	}
 
 	private JsonSchemaBuilder createElementTypeInfosSchema(
@@ -265,20 +290,19 @@ public class JsonSchemaPropertyInfoCompilerVisitor<T, C extends T> implements
 		return elementTypeInfoSchema;
 	}
 
-	private JsonSchemaBuilder createElementRefsSchema(
+	private List<JsonSchemaBuilder> createElementRefsSchema(
 			MElementTypeInfos<T, C> info) {
-
-		final JsonSchemaBuilder schema = new JsonSchemaBuilder();
 
 		final List<MElementTypeInfo<T, C>> elementTypeInfos = info
 				.getElementTypeInfos();
-		if (!elementTypeInfos.isEmpty()) {
-			for (MElementTypeInfo<T, C> elementTypeInfo : elementTypeInfos) {
-				final JsonSchemaBuilder elementTypeInfoSchema = createElementRefSchema(elementTypeInfo);
-				schema.addAnyOf(elementTypeInfoSchema);
-			}
+		final List<JsonSchemaBuilder> schemas = new ArrayList<JsonSchemaBuilder>(
+				elementTypeInfos.size());
+
+		for (MElementTypeInfo<T, C> elementTypeInfo : elementTypeInfos) {
+			final JsonSchemaBuilder elementTypeInfoSchema = createElementRefSchema(elementTypeInfo);
+			schemas.add(elementTypeInfoSchema);
 		}
-		return schema;
+		return schemas;
 
 	}
 
@@ -295,6 +319,19 @@ public class JsonSchemaPropertyInfoCompilerVisitor<T, C extends T> implements
 		schema.addProperty(JsonixConstants.VALUE_PROPERTY_NAME,
 				createTypeSchema(elementTypeInfo.getTypeInfo()));
 		return schema;
+	}
+
+	private JsonSchemaBuilder createPossiblyAnyOfTypeSchema(
+			final List<JsonSchemaBuilder> schemas) {
+		if (schemas.size() == 0) {
+			return new JsonSchemaBuilder();
+		} else if (schemas.size() == 1) {
+			return schemas.get(0);
+		} else {
+			final JsonSchemaBuilder schema = new JsonSchemaBuilder();
+			schema.addAnyOf(schemas);
+			return schema;
+		}
 	}
 
 	private JsonSchemaBuilder createPossiblyCollectionTypeSchema(

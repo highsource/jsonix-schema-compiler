@@ -7,6 +7,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.json.JsonBuilderFactory;
@@ -61,6 +62,8 @@ public class JsonSchemaBuilder implements JsonObjectBuildable {
 	private List<JsonSchemaBuilder> anyOf;
 	private List<JsonSchemaBuilder> oneOf;
 	private JsonSchemaBuilder not;
+
+	private Map<String, Object> anyProperties;
 
 	public JsonSchemaBuilder addRef(String $ref) {
 		Validate.notNull($ref);
@@ -315,7 +318,13 @@ public class JsonSchemaBuilder implements JsonObjectBuildable {
 		return this;
 	}
 
-	// TODO addAnyOf for collection
+	public void addAllOf(Iterable<JsonSchemaBuilder> schemas) {
+		Validate.notNull(schemas);
+		for (JsonSchemaBuilder schema : schemas) {
+			addAllOf(schema);
+		}
+	}
+
 	public JsonSchemaBuilder addAnyOf(JsonSchemaBuilder schema) {
 		Validate.notNull(schema);
 		if (this.anyOf == null) {
@@ -323,6 +332,13 @@ public class JsonSchemaBuilder implements JsonObjectBuildable {
 		}
 		this.anyOf.add(schema);
 		return this;
+	}
+
+	public void addAnyOf(Iterable<JsonSchemaBuilder> schemas) {
+		Validate.notNull(schemas);
+		for (JsonSchemaBuilder schema : schemas) {
+			addAnyOf(schema);
+		}
 	}
 
 	public JsonSchemaBuilder addOneOf(JsonSchemaBuilder schema) {
@@ -334,9 +350,24 @@ public class JsonSchemaBuilder implements JsonObjectBuildable {
 		return this;
 	}
 
+	public void addOneOf(Iterable<JsonSchemaBuilder> schemas) {
+		Validate.notNull(schemas);
+		for (JsonSchemaBuilder schema : schemas) {
+			addOneOf(schema);
+		}
+	}
+
 	public JsonSchemaBuilder addNot(JsonSchemaBuilder schema) {
 		Validate.notNull(schema);
 		this.not = schema;
+		return this;
+	}
+
+	public JsonSchemaBuilder add(String name, Object value) {
+		if (this.anyProperties == null) {
+			this.anyProperties = new LinkedHashMap<String, Object>();
+		}
+		this.anyProperties.put(name, value);
 		return this;
 	}
 
@@ -361,6 +392,14 @@ public class JsonSchemaBuilder implements JsonObjectBuildable {
 		if ($schema != null) {
 			builder.add(JsonSchemaKeywords.$schema, $schema);
 		}
+		if (types != null) {
+			if (types.size() == 1) {
+				builder.add(JsonSchemaKeywords.type, types.iterator().next());
+			} else {
+				JsonBuilderUtils.add(builderFactory, builder,
+						JsonSchemaKeywords.type, types);
+			}
+		}
 		if (title != null) {
 			builder.add(JsonSchemaKeywords.title, title);
 		}
@@ -368,8 +407,8 @@ public class JsonSchemaBuilder implements JsonObjectBuildable {
 			builder.add(JsonSchemaKeywords.description, description);
 		}
 		if (_default != null) {
-			JsonBuilderUtils.add(builderFactory, builder, JsonSchemaKeywords._default,
-					_default);
+			JsonBuilderUtils.add(builderFactory, builder,
+					JsonSchemaKeywords._default, _default);
 		}
 		if (format != null) {
 			builder.add(JsonSchemaKeywords.format, format);
@@ -428,8 +467,8 @@ public class JsonSchemaBuilder implements JsonObjectBuildable {
 								.build(builderFactory,
 										builderFactory.createObjectBuilder()));
 			} else {
-				JsonBuilderUtils.add(builderFactory, builder, JsonSchemaKeywords.items,
-						items);
+				JsonBuilderUtils.add(builderFactory, builder,
+						JsonSchemaKeywords.items, items);
 			}
 		}
 
@@ -449,8 +488,8 @@ public class JsonSchemaBuilder implements JsonObjectBuildable {
 			builder.add(JsonSchemaKeywords.minProperties, minProperties);
 		}
 		if (required != null) {
-			JsonBuilderUtils.add(builderFactory, builder, JsonSchemaKeywords.required,
-					required);
+			JsonBuilderUtils.add(builderFactory, builder,
+					JsonSchemaKeywords.required, required);
 		}
 
 		if (additionalProperties != null) {
@@ -466,12 +505,12 @@ public class JsonSchemaBuilder implements JsonObjectBuildable {
 		}
 
 		if (definitions != null) {
-			JsonBuilderUtils.add(builderFactory, builder, JsonSchemaKeywords.definitions,
-					definitions);
+			JsonBuilderUtils.add(builderFactory, builder,
+					JsonSchemaKeywords.definitions, definitions);
 		}
 		if (properties != null) {
-			JsonBuilderUtils.add(builderFactory, builder, JsonSchemaKeywords.properties,
-					properties);
+			JsonBuilderUtils.add(builderFactory, builder,
+					JsonSchemaKeywords.properties, properties);
 		}
 		if (patternProperties != null) {
 			JsonBuilderUtils.add(builderFactory, builder,
@@ -489,38 +528,38 @@ public class JsonSchemaBuilder implements JsonObjectBuildable {
 		}
 
 		if (_enum != null) {
-			JsonBuilderUtils
-					.add(builderFactory, builder, JsonSchemaKeywords._enum, _enum);
-		}
-
-		if (types != null) {
-			if (types.size() == 1) {
-				builder.add(JsonSchemaKeywords.type, types.iterator().next());
-			} else {
-				JsonBuilderUtils.add(builderFactory, builder, JsonSchemaKeywords.type,
-						types);
-			}
+			JsonBuilderUtils.add(builderFactory, builder,
+					JsonSchemaKeywords._enum, _enum);
 		}
 
 		if (allOf != null) {
-			JsonBuilderUtils
-					.add(builderFactory, builder, JsonSchemaKeywords.allOf, allOf);
+			JsonBuilderUtils.add(builderFactory, builder,
+					JsonSchemaKeywords.allOf, allOf);
 		}
 
 		if (anyOf != null) {
-			JsonBuilderUtils
-					.add(builderFactory, builder, JsonSchemaKeywords.anyOf, anyOf);
+			JsonBuilderUtils.add(builderFactory, builder,
+					JsonSchemaKeywords.anyOf, anyOf);
 		}
 
 		if (oneOf != null) {
-			JsonBuilderUtils
-					.add(builderFactory, builder, JsonSchemaKeywords.oneOf, oneOf);
+			JsonBuilderUtils.add(builderFactory, builder,
+					JsonSchemaKeywords.oneOf, oneOf);
 		}
 
 		if (not != null) {
-			JsonBuilderUtils.add(builderFactory, builder, JsonSchemaKeywords.not, not);
+			JsonBuilderUtils.add(builderFactory, builder,
+					JsonSchemaKeywords.not, not);
+		}
+
+		if (anyProperties != null) {
+			for (Entry<String, Object> entry : this.anyProperties.entrySet()) {
+				JsonBuilderUtils.add(builderFactory, builder, entry.getKey(),
+						entry.getValue());
+			}
 		}
 
 		return builder;
 	}
+
 }

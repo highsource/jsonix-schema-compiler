@@ -9,6 +9,7 @@ import javax.xml.namespace.QName;
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.jsonschema.JsonSchemaBuilder;
+import org.hisrc.jsonix.naming.StandardNaming;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
@@ -35,18 +36,13 @@ public class JsonSchemaClassInfoCompiler<T, C extends T> implements
 
 	@Override
 	public JsonSchemaBuilder compile(MClassInfo<T, C> classInfo) {
-		final JsonSchemaBuilder classInfoSchemaBuilder = new JsonSchemaBuilder();
-		classInfoSchemaBuilder.addType("object");
+		final JsonSchemaBuilder classInfoSchema = new JsonSchemaBuilder();
+		classInfoSchema.addType("object");
 		final String localName = classInfo
 				.getContainerLocalName(DEFAULT_SCOPED_NAME_DELIMITER);
-		classInfoSchemaBuilder.addTitle(localName);
+		classInfoSchema.addTitle(localName);
 		// TODO addId ?
 		// ...
-		// TODO add type name ?
-		final String targetNamespace = mapping.getTargetNamespaceURI();
-		final QName defaultTypeName = new QName(targetNamespace, localName);
-		final QName typeName = classInfo.getTypeName();
-
 		final MClassTypeInfo<T, C> baseTypeInfo = classInfo.getBaseTypeInfo();
 		final JsonSchemaBuilder typeInfoSchemaBuilder;
 		if (baseTypeInfo != null) {
@@ -54,17 +50,28 @@ public class JsonSchemaClassInfoCompiler<T, C extends T> implements
 					.createTypeInfoSchemaRef(baseTypeInfo);
 			typeInfoSchemaBuilder = new JsonSchemaBuilder();
 			typeInfoSchemaBuilder.addAllOf(baseTypeInfoSchemaBuilder);
-			typeInfoSchemaBuilder.addAllOf(classInfoSchemaBuilder);
+			typeInfoSchemaBuilder.addAllOf(classInfoSchema);
 		} else {
-			typeInfoSchemaBuilder = classInfoSchemaBuilder;
+			typeInfoSchemaBuilder = classInfoSchema;
 		}
 
 		// TODO move to the builder
 		final Map<String, JsonSchemaBuilder> propertyInfoSchemaBuilders = compilePropertyInfos(classInfo);
 		for (Entry<String, JsonSchemaBuilder> entry : propertyInfoSchemaBuilders
 				.entrySet()) {
-			classInfoSchemaBuilder
-					.addProperty(entry.getKey(), entry.getValue());
+			classInfoSchema.addProperty(entry.getKey(), entry.getValue());
+		}
+		classInfoSchema.add(JsonixJsonSchemaConstants.TYPE_TYPE_PROPERTY_NAME,
+				StandardNaming.CLASS_INFO);
+		final QName typeName = classInfo.getTypeName();
+		if (typeName != null) {
+			classInfoSchema
+					.add(JsonixJsonSchemaConstants.TYPE_NAME_PROPERTY_NAME,
+							new JsonSchemaBuilder()
+									.add(JsonixJsonSchemaConstants.LOCAL_PART_PROPERTY_NAME,
+											typeName.getLocalPart())
+									.add(JsonixJsonSchemaConstants.NAMESPACE_URI_PROPERTY_NAME,
+											typeName.getNamespaceURI()));
 		}
 
 		return typeInfoSchemaBuilder;
