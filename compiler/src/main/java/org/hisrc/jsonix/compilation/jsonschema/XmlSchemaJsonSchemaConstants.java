@@ -13,7 +13,8 @@ public class XmlSchemaJsonSchemaConstants {
 	private XmlSchemaJsonSchemaConstants() {
 	}
 
-	public static final String SCHEMA_ID = "https://cdn.rawgit.com/highsource/jsonix/master/jsonschemas/w3c/2001/XMLSchema.jsonschema#";
+	public static final String SCHEMA_ID = JsonixJsonSchemaConstants.BASE_URI
+			+ "/w3c/2001/XMLSchema.jsonschema#";
 
 	public static final Map<QName, String> TYPE_NAME_SCHEMA_REFS;
 	static {
