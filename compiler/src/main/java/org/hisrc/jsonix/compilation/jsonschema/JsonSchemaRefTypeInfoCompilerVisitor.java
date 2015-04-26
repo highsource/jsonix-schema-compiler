@@ -11,6 +11,8 @@ import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Modules;
 import org.hisrc.jsonix.jsonschema.JsonSchemaBuilder;
+import org.hisrc.jsonix.jsonschema.JsonSchemaConstants;
+import org.hisrc.jsonix.jsonschema.JsonSchemaKeywords;
 import org.jvnet.jaxb2_commons.xml.bind.model.MBuiltinLeafInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassRef;
@@ -70,7 +72,7 @@ public class JsonSchemaRefTypeInfoCompilerVisitor<T, C extends T> implements
 
 	@Override
 	public JsonSchemaBuilder visitList(MList<T, C> info) {
-		return new JsonSchemaBuilder().addType("array").addItem(
+		return new JsonSchemaBuilder().addType(JsonSchemaConstants.ARRAY_TYPE).addItem(
 				info.getItemTypeInfo().acceptTypeInfoVisitor(this));
 	}
 

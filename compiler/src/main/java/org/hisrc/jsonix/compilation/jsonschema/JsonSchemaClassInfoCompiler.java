@@ -11,6 +11,7 @@ import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.JsonixConstants;
 import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.jsonschema.JsonSchemaBuilder;
+import org.hisrc.jsonix.jsonschema.JsonSchemaConstants;
 import org.hisrc.jsonix.naming.StandardNaming;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassTypeInfo;
@@ -36,7 +37,7 @@ public class JsonSchemaClassInfoCompiler<T, C extends T> implements
 	@Override
 	public JsonSchemaBuilder compile(MClassInfo<T, C> classInfo) {
 		final JsonSchemaBuilder classInfoSchema = new JsonSchemaBuilder();
-		classInfoSchema.addType("object");
+		classInfoSchema.addType(JsonSchemaConstants.OBJECT_TYPE);
 		final String localName = classInfo
 				.getContainerLocalName(JsonixConstants.DEFAULT_SCOPED_NAME_DELIMITER);
 		classInfoSchema.addTitle(localName);

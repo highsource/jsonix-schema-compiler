@@ -87,12 +87,12 @@ public class JsonSchemaPropertyInfoCompilerVisitor<T, C extends T> implements
 		if (info.isMixed()) {
 			itemTypeSchemas
 					.add(new JsonSchemaBuilder()
-							.addType(XmlSchemaJsonSchemaConstants.STRING_TYPE_INFO_SCHEMA_REF));
+							.addRef(XmlSchemaJsonSchemaConstants.STRING_TYPE_INFO_SCHEMA_REF));
 		}
 		if (info.isDomAllowed()) {
 			itemTypeSchemas
 					.add(new JsonSchemaBuilder()
-							.addType(JsonixJsonSchemaConstants.DOM_TYPE_INFO_SCHEMA_REF));
+							.addRef(JsonixJsonSchemaConstants.DOM_TYPE_INFO_SCHEMA_REF));
 		}
 		if (info.isTypedObjectAllowed()) {
 			itemTypeSchemas.add(createElementRefSchema(info));
@@ -117,12 +117,12 @@ public class JsonSchemaPropertyInfoCompilerVisitor<T, C extends T> implements
 		if (info.isMixed()) {
 			itemTypeSchemas
 					.add(new JsonSchemaBuilder()
-							.addType(XmlSchemaJsonSchemaConstants.STRING_TYPE_INFO_SCHEMA_REF));
+							.addRef(XmlSchemaJsonSchemaConstants.STRING_TYPE_INFO_SCHEMA_REF));
 		}
 		if (info.isDomAllowed()) {
 			itemTypeSchemas
 					.add(new JsonSchemaBuilder()
-							.addType(JsonixJsonSchemaConstants.DOM_TYPE_INFO_SCHEMA_REF));
+							.addRef(JsonixJsonSchemaConstants.DOM_TYPE_INFO_SCHEMA_REF));
 		}
 		if (info.isTypedObjectAllowed()) {
 			itemTypeSchemas.addAll(createElementRefsSchema(info));
@@ -163,12 +163,12 @@ public class JsonSchemaPropertyInfoCompilerVisitor<T, C extends T> implements
 		if (info.isMixed()) {
 			itemTypeSchemas
 					.add(new JsonSchemaBuilder()
-							.addType(XmlSchemaJsonSchemaConstants.STRING_TYPE_INFO_SCHEMA_REF));
+							.addRef(XmlSchemaJsonSchemaConstants.STRING_TYPE_INFO_SCHEMA_REF));
 		}
 		if (info.isDomAllowed()) {
 			itemTypeSchemas
 					.add(new JsonSchemaBuilder()
-							.addType(JsonixJsonSchemaConstants.DOM_TYPE_INFO_SCHEMA_REF));
+							.addRef(JsonixJsonSchemaConstants.DOM_TYPE_INFO_SCHEMA_REF));
 		}
 		if (info.isTypedObjectAllowed()) {
 			final JsonSchemaBuilder anyElementSchema = new JsonSchemaBuilder()
