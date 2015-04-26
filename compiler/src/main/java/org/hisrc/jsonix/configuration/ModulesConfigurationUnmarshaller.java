@@ -141,6 +141,11 @@ public class ModulesConfigurationUnmarshaller {
 			modulesConfiguration.getOutputConfigurations().add(
 					unmarshalOutputConfiguration(customization));
 		}
+		if (modulesConfiguration.getOutputConfigurations().isEmpty()) {
+			modulesConfiguration.getOutputConfigurations().add(
+					defaultOutputConfiguration);
+		}
+
 		for (CPluginCustomization customization : CustomizationUtils
 				.findCustomizations(model,
 						JsonSchemaConfiguration.JSON_SCHEMA_NAME)) {
@@ -148,9 +153,10 @@ public class ModulesConfigurationUnmarshaller {
 					unmarshalJsonSchemaConfiguration(customization));
 		}
 
-		if (modulesConfiguration.getOutputConfigurations().isEmpty()) {
-			modulesConfiguration.getOutputConfigurations().add(
-					defaultOutputConfiguration);
+		if (modulesConfiguration.getJsonSchemaConfigurations().isEmpty()
+				&& defaultJsonSchemaConfiguration != null) {
+			modulesConfiguration.getJsonSchemaConfigurations().add(
+					defaultJsonSchemaConfiguration);
 		}
 		return modulesConfiguration;
 	}

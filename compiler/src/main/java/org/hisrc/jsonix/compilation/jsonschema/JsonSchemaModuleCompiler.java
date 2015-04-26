@@ -1,7 +1,11 @@
 package org.hisrc.jsonix.compilation.jsonschema;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.json.JsonBuilderFactory;
+import javax.json.spi.JsonProvider;
 
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.definition.JsonSchema;
@@ -15,17 +19,19 @@ public class JsonSchemaModuleCompiler<T, C extends T> {
 	private final JsonSchemaModulesCompiler<T, C> modulesCompiler;
 	private final Modules<T, C> modules;
 	private final Module<T, C> module;
-//	private final JsonSchema jsonSchema;
+
+	// private final JsonSchema jsonSchema;
 
 	public JsonSchemaModuleCompiler(
-			JsonSchemaModulesCompiler<T, C> modulesCompiler, Module<T, C> module, JsonSchema jsonSchema) {
+			JsonSchemaModulesCompiler<T, C> modulesCompiler,
+			Module<T, C> module, JsonSchema jsonSchema) {
 		Validate.notNull(modulesCompiler);
 		Validate.notNull(module);
 		Validate.notNull(jsonSchema);
 		this.modulesCompiler = modulesCompiler;
 		this.modules = modulesCompiler.getModules();
 		this.module = module;
-//		this.jsonSchema = jsonSchema;
+		// this.jsonSchema = jsonSchema;
 	}
 
 	public JsonSchemaModulesCompiler<T, C> getModulesCompiler() {
@@ -40,30 +46,42 @@ public class JsonSchemaModuleCompiler<T, C extends T> {
 		return module;
 	}
 
-	public JsonSchemaBuilder compile() {
-		final List<JsonSchemaBuilder> mappingSchemas = new ArrayList<JsonSchemaBuilder>(
+	public JsonSchemaBuilder compile(JsonStructureWriter<T, C> writer) {
+		final JsonProvider provider = JsonProvider.provider();
+		final JsonBuilderFactory builderFactory = provider
+				.createBuilderFactory(null);
+
+		final Map<Mapping<T, C>, JsonSchemaBuilder> mappingSchemas = new LinkedHashMap<Mapping<T, C>, JsonSchemaBuilder>(
 				this.module.getMappings().size());
 		for (Mapping<T, C> mapping : this.module.getMappings()) {
 			if (!mapping.isEmpty()) {
 				final JsonSchemaMappingCompiler<T, C> mappingCompiler = new JsonSchemaMappingCompiler<T, C>(
 						this, mapping);
+				mappingSchemas.put(mapping, mappingCompiler.compile());
 
-				final JsonSchemaBuilder mappingSchema = mappingCompiler
-						.compile();
-
-				mappingSchemas.add(mappingSchema);
 			}
 		}
 
+		final JsonSchemaBuilder schema;
 		if (mappingSchemas.size() == 1) {
-			return mappingSchemas.get(0);
+			schema = mappingSchemas.values().iterator().next();
 		} else {
-			final JsonSchemaBuilder schema = new JsonSchemaBuilder();
-			for (JsonSchemaBuilder mappingSchema : mappingSchemas) {
-				schema.addAnyOf(mappingSchema);
+			schema = new JsonSchemaBuilder();
+			schema.addId(getModule().getSchemaId());
+			for (Entry<Mapping<T, C>, JsonSchemaBuilder> entry : mappingSchemas
+					.entrySet()) {
+				final Mapping<T, C> mapping = entry.getKey();
+				final JsonSchemaBuilder mappingSchema = entry.getValue();
+				schema.addDefinition(mapping.getMappingName(), mappingSchema);
+				schema.addAnyOf(new JsonSchemaBuilder().addRef(mapping
+						.getSchemaId()));
 			}
-			return schema;
 		}
-	}
 
+		for (JsonSchema jsonSchema : module.getJsonSchemas()) {
+			writer.writeJsonStructure(module, schema.build(builderFactory),
+					jsonSchema.getFileName());
+		}
+		return schema;
+	}
 }

@@ -5,13 +5,13 @@ import java.io.File;
 import org.kohsuke.args4j.Option;
 
 public class Settings {
-	
+
 	private File targetDirectory;
-	
+
 	public File getTargetDirectory() {
 		return targetDirectory;
 	}
-	
+
 	@Option(name = "-d")
 	public void setTargetDirectory(File targetDirectory) {
 		this.targetDirectory = targetDirectory;
@@ -44,6 +44,17 @@ public class Settings {
 		if (value) {
 			defaultNaming = NamingSetting.COMPACT;
 		}
+	}
+
+	private boolean generateJsonSchema = false;
+
+	public boolean isGenerateJsonSchema() {
+		return generateJsonSchema;
+	}
+
+	@Option(name = "-generateJsonSchema", aliases = { "-Xjsonix-generateJsonSchema" })
+	public void setGenerateJsonSchema(boolean value) {
+		generateJsonSchema = value;
 	}
 
 }

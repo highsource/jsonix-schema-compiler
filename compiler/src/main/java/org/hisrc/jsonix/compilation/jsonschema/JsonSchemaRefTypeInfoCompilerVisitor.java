@@ -72,8 +72,8 @@ public class JsonSchemaRefTypeInfoCompilerVisitor<T, C extends T> implements
 
 	@Override
 	public JsonSchemaBuilder visitList(MList<T, C> info) {
-		return new JsonSchemaBuilder().addType(JsonSchemaConstants.ARRAY_TYPE).addItem(
-				info.getItemTypeInfo().acceptTypeInfoVisitor(this));
+		return new JsonSchemaBuilder().addType(JsonSchemaConstants.ARRAY_TYPE)
+				.addItem(info.getItemTypeInfo().acceptTypeInfoVisitor(this));
 	}
 
 	@Override
@@ -125,8 +125,11 @@ public class JsonSchemaRefTypeInfoCompilerVisitor<T, C extends T> implements
 
 		final String typeInfoSchemaId = getModules().getSchemaId(
 				info.getPackageInfo().getPackageName());
-		final String mappingSchemaId = typeInfoSchemaId.equals(getMapping()
-				.getSchemaId()) ? "#" : typeInfoSchemaId;
+
+		final String schemaId = getMapping().getSchemaId();
+
+		final String mappingSchemaId = typeInfoSchemaId.equals(schemaId) ? "#"
+				: typeInfoSchemaId;
 		final String typeInfoRef = mappingSchemaId
 				+ "/"
 				+ JsonSchemaKeywords.definitions

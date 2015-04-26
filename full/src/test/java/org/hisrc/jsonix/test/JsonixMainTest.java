@@ -51,7 +51,7 @@ public class JsonixMainTest {
 		URL binding = getClass().getResource("/ogc/ows-v_1_1_0.xjb");
 		final String[] arguments = new String[] { "-xmlschema",
 				schema.toExternalForm(), "-b", binding.toExternalForm(), "-d",
-				"target/generated-sources/ows-v_1_1_0", "-Xjsonix-compact"
+				"target/generated-sources/ows-v_1_1_0", "-Xjsonix-compact", "-Xjsonix-generateJsonSchema"
 
 		};
 
@@ -70,7 +70,7 @@ public class JsonixMainTest {
 		final String[] arguments = new String[] { "-xmlschema",
 				filter.toExternalForm(), gml.toExternalForm(),
 				xlink.toExternalForm(), "-b", binding.toExternalForm(), "-d",
-				"target/generated-sources/filter-v_1_1_0", "-Xjsonix-compact"
+				"target/generated-sources/filter-v_1_1_0", "-Xjsonix-compact", "-generateJsonSchema"
 		};
 
 		JsonixMain.main(arguments);

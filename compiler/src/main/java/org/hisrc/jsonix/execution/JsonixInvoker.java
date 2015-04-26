@@ -44,8 +44,9 @@ public class JsonixInvoker {
 				settings.getDefaultNaming().getName(),
 				OutputConfiguration.STANDARD_FILE_NAME_PATTERN);
 
-		final JsonSchemaConfiguration defaultJsonSchemaConfiguration = new JsonSchemaConfiguration(
-				JsonSchemaConfiguration.STANDARD_FILE_NAME_PATTERN);
+		final JsonSchemaConfiguration defaultJsonSchemaConfiguration = settings
+				.isGenerateJsonSchema() ? new JsonSchemaConfiguration(
+				JsonSchemaConfiguration.STANDARD_FILE_NAME_PATTERN) : null;
 
 		final ModulesConfiguration modulesConfiguration = customizationHandler
 				.unmarshal(model, defaultOutputConfiguration,

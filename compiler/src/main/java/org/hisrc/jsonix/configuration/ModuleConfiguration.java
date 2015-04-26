@@ -27,9 +27,11 @@ public class ModuleConfiguration {
 	// private Log log = new SystemLog();
 
 	public static final String MODULE_NAME_PROPERTY = "${module.name}";
+	public static final String MODULE_SCHEMA_ID_PROPERTY = "${module.schemaId}";
 	public static final String MODULE_NAME_SEPARATOR = "_";
 
 	private String name;
+	private String schemaId = MODULE_NAME_PROPERTY + ".jsonschema#";
 	private List<MappingConfiguration> mappingConfigurations = new LinkedList<MappingConfiguration>();
 	private List<OutputConfiguration> outputConfigurations = new LinkedList<OutputConfiguration>();
 	private List<JsonSchemaConfiguration> jsonSchemaConfigurations = new LinkedList<JsonSchemaConfiguration>();
@@ -45,6 +47,15 @@ public class ModuleConfiguration {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	@XmlAttribute(name = "schemaId")
+	public String getSchemaId() {
+		return schemaId;
+	}
+
+	public void setSchemaId(String schemaId) {
+		this.schemaId = schemaId;
 	}
 
 	@XmlElement(name = "mapping")
@@ -101,12 +112,13 @@ public class ModuleConfiguration {
 			return null;
 		}
 
-		final String moduleName;
-		if (this.name != null) {
-			moduleName = this.name;
-		} else {
-			moduleName = createModuleName(moduleMappings);
+		final String moduleName = this.name;
+		if (moduleName == null) {
+			throw new IllegalStateException("Module name was not assigned yet.");
 		}
+
+		final String moduleSchemaId = schemaId.replace(
+				ModuleConfiguration.MODULE_NAME_PROPERTY, moduleName);
 
 		final List<Output> outputs = new ArrayList<Output>(
 				this.outputConfigurations.size());
@@ -125,22 +137,22 @@ public class ModuleConfiguration {
 				jsonSchemas.add(jsonSchema);
 			}
 		}
-		return new Module<T, C>(moduleName, moduleMappings, outputs,
-				jsonSchemas);
+		return new Module<T, C>(moduleName, moduleSchemaId, moduleMappings,
+				outputs, jsonSchemas);
 	}
 
-	private <T, C extends T> String createModuleName(
-			Iterable<Mapping<T, C>> mappings) {
-		boolean first = true;
-		final StringBuilder sb = new StringBuilder();
-		for (Mapping<T, C> mapping : mappings) {
-			if (!first) {
-				sb.append(MODULE_NAME_SEPARATOR);
-			}
-			sb.append(mapping.getMappingName());
-			first = false;
-		}
-		return sb.toString();
-	}
+//	private <T, C extends T> String createModuleName(
+//			Iterable<Mapping<T, C>> mappings) {
+//		boolean first = true;
+//		final StringBuilder sb = new StringBuilder();
+//		for (Mapping<T, C> mapping : mappings) {
+//			if (!first) {
+//				sb.append(MODULE_NAME_SEPARATOR);
+//			}
+//			sb.append(mapping.getMappingName());
+//			first = false;
+//		}
+//		return sb.toString();
+//	}
 
 }

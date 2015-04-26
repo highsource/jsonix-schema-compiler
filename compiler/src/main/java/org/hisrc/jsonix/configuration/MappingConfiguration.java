@@ -13,6 +13,7 @@ import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
 import org.hisrc.jsonix.context.JsonixContext;
 import org.hisrc.jsonix.definition.Mapping;
+import org.hisrc.jsonix.jsonschema.JsonSchemaKeywords;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
@@ -25,12 +26,15 @@ import org.slf4j.Logger;
 @XmlType(propOrder = {})
 public class MappingConfiguration {
 
+	public static final String MAPPING_NAME_PROPERTY = "${mapping.name}";
+	public static final String MAPPING_TARGET_NAMESPACE_URI_PROPERTY = "${mapping.targetNamespace}";
 	public static final String LOCAL_ELEMENT_NAME = "mapping";
 
+	private ModuleConfiguration moduleConfiguration;
 	private String id;
 	private String name;
 	private String _package;
-	private String schemaId;
+	private String schemaId = MappingConfiguration.MAPPING_TARGET_NAMESPACE_URI_PROPERTY + "#";
 	private String targetNamespaceURI;
 	private String defaultElementNamespaceURI;
 	private String defaultAttributeNamespaceURI;
@@ -186,20 +190,16 @@ public class MappingConfiguration {
 			defaultAttributeNamespaceURI = mostUsedAttributeNamespaceURI;
 		}
 
-		final String schemaId;
-		if (this.schemaId != null) {
-			schemaId = this.schemaId;
-		} else {
-			schemaId = targetNamespaceURI
-					+ (targetNamespaceURI.endsWith("#") ? "" : "#");
-			logger.debug(MessageFormat
-					.format("Mapping [{0}] will use schema id \"{1}\" based on the target namespace URI for the package [{2}].",
-							mappingName, schemaId, packageName));
-
-		}
+		final String mappingSchemaId = schemaId
+				.replace(ModuleConfiguration.MODULE_SCHEMA_ID_PROPERTY,
+						getModuleConfiguration().getSchemaId())
+				.replace(ModuleConfiguration.MODULE_NAME_PROPERTY,
+						getModuleConfiguration().getName())
+				.replace(MappingConfiguration.MAPPING_NAME_PROPERTY, getName())
+				.replace(MappingConfiguration.MAPPING_TARGET_NAMESPACE_URI_PROPERTY, targetNamespaceURI);
 
 		final Mapping<T, C> mapping = new Mapping<T, C>(context, analyzer,
-				packageInfo, mappingName, schemaId, targetNamespaceURI,
+				packageInfo, mappingName, mappingSchemaId, targetNamespaceURI,
 				defaultElementNamespaceURI, defaultAttributeNamespaceURI);
 
 		if (getExcludesConfiguration() != null) {
@@ -279,5 +279,17 @@ public class MappingConfiguration {
 	@Override
 	public String toString() {
 		return MessageFormat.format("[{0}:{1}]", getId(), getName());
+	}
+
+	public ModuleConfiguration getModuleConfiguration() {
+		return moduleConfiguration;
+	}
+
+	public void setModuleConfiguration(ModuleConfiguration moduleConfiguration) {
+		if (this.moduleConfiguration != null) {
+			throw new IllegalStateException(
+					"Module configuration was already assigned.");
+		}
+		this.moduleConfiguration = moduleConfiguration;
 	}
 }

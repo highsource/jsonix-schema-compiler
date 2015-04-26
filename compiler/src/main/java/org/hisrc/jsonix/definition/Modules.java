@@ -8,7 +8,10 @@ import java.util.Map;
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.configuration.AmbiguousPackageMappingNameException;
 import org.hisrc.jsonix.configuration.AmbiguousPackageSchemaIdException;
+import org.hisrc.jsonix.configuration.MappingConfiguration;
+import org.hisrc.jsonix.configuration.ModuleConfiguration;
 import org.hisrc.jsonix.context.JsonixContext;
+import org.hisrc.jsonix.jsonschema.JsonSchemaKeywords;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 import org.slf4j.Logger;
 
@@ -30,11 +33,12 @@ public class Modules<T, C extends T> {
 		this.modules = modules;
 
 		for (Module<T, C> module : modules) {
+			final String moduleSchemaId = module.getSchemaId();
 			for (Mapping<T, C> mapping : module.getMappings()) {
 
 				final String packageName = mapping.getPackageName();
+				final String mappingName = mapping.getMappingName();
 				{
-					final String mappingName = mapping.getMappingName();
 					final String knownMappingName = packageMappingNameMap
 							.get(packageName);
 					if (knownMappingName == null) {
@@ -50,17 +54,20 @@ public class Modules<T, C extends T> {
 					}
 				}
 				{
-					final String schemaId = mapping.getSchemaId();
+					final String mappingSchemaId = mapping.getSchemaId();
 					final String knownSchemaId = packageSchemaIdMap
 							.get(packageName);
 					if (knownSchemaId == null) {
-						this.packageSchemaIdMap.put(packageName, schemaId);
-					} else if (!knownSchemaId.equals(schemaId)) {
+						this.packageSchemaIdMap.put(packageName, mappingSchemaId);
+					} else if (!knownSchemaId.equals(mappingSchemaId)) {
 						logger.warn(MessageFormat
-								.format("Package [{0}] is mapped using at least two different schema ids [{1}] and [{2}]. Packages may be mapped by several mappings but they have to have equal schema ids.",
-										packageName, knownSchemaId, schemaId));
-						throw new AmbiguousPackageSchemaIdException(
-								packageName, knownSchemaId, schemaId);
+								.format("Package [{0}] is mapped using at least two different schema ids [{1}] and [{2}]. "
+										+ "This package [{0}] will be referenced using the schema id [{1}]. "
+										+ "Packages may be mapped by several mappings but they have to have equal schema ids. "
+										+ "Please use the [jsonix:mapping/@schemaId] attribute and specify the same schema id in both mappings.",
+										packageName, knownSchemaId, mappingSchemaId));
+//						throw new AmbiguousPackageSchemaIdException(
+//								packageName, knownSchemaId, mappingSchemaId);
 					}
 				}
 			}

@@ -50,9 +50,7 @@ public class JsonSchemaMappingCompiler<T, C extends T> {
 	public JsonSchemaBuilder compile() {
 		final JsonSchemaBuilder schema = new JsonSchemaBuilder();
 		final String schemaId = mapping.getSchemaId();
-		if (!schemaId.isEmpty()) {
-			schema.addId(schemaId);
-		}
+		schema.addId(schemaId);
 		addElementInfos(schema);
 		addClassInfoSchemas(schema);
 		addElementLeafInfoSchemas(schema);

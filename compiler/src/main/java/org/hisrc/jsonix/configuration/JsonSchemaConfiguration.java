@@ -13,8 +13,9 @@ import org.hisrc.jsonix.definition.JsonSchema;
 public class JsonSchemaConfiguration {
 
 	public static final String LOCAL_ELEMENT_NAME = "jsonSchema";
-	public static final String STANDARD_FILE_NAME_PATTERN = ModuleConfiguration.MODULE_NAME_PROPERTY
-			+ ".jsonschema";
+	public static final String STANDARD_FILE_NAME_PATTERN = ModuleConfiguration.MODULE_NAME_PROPERTY +
+//			+ "." + MappingConfiguration.MAPPING_NAME_PROPERTY + 
+			".jsonschema";
 
 	private String fileName;
 	public static final QName JSON_SCHEMA_NAME = new QName(

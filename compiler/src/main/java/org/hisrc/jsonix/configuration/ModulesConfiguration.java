@@ -100,12 +100,25 @@ public class ModulesConfiguration {
 		createModuleConfigurationsForUnmappedPackages(analyzer,
 				moduleConfigurations);
 
+		assignModuleConfigurationsToMappingConfigurations(moduleConfigurations);
 		assignDefaultOutputConfigurations(moduleConfigurations);
 		assignDefaultJsonSchemaConfigurations(moduleConfigurations);
 
 		assignMappingNamesAndIds(context, moduleConfigurations);
+		assignModuleNames(context, moduleConfigurations);
 
 		return buildModules(context, modelInfo, analyzer, moduleConfigurations);
+	}
+
+	private void assignModuleConfigurationsToMappingConfigurations(
+			List<ModuleConfiguration> moduleConfigurations) {
+		for (ModuleConfiguration moduleConfiguration : moduleConfigurations) {
+			for (MappingConfiguration mappingConfiguration : moduleConfiguration
+					.getMappingConfigurations()) {
+				mappingConfiguration
+						.setModuleConfiguration(moduleConfiguration);
+			}
+		}
 	}
 
 	private void assignMappingNamesAndIds(JsonixContext context,
@@ -118,13 +131,35 @@ public class ModulesConfiguration {
 		for (final ModuleConfiguration moduleConfiguration : moduleConfigurations) {
 			for (final MappingConfiguration mappingConfiguration : moduleConfiguration
 					.getMappingConfigurations()) {
-
 				assignMappingName(mappingConfiguration);
-
 				assignMappingId(context, idToMappingConfiguration,
 						nameToMappingConfiguration, mappingConfiguration);
 			}
 		}
+	}
+
+	private void assignModuleNames(JsonixContext context,
+			final List<ModuleConfiguration> moduleConfigurations) {
+		for (final ModuleConfiguration moduleConfiguration : moduleConfigurations) {
+			if (moduleConfiguration.getName() == null) {
+				moduleConfiguration
+						.setName(createModuleName(mappingConfigurations));
+			}
+		}
+	}
+
+	private <T, C extends T> String createModuleName(
+			Iterable<MappingConfiguration> mappings) {
+		boolean first = true;
+		final StringBuilder sb = new StringBuilder();
+		for (MappingConfiguration mapping : mappings) {
+			if (!first) {
+				sb.append(ModuleConfiguration.MODULE_NAME_SEPARATOR);
+			}
+			sb.append(mapping.getName());
+			first = false;
+		}
+		return sb.toString();
 	}
 
 	private void assignMappingId(
@@ -289,10 +324,9 @@ public class ModulesConfiguration {
 
 	private List<JsonSchemaConfiguration> createDefaultJsonSchemaConfigurations() {
 		final List<JsonSchemaConfiguration> defaultJsonSchemaConfigurations = getJsonSchemaConfigurations();
-
-		if (defaultJsonSchemaConfigurations.isEmpty()) {
-			defaultJsonSchemaConfigurations.add(new JsonSchemaConfiguration());
-		}
+		// if (defaultJsonSchemaConfigurations.isEmpty()) {
+		// defaultJsonSchemaConfigurations.add(new JsonSchemaConfiguration());
+		// }
 		return defaultJsonSchemaConfigurations;
 	}
 

@@ -8,17 +8,20 @@ import org.apache.commons.lang3.Validate;
 public class Module<T, C extends T> {
 
 	private final String name;
+	private final String schemaId;
 	private final List<Mapping<T, C>> mappings;
 	private final List<Output> outputs;
 	private final List<JsonSchema> jsonSchemas;
 
-	public Module(String name, List<Mapping<T, C>> mappings,
+	public Module(String name, String schemaId, List<Mapping<T, C>> mappings,
 			List<Output> outputs, List<JsonSchema> jsonSchemas) {
 		Validate.notNull(name);
+		Validate.notNull(schemaId);
 		Validate.noNullElements(mappings);
 		Validate.noNullElements(outputs);
 		Validate.noNullElements(jsonSchemas);
 		this.name = name;
+		this.schemaId = schemaId;
 		this.mappings = mappings;
 		this.outputs = outputs;
 		this.jsonSchemas = jsonSchemas;
@@ -35,6 +38,10 @@ public class Module<T, C extends T> {
 
 	public String getName() {
 		return name;
+	}
+	
+	public String getSchemaId() {
+		return schemaId;
 	}
 
 	public List<Mapping<T, C>> getMappings() {
