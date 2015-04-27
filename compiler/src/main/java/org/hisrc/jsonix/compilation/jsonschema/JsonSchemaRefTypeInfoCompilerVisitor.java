@@ -6,7 +6,7 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.Validate;
-import org.hisrc.jsonix.compilation.MappingCompiler;
+import org.hisrc.jsonix.compilation.mapping.MappingCompiler;
 import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Modules;

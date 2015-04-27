@@ -1,4 +1,4 @@
-package org.hisrc.jsonix.compilation;
+package org.hisrc.jsonix.compilation.mapping;
 
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jscm.codemodel.expression.JSExpression;

@@ -1,4 +1,4 @@
-package org.hisrc.jsonix.compilation;
+package org.hisrc.jsonix.compilation.mapping;
 
 import javax.xml.namespace.QName;
 

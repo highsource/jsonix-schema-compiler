@@ -1,4 +1,4 @@
-package org.hisrc.jsonix.compilation;
+package org.hisrc.jsonix.compilation.mapping;
 
 import org.hisrc.jscm.codemodel.JSProgram;
 import org.hisrc.jsonix.definition.Module;

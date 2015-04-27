@@ -7,7 +7,7 @@ import java.text.MessageFormat;
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jscm.codemodel.JSProgram;
 import org.hisrc.jscm.codemodel.writer.CodeWriter;
-import org.hisrc.jsonix.compilation.ProgramWriter;
+import org.hisrc.jsonix.compilation.mapping.ProgramWriter;
 import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Output;
 import org.xml.sax.ErrorHandler;

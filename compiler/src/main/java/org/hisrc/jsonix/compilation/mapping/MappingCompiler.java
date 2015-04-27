@@ -31,7 +31,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.hisrc.jsonix.compilation;
+package org.hisrc.jsonix.compilation.mapping;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
