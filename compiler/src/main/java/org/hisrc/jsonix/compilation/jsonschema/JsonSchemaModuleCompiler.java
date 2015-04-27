@@ -13,14 +13,14 @@ import org.hisrc.jsonix.jsonschema.JsonSchemaBuilder;
 
 public class JsonSchemaModuleCompiler<T, C extends T> {
 
-	private final JsonSchemaModulesCompiler<T, C> modulesCompiler;
+	private final JsonSchemaModulesGenerator<T, C> modulesCompiler;
 	private final Modules<T, C> modules;
 	private final Module<T, C> module;
 
 	// private final JsonSchema jsonSchema;
 
 	public JsonSchemaModuleCompiler(
-			JsonSchemaModulesCompiler<T, C> modulesCompiler,
+			JsonSchemaModulesGenerator<T, C> modulesCompiler,
 			Module<T, C> module, JsonSchema jsonSchema) {
 		Validate.notNull(modulesCompiler);
 		Validate.notNull(module);
@@ -31,7 +31,7 @@ public class JsonSchemaModuleCompiler<T, C extends T> {
 		// this.jsonSchema = jsonSchema;
 	}
 
-	public JsonSchemaModulesCompiler<T, C> getModulesCompiler() {
+	public JsonSchemaModulesGenerator<T, C> getModulesCompiler() {
 		return modulesCompiler;
 	}
 

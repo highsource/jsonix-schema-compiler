@@ -90,11 +90,11 @@ public class JsonSchemaMappingCompiler<T, C extends T> {
 	}
 
 	private void addElementLeafInfoSchemas(final JsonSchemaBuilder schema) {
-		final JsonSchemaEnumLeafInfoCompiler<T, C> enumLeafInfoCompiler = new JsonSchemaEnumLeafInfoCompiler<T, C>(
+		final JsonSchemaEnumLeafInfoProducer<T, C> enumLeafInfoCompiler = new JsonSchemaEnumLeafInfoProducer<T, C>(
 				this);
 		for (MEnumLeafInfo<T, C> enumLeafInfo : mapping.getEnumLeafInfos()) {
 			final JsonSchemaBuilder enumLeafInfoSchema = enumLeafInfoCompiler
-					.compile(enumLeafInfo);
+					.produce(enumLeafInfo);
 			schema.addDefinition(
 					enumLeafInfo
 							.getContainerLocalName(JsonixConstants.DEFAULT_SCOPED_NAME_DELIMITER),
@@ -103,11 +103,11 @@ public class JsonSchemaMappingCompiler<T, C extends T> {
 	}
 
 	private void addClassInfoSchemas(final JsonSchemaBuilder schema) {
-		final JsonSchemaClassInfoCompiler<T, C> classInfoCompiler = new JsonSchemaClassInfoCompiler<T, C>(
+		final JsonSchemaClassInfoProducer<T, C> classInfoCompiler = new JsonSchemaClassInfoProducer<T, C>(
 				this);
 		for (MClassInfo<T, C> classInfo : mapping.getClassInfos()) {
 			final JsonSchemaBuilder classInfoSchema = classInfoCompiler
-					.compile(classInfo);
+					.produce(classInfo);
 			schema.addDefinition(
 					classInfo
 							.getContainerLocalName(JsonixConstants.DEFAULT_SCOPED_NAME_DELIMITER),
@@ -117,7 +117,7 @@ public class JsonSchemaMappingCompiler<T, C extends T> {
 
 	public JsonSchemaBuilder createTypeInfoSchemaRef(MTypeInfo<T, C> typeInfo) {
 		return typeInfo
-				.acceptTypeInfoVisitor(new JsonSchemaRefTypeInfoCompilerVisitor<T, C>(
+				.acceptTypeInfoVisitor(new JsonSchemaRefTypeInfoProducerVisitor<T, C>(
 						this));
 	}
 }

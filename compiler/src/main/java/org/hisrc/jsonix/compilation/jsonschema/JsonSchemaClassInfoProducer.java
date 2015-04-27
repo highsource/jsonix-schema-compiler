@@ -17,13 +17,13 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
 
-public class JsonSchemaClassInfoCompiler<T, C extends T> implements
-		JsonSchemaTypeInfoCompiler<MClassInfo<T, C>, T, C> {
+public class JsonSchemaClassInfoProducer<T, C extends T> implements
+		JsonSchemaTypeInfoProducer<MClassInfo<T, C>, T, C> {
 
 	private final JsonSchemaMappingCompiler<T, C> mappingCompiler;
 	private final Mapping<T, C> mapping;
 
-	public JsonSchemaClassInfoCompiler(
+	public JsonSchemaClassInfoProducer(
 			JsonSchemaMappingCompiler<T, C> mappingCompiler) {
 		Validate.notNull(mappingCompiler);
 		this.mappingCompiler = mappingCompiler;
@@ -35,7 +35,7 @@ public class JsonSchemaClassInfoCompiler<T, C extends T> implements
 	}
 
 	@Override
-	public JsonSchemaBuilder compile(MClassInfo<T, C> classInfo) {
+	public JsonSchemaBuilder produce(MClassInfo<T, C> classInfo) {
 		final JsonSchemaBuilder classInfoSchema = new JsonSchemaBuilder();
 		classInfoSchema.addType(JsonSchemaConstants.OBJECT_TYPE);
 		final String localName = classInfo
@@ -85,7 +85,7 @@ public class JsonSchemaClassInfoCompiler<T, C extends T> implements
 				propertyInfoSchemas
 						.put(propertyInfo.getPrivateName(),
 								propertyInfo
-										.acceptPropertyInfoVisitor(new JsonSchemaPropertyInfoCompilerVisitor<T, C>(
+										.acceptPropertyInfoVisitor(new JsonSchemaPropertyInfoProducerVisitor<T, C>(
 												this)));
 			}
 		}

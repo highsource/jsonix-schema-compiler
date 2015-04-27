@@ -1,6 +1,6 @@
 package org.hisrc.jsonix.execution;
 
-import org.hisrc.jsonix.compilation.jsonschema.JsonSchemaModulesCompiler;
+import org.hisrc.jsonix.compilation.jsonschema.JsonSchemaModulesGenerator;
 import org.hisrc.jsonix.compilation.jsonschema.JsonStructureWriter;
 import org.hisrc.jsonix.compilation.mapping.ModulesCompiler;
 import org.hisrc.jsonix.compilation.mapping.ProgramWriter;
@@ -63,8 +63,8 @@ public class JsonixInvoker {
 
 		modulesCompiler.compile(programWriter);
 
-		final JsonSchemaModulesCompiler<NType, NClass> jsonSchemaModulesCompiler = new JsonSchemaModulesCompiler<NType, NClass>(
+		final JsonSchemaModulesGenerator<NType, NClass> jsonSchemaModulesGenerator = new JsonSchemaModulesGenerator<NType, NClass>(
 				modules);
-		jsonSchemaModulesCompiler.compile(jsonStructureWriter);
+		jsonSchemaModulesGenerator.generate(jsonStructureWriter);
 	}
 }

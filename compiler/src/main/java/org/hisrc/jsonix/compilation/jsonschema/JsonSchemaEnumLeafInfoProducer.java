@@ -10,12 +10,12 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MEnumConstantInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 
-public class JsonSchemaEnumLeafInfoCompiler<T, C extends T> implements
-		JsonSchemaTypeInfoCompiler<MEnumLeafInfo<T, C>, T, C> {
+public class JsonSchemaEnumLeafInfoProducer<T, C extends T> implements
+		JsonSchemaTypeInfoProducer<MEnumLeafInfo<T, C>, T, C> {
 
 	private final JsonSchemaMappingCompiler<T, C> mappingCompiler;
 
-	public JsonSchemaEnumLeafInfoCompiler(
+	public JsonSchemaEnumLeafInfoProducer(
 			JsonSchemaMappingCompiler<T, C> mappingCompiler) {
 		Validate.notNull(mappingCompiler);
 		this.mappingCompiler = mappingCompiler;
@@ -26,7 +26,7 @@ public class JsonSchemaEnumLeafInfoCompiler<T, C extends T> implements
 	}
 
 	@Override
-	public JsonSchemaBuilder compile(MEnumLeafInfo<T, C> enumLeafInfo) {
+	public JsonSchemaBuilder produce(MEnumLeafInfo<T, C> enumLeafInfo) {
 		final JsonSchemaBuilder enumLeafInfoSchema = new JsonSchemaBuilder();
 		final String localName = enumLeafInfo
 				.getContainerLocalName(JsonixConstants.DEFAULT_SCOPED_NAME_DELIMITER);

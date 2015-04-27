@@ -25,18 +25,18 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MValuePropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MWrappable;
 
-public class JsonSchemaPropertyInfoCompilerVisitor<T, C extends T> implements
+public class JsonSchemaPropertyInfoProducerVisitor<T, C extends T> implements
 		MPropertyInfoVisitor<T, C, JsonSchemaBuilder> {
 
-	private final JsonSchemaClassInfoCompiler<T, C> classInfoCompiler;
+	private final JsonSchemaClassInfoProducer<T, C> classInfoCompiler;
 
-	public JsonSchemaPropertyInfoCompilerVisitor(
-			JsonSchemaClassInfoCompiler<T, C> classInfoCompiler) {
+	public JsonSchemaPropertyInfoProducerVisitor(
+			JsonSchemaClassInfoProducer<T, C> classInfoCompiler) {
 		Validate.notNull(classInfoCompiler);
 		this.classInfoCompiler = classInfoCompiler;
 	}
 
-	public JsonSchemaClassInfoCompiler<T, C> getClassInfoCompiler() {
+	public JsonSchemaClassInfoProducer<T, C> getClassInfoCompiler() {
 		return classInfoCompiler;
 	}
 

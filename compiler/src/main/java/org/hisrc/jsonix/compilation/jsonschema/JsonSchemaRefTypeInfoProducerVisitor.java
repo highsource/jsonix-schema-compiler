@@ -25,7 +25,7 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MPackagedTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfoVisitor;
 import org.jvnet.jaxb2_commons.xml.bind.model.MWildcardTypeInfo;
 
-public class JsonSchemaRefTypeInfoCompilerVisitor<T, C extends T> implements
+public class JsonSchemaRefTypeInfoProducerVisitor<T, C extends T> implements
 		MTypeInfoVisitor<T, C, JsonSchemaBuilder> {
 
 	private final JsonSchemaMappingCompiler<T, C> mappingCompiler;
@@ -34,7 +34,7 @@ public class JsonSchemaRefTypeInfoCompilerVisitor<T, C extends T> implements
 	private final Mapping<T, C> mapping;
 	private final Map<QName, String> typeNameSchemaRefs;
 
-	public JsonSchemaRefTypeInfoCompilerVisitor(
+	public JsonSchemaRefTypeInfoProducerVisitor(
 			JsonSchemaMappingCompiler<T, C> mappingCompiler) {
 		Validate.notNull(mappingCompiler);
 		this.mappingCompiler = mappingCompiler;

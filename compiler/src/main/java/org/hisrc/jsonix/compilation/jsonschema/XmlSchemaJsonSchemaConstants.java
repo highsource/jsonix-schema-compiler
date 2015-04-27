@@ -14,7 +14,7 @@ public class XmlSchemaJsonSchemaConstants {
 	private XmlSchemaJsonSchemaConstants() {
 	}
 
-	public static final String SCHEMA_ID = JsonixJsonSchemaConstants.BASE_URI
+	public static final String SCHEMA_ID = JsonixJsonSchemaConstants.JSONIX_JSONSCHEMAS_BASE_URI
 			+ "/w3c/2001/XMLSchema.jsonschema#";
 
 	public static final Map<QName, String> TYPE_NAME_SCHEMA_REFS;

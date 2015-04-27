@@ -1,21 +1,25 @@
 package org.hisrc.jsonix.compilation.jsonschema;
 
+import org.hisrc.jsonix.jsonschema.JsonSchemaKeywords;
+
 public class JsonixJsonSchemaConstants {
 
 	private JsonixJsonSchemaConstants() {
 	}
 
-	public static final String BASE_URI = "http://highsource.github.io/jsonix/jsonschemas";
+	public static final String JSONIX_BASE_URI = "http://highsource.github.io/jsonix";
+	public static final String JSONIX_JSONSCHEMAS_BASE_URI = JSONIX_BASE_URI
+			+ "/jsonschemas";
 
-	public static final String JSONIX_JSON_SCHEMA_ID = BASE_URI
+	public static final String JSONIX_JSON_SCHEMA_ID = JSONIX_JSONSCHEMAS_BASE_URI
 			+ "/jsonix/Jsonix.jsonschema#";
 
 	public static final String CALENDAR_TYPE_INFO_SCHEMA_REF = JSONIX_JSON_SCHEMA_ID
-			+ "/definitions/calendar";
+			+ "/" + JsonSchemaKeywords.definitions + "/calendar";
 	public static final String WILDCARD_TYPE_INFO_SCHEMA_REF = JSONIX_JSON_SCHEMA_ID
-			+ "/definitions/wildcard";
+			+ "/" + JsonSchemaKeywords.definitions + "/wildcard";
 	public static final String DOM_TYPE_INFO_SCHEMA_REF = JSONIX_JSON_SCHEMA_ID
-			+ "/definitions/dom";
+			+ "/" + JsonSchemaKeywords.definitions + "/dom";
 
 	public static String TYPE_TYPE_PROPERTY_NAME = "typeType";
 
