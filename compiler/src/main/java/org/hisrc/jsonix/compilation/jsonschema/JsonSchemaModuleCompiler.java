@@ -4,9 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.json.JsonBuilderFactory;
-import javax.json.spi.JsonProvider;
-
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.definition.JsonSchema;
 import org.hisrc.jsonix.definition.Mapping;
@@ -46,11 +43,7 @@ public class JsonSchemaModuleCompiler<T, C extends T> {
 		return module;
 	}
 
-	public JsonSchemaBuilder compile(JsonStructureWriter<T, C> writer) {
-		final JsonProvider provider = JsonProvider.provider();
-		final JsonBuilderFactory builderFactory = provider
-				.createBuilderFactory(null);
-
+	public JsonSchemaBuilder compile() {
 		final Map<Mapping<T, C>, JsonSchemaBuilder> mappingSchemas = new LinkedHashMap<Mapping<T, C>, JsonSchemaBuilder>(
 				this.module.getMappings().size());
 		for (Mapping<T, C> mapping : this.module.getMappings()) {
@@ -78,10 +71,6 @@ public class JsonSchemaModuleCompiler<T, C extends T> {
 			}
 		}
 
-		for (JsonSchema jsonSchema : module.getJsonSchemas()) {
-			writer.writeJsonStructure(module, schema.build(builderFactory),
-					jsonSchema.getFileName());
-		}
 		return schema;
 	}
 }
