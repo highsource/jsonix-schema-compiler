@@ -1,4 +1,4 @@
-package org.hisrc.jsonix.configuration;
+package org.hisrc.jsonix.configuration.exception;
 
 import java.text.MessageFormat;
 import java.util.Arrays;

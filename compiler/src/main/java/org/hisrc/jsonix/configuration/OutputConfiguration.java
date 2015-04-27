@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.Validate;
+import org.hisrc.jsonix.configuration.exception.UnsupportedNamingException;
 import org.hisrc.jsonix.definition.Output;
 import org.hisrc.jsonix.naming.CompactNaming;
 import org.hisrc.jsonix.naming.Naming;

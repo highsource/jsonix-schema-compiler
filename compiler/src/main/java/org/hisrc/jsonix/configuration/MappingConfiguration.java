@@ -11,9 +11,9 @@ import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
+import org.hisrc.jsonix.configuration.exception.MissingMappingWithIdException;
 import org.hisrc.jsonix.context.JsonixContext;
 import org.hisrc.jsonix.definition.Mapping;
-import org.hisrc.jsonix.jsonschema.JsonSchemaKeywords;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;

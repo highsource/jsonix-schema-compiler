@@ -43,6 +43,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.lang3.Validate;
+import org.hisrc.jsonix.configuration.exception.ConfigurationUnmarshallingException;
 import org.hisrc.jsonix.context.JsonixContext;
 import org.jvnet.jaxb2_commons.util.CustomizationUtils;
 import org.slf4j.Logger;
@@ -53,7 +54,6 @@ import com.sun.tools.xjc.model.Model;
 public class ModulesConfigurationUnmarshaller {
 
 	private final Logger logger;
-	@SuppressWarnings("unused")
 	private final JsonixContext context;
 	private final JAXBContext jaxbContext;
 

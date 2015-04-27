@@ -3,6 +3,7 @@ package org.hisrc.jsonix.configuration;
 import java.text.MessageFormat;
 
 import org.apache.commons.lang3.Validate;
+import org.hisrc.jsonix.configuration.exception.ConfigurationException;
 
 public class MissingPackageException extends ConfigurationException {
 

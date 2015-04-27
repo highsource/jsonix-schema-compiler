@@ -13,11 +13,10 @@ import org.hisrc.jsonix.definition.JsonSchema;
 public class JsonSchemaConfiguration {
 
 	public static final String LOCAL_ELEMENT_NAME = "jsonSchema";
-	public static final String STANDARD_FILE_NAME_PATTERN = ModuleConfiguration.MODULE_NAME_PROPERTY +
-//			+ "." + MappingConfiguration.MAPPING_NAME_PROPERTY + 
-			".jsonschema";
+	public static final String STANDARD_FILE_NAME_PATTERN = ModuleConfiguration.MODULE_NAME_PROPERTY
+			+ ".jsonschema";
 
-	private String fileName;
+	private String fileName = STANDARD_FILE_NAME_PATTERN;
 	public static final QName JSON_SCHEMA_NAME = new QName(
 			ModulesConfiguration.NAMESPACE_URI, LOCAL_ELEMENT_NAME,
 			ModulesConfiguration.DEFAULT_PREFIX);
@@ -27,7 +26,7 @@ public class JsonSchemaConfiguration {
 	}
 
 	public JsonSchemaConfiguration(String fileName) {
-		super();
+		Validate.notNull(fileName);
 		this.fileName = fileName;
 	}
 
@@ -37,14 +36,13 @@ public class JsonSchemaConfiguration {
 	}
 
 	public void setFileName(String fileName) {
+		Validate.notNull(fileName);
 		this.fileName = fileName;
 	}
 
 	public JsonSchema build(String moduleName) {
 		Validate.notNull(moduleName);
-		final String fileNamePattern = this.fileName == null ? STANDARD_FILE_NAME_PATTERN
-				: this.fileName;
-		final String fileName = fileNamePattern.replace(
+		final String fileName = getFileName().replace(
 				ModuleConfiguration.MODULE_NAME_PROPERTY, moduleName);
 		return new JsonSchema(fileName);
 	}

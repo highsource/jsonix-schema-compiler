@@ -17,6 +17,9 @@ import javax.xml.namespace.QName;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
+import org.hisrc.jsonix.configuration.exception.AmbiguousMappingNameException;
+import org.hisrc.jsonix.configuration.exception.MissingMappinWithNameException;
+import org.hisrc.jsonix.configuration.exception.MissingMappingWithIdException;
 import org.hisrc.jsonix.context.JsonixContext;
 import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.definition.Module;
@@ -104,8 +107,8 @@ public class ModulesConfiguration {
 		assignDefaultOutputConfigurations(moduleConfigurations);
 		assignDefaultJsonSchemaConfigurations(moduleConfigurations);
 
-		assignMappingNamesAndIds(context, moduleConfigurations);
-		assignModuleNames(context, moduleConfigurations);
+		assignMappingNamesAndIdsToMappingConfigurations(context, moduleConfigurations);
+		assignModuleNamesToModules(context, moduleConfigurations);
 
 		return buildModules(context, modelInfo, analyzer, moduleConfigurations);
 	}
@@ -121,7 +124,7 @@ public class ModulesConfiguration {
 		}
 	}
 
-	private void assignMappingNamesAndIds(JsonixContext context,
+	private void assignMappingNamesAndIdsToMappingConfigurations(JsonixContext context,
 			final List<ModuleConfiguration> moduleConfigurations) {
 		// Generate ids where missing
 		final Map<String, MappingConfiguration> idToMappingConfiguration = new HashMap<String, MappingConfiguration>();
@@ -138,7 +141,7 @@ public class ModulesConfiguration {
 		}
 	}
 
-	private void assignModuleNames(JsonixContext context,
+	private void assignModuleNamesToModules(JsonixContext context,
 			final List<ModuleConfiguration> moduleConfigurations) {
 		for (final ModuleConfiguration moduleConfiguration : moduleConfigurations) {
 			if (moduleConfiguration.getName() == null) {

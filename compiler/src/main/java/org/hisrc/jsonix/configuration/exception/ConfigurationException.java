@@ -1,4 +1,4 @@
-package org.hisrc.jsonix.configuration;
+package org.hisrc.jsonix.configuration.exception;
 
 public abstract class ConfigurationException extends RuntimeException {
 

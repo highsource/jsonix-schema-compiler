@@ -6,12 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.Validate;
-import org.hisrc.jsonix.configuration.AmbiguousPackageMappingNameException;
-import org.hisrc.jsonix.configuration.AmbiguousPackageSchemaIdException;
-import org.hisrc.jsonix.configuration.MappingConfiguration;
-import org.hisrc.jsonix.configuration.ModuleConfiguration;
+import org.hisrc.jsonix.configuration.exception.AmbiguousPackageMappingNameException;
+import org.hisrc.jsonix.configuration.exception.AmbiguousPackageSchemaIdException;
 import org.hisrc.jsonix.context.JsonixContext;
-import org.hisrc.jsonix.jsonschema.JsonSchemaKeywords;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 import org.slf4j.Logger;
 
@@ -33,7 +30,6 @@ public class Modules<T, C extends T> {
 		this.modules = modules;
 
 		for (Module<T, C> module : modules) {
-			final String moduleSchemaId = module.getSchemaId();
 			for (Mapping<T, C> mapping : module.getMappings()) {
 
 				final String packageName = mapping.getPackageName();
@@ -58,16 +54,17 @@ public class Modules<T, C extends T> {
 					final String knownSchemaId = packageSchemaIdMap
 							.get(packageName);
 					if (knownSchemaId == null) {
-						this.packageSchemaIdMap.put(packageName, mappingSchemaId);
+						this.packageSchemaIdMap.put(packageName,
+								mappingSchemaId);
 					} else if (!knownSchemaId.equals(mappingSchemaId)) {
 						logger.warn(MessageFormat
 								.format("Package [{0}] is mapped using at least two different schema ids [{1}] and [{2}]. "
-										+ "This package [{0}] will be referenced using the schema id [{1}]. "
 										+ "Packages may be mapped by several mappings but they have to have equal schema ids. "
-										+ "Please use the [jsonix:mapping/@schemaId] attribute and specify the same schema id in both mappings.",
-										packageName, knownSchemaId, mappingSchemaId));
-//						throw new AmbiguousPackageSchemaIdException(
-//								packageName, knownSchemaId, mappingSchemaId);
+										+ "Please use the [jsonix:module/@schemaId] or [jsonix:mapping/@schemaId] attribute and specify the same schema id in both mappings.",
+										packageName, knownSchemaId,
+										mappingSchemaId));
+						throw new AmbiguousPackageSchemaIdException(
+								packageName, knownSchemaId, mappingSchemaId);
 					}
 				}
 			}
@@ -94,5 +91,4 @@ public class Modules<T, C extends T> {
 	public String toString() {
 		return this.modules.toString();
 	}
-
 }
