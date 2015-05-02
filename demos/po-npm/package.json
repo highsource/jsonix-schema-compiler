@@ -7,7 +7,7 @@
 	"main": "index.js",
 	"dependencies": {
 		"jsonix": "x.x.x",
-		"jsonix-schema-compiler": "x.x.x"
+		"jsonix-schema-compiler": ">=2.3.4"
 	},
 	"devDependencies" : {
 		"nodeunit" : "~0.8.6"
