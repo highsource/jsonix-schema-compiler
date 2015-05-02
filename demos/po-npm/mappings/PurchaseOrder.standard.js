@@ -40,37 +40,14 @@ var PurchaseOrder_Module_Factory = function () {
             type: 'attribute'
           }]
       }, {
-        localName: 'PurchaseOrderType',
+        localName: 'Items',
         propertyInfos: [{
-            name: 'shipTo',
+            name: 'item',
+            collection: true,
             elementName: {
-              localPart: 'shipTo'
+              localPart: 'item'
             },
-            typeInfo: '.USAddress'
-          }, {
-            name: 'billTo',
-            elementName: {
-              localPart: 'billTo'
-            },
-            typeInfo: '.USAddress'
-          }, {
-            name: 'comment',
-            elementName: {
-              localPart: 'comment'
-            }
-          }, {
-            name: 'items',
-            elementName: {
-              localPart: 'items'
-            },
-            typeInfo: '.Items'
-          }, {
-            name: 'orderDate',
-            typeInfo: 'Calendar',
-            attributeName: {
-              localPart: 'orderDate'
-            },
-            type: 'attribute'
+            typeInfo: '.Items.Item'
           }]
       }, {
         localName: 'USAddress',
@@ -108,25 +85,48 @@ var PurchaseOrder_Module_Factory = function () {
             type: 'attribute'
           }]
       }, {
-        localName: 'Items',
+        localName: 'PurchaseOrderType',
         propertyInfos: [{
-            name: 'item',
-            collection: true,
+            name: 'shipTo',
             elementName: {
-              localPart: 'item'
+              localPart: 'shipTo'
             },
-            typeInfo: '.Items.Item'
+            typeInfo: '.USAddress'
+          }, {
+            name: 'billTo',
+            elementName: {
+              localPart: 'billTo'
+            },
+            typeInfo: '.USAddress'
+          }, {
+            name: 'comment',
+            elementName: {
+              localPart: 'comment'
+            }
+          }, {
+            name: 'items',
+            elementName: {
+              localPart: 'items'
+            },
+            typeInfo: '.Items'
+          }, {
+            name: 'orderDate',
+            typeInfo: 'Calendar',
+            attributeName: {
+              localPart: 'orderDate'
+            },
+            type: 'attribute'
           }]
       }],
     elementInfos: [{
         elementName: {
+          localPart: 'comment'
+        }
+      }, {
+        elementName: {
           localPart: 'purchaseOrder'
         },
         typeInfo: '.PurchaseOrderType'
-      }, {
-        elementName: {
-          localPart: 'comment'
-        }
       }]
   };
   return {

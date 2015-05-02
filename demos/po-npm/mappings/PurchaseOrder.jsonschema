@@ -10,7 +10,7 @@
                     "title":"productName",
                     "allOf":[
                         {
-                            "$ref":"https://cdn.rawgit.com/highsource/jsonix/master/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/string"
+                            "$ref":"http://www.jsonix.org/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/string"
                         }
                     ],
                     "propertyType":"element",
@@ -23,7 +23,7 @@
                     "title":"quantity",
                     "allOf":[
                         {
-                            "$ref":"https://cdn.rawgit.com/highsource/jsonix/master/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/int"
+                            "$ref":"http://www.jsonix.org/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/int"
                         }
                     ],
                     "propertyType":"element",
@@ -36,7 +36,7 @@
                     "title":"usPrice",
                     "allOf":[
                         {
-                            "$ref":"https://cdn.rawgit.com/highsource/jsonix/master/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/decimal"
+                            "$ref":"http://www.jsonix.org/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/decimal"
                         }
                     ],
                     "propertyType":"element",
@@ -49,7 +49,7 @@
                     "title":"comment",
                     "allOf":[
                         {
-                            "$ref":"https://cdn.rawgit.com/highsource/jsonix/master/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/string"
+                            "$ref":"http://www.jsonix.org/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/string"
                         }
                     ],
                     "propertyType":"element",
@@ -62,7 +62,7 @@
                     "title":"shipDate",
                     "allOf":[
                         {
-                            "$ref":"https://cdn.rawgit.com/highsource/jsonix/master/jsonschemas/jsonix/Jsonix.jsonschema#/definitions/calendar"
+                            "$ref":"http://www.jsonix.org/jsonschemas/jsonix/Jsonix.jsonschema#/definitions/calendar"
                         }
                     ],
                     "propertyType":"element",
@@ -75,7 +75,7 @@
                     "title":"partNum",
                     "allOf":[
                         {
-                            "$ref":"https://cdn.rawgit.com/highsource/jsonix/master/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/string"
+                            "$ref":"http://www.jsonix.org/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/string"
                         }
                     ],
                     "propertyType":"attribute",
@@ -93,6 +93,133 @@
                 "comment",
                 "shipDate",
                 "partNum"
+            ]
+        },
+        "Items":{
+            "type":"object",
+            "title":"Items",
+            "properties":{
+                "item":{
+                    "title":"item",
+                    "allOf":[
+                        {
+                            "type":"array",
+                            "items":{
+                                "$ref":"#/definitions/Items.Item"
+                            }
+                        }
+                    ],
+                    "propertyType":"element",
+                    "elementName":{
+                        "localPart":"item",
+                        "namespaceURI":""
+                    }
+                }
+            },
+            "typeType":"classInfo",
+            "typeName":{
+                "localPart":"Items",
+                "namespaceURI":""
+            },
+            "propertiesOrder":[
+                "item"
+            ]
+        },
+        "USAddress":{
+            "type":"object",
+            "title":"USAddress",
+            "properties":{
+                "name":{
+                    "title":"name",
+                    "allOf":[
+                        {
+                            "$ref":"http://www.jsonix.org/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/string"
+                        }
+                    ],
+                    "propertyType":"element",
+                    "elementName":{
+                        "localPart":"name",
+                        "namespaceURI":""
+                    }
+                },
+                "street":{
+                    "title":"street",
+                    "allOf":[
+                        {
+                            "$ref":"http://www.jsonix.org/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/string"
+                        }
+                    ],
+                    "propertyType":"element",
+                    "elementName":{
+                        "localPart":"street",
+                        "namespaceURI":""
+                    }
+                },
+                "city":{
+                    "title":"city",
+                    "allOf":[
+                        {
+                            "$ref":"http://www.jsonix.org/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/string"
+                        }
+                    ],
+                    "propertyType":"element",
+                    "elementName":{
+                        "localPart":"city",
+                        "namespaceURI":""
+                    }
+                },
+                "state":{
+                    "title":"state",
+                    "allOf":[
+                        {
+                            "$ref":"http://www.jsonix.org/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/string"
+                        }
+                    ],
+                    "propertyType":"element",
+                    "elementName":{
+                        "localPart":"state",
+                        "namespaceURI":""
+                    }
+                },
+                "zip":{
+                    "title":"zip",
+                    "allOf":[
+                        {
+                            "$ref":"http://www.jsonix.org/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/decimal"
+                        }
+                    ],
+                    "propertyType":"element",
+                    "elementName":{
+                        "localPart":"zip",
+                        "namespaceURI":""
+                    }
+                },
+                "country":{
+                    "title":"country",
+                    "allOf":[
+                        {
+                            "$ref":"http://www.jsonix.org/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/string"
+                        }
+                    ],
+                    "propertyType":"attribute",
+                    "attributeName":{
+                        "localPart":"country",
+                        "namespaceURI":""
+                    }
+                }
+            },
+            "typeType":"classInfo",
+            "typeName":{
+                "localPart":"USAddress",
+                "namespaceURI":""
+            },
+            "propertiesOrder":[
+                "name",
+                "street",
+                "city",
+                "state",
+                "zip",
+                "country"
             ]
         },
         "PurchaseOrderType":{
@@ -129,7 +256,7 @@
                     "title":"comment",
                     "allOf":[
                         {
-                            "$ref":"https://cdn.rawgit.com/highsource/jsonix/master/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/string"
+                            "$ref":"http://www.jsonix.org/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/string"
                         }
                     ],
                     "propertyType":"element",
@@ -155,7 +282,7 @@
                     "title":"orderDate",
                     "allOf":[
                         {
-                            "$ref":"https://cdn.rawgit.com/highsource/jsonix/master/jsonschemas/jsonix/Jsonix.jsonschema#/definitions/calendar"
+                            "$ref":"http://www.jsonix.org/jsonschemas/jsonix/Jsonix.jsonschema#/definitions/calendar"
                         }
                     ],
                     "propertyType":"attribute",
@@ -177,133 +304,6 @@
                 "items",
                 "orderDate"
             ]
-        },
-        "USAddress":{
-            "type":"object",
-            "title":"USAddress",
-            "properties":{
-                "name":{
-                    "title":"name",
-                    "allOf":[
-                        {
-                            "$ref":"https://cdn.rawgit.com/highsource/jsonix/master/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/string"
-                        }
-                    ],
-                    "propertyType":"element",
-                    "elementName":{
-                        "localPart":"name",
-                        "namespaceURI":""
-                    }
-                },
-                "street":{
-                    "title":"street",
-                    "allOf":[
-                        {
-                            "$ref":"https://cdn.rawgit.com/highsource/jsonix/master/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/string"
-                        }
-                    ],
-                    "propertyType":"element",
-                    "elementName":{
-                        "localPart":"street",
-                        "namespaceURI":""
-                    }
-                },
-                "city":{
-                    "title":"city",
-                    "allOf":[
-                        {
-                            "$ref":"https://cdn.rawgit.com/highsource/jsonix/master/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/string"
-                        }
-                    ],
-                    "propertyType":"element",
-                    "elementName":{
-                        "localPart":"city",
-                        "namespaceURI":""
-                    }
-                },
-                "state":{
-                    "title":"state",
-                    "allOf":[
-                        {
-                            "$ref":"https://cdn.rawgit.com/highsource/jsonix/master/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/string"
-                        }
-                    ],
-                    "propertyType":"element",
-                    "elementName":{
-                        "localPart":"state",
-                        "namespaceURI":""
-                    }
-                },
-                "zip":{
-                    "title":"zip",
-                    "allOf":[
-                        {
-                            "$ref":"https://cdn.rawgit.com/highsource/jsonix/master/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/decimal"
-                        }
-                    ],
-                    "propertyType":"element",
-                    "elementName":{
-                        "localPart":"zip",
-                        "namespaceURI":""
-                    }
-                },
-                "country":{
-                    "title":"country",
-                    "allOf":[
-                        {
-                            "$ref":"https://cdn.rawgit.com/highsource/jsonix/master/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/string"
-                        }
-                    ],
-                    "propertyType":"attribute",
-                    "attributeName":{
-                        "localPart":"country",
-                        "namespaceURI":""
-                    }
-                }
-            },
-            "typeType":"classInfo",
-            "typeName":{
-                "localPart":"USAddress",
-                "namespaceURI":""
-            },
-            "propertiesOrder":[
-                "name",
-                "street",
-                "city",
-                "state",
-                "zip",
-                "country"
-            ]
-        },
-        "Items":{
-            "type":"object",
-            "title":"Items",
-            "properties":{
-                "item":{
-                    "title":"item",
-                    "allOf":[
-                        {
-                            "type":"array",
-                            "items":{
-                                "$ref":"#/definitions/Items.Item"
-                            }
-                        }
-                    ],
-                    "propertyType":"element",
-                    "elementName":{
-                        "localPart":"item",
-                        "namespaceURI":""
-                    }
-                }
-            },
-            "typeType":"classInfo",
-            "typeName":{
-                "localPart":"Items",
-                "namespaceURI":""
-            },
-            "propertiesOrder":[
-                "item"
-            ]
         }
     },
     "anyOf":[
@@ -311,14 +311,14 @@
             "type":"object",
             "properties":{
                 "name":{
-                    "$ref":"https://cdn.rawgit.com/highsource/jsonix/master/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/QName"
+                    "$ref":"http://www.jsonix.org/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/QName"
                 },
                 "value":{
-                    "$ref":"#/definitions/PurchaseOrderType"
+                    "$ref":"http://www.jsonix.org/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/string"
                 }
             },
             "elementName":{
-                "localPart":"purchaseOrder",
+                "localPart":"comment",
                 "namespaceURI":""
             }
         },
@@ -326,14 +326,14 @@
             "type":"object",
             "properties":{
                 "name":{
-                    "$ref":"https://cdn.rawgit.com/highsource/jsonix/master/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/QName"
+                    "$ref":"http://www.jsonix.org/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/QName"
                 },
                 "value":{
-                    "$ref":"https://cdn.rawgit.com/highsource/jsonix/master/jsonschemas/w3c/2001/XMLSchema.jsonschema#/definitions/string"
+                    "$ref":"#/definitions/PurchaseOrderType"
                 }
             },
             "elementName":{
-                "localPart":"comment",
+                "localPart":"purchaseOrder",
                 "namespaceURI":""
             }
         }

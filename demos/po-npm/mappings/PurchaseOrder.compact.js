@@ -40,37 +40,14 @@ var PurchaseOrder_Module_Factory = function () {
             t: 'a'
           }]
       }, {
-        ln: 'PurchaseOrderType',
+        ln: 'Items',
         ps: [{
-            n: 'shipTo',
+            n: 'item',
+            col: true,
             en: {
-              lp: 'shipTo'
+              lp: 'item'
             },
-            ti: '.USAddress'
-          }, {
-            n: 'billTo',
-            en: {
-              lp: 'billTo'
-            },
-            ti: '.USAddress'
-          }, {
-            n: 'comment',
-            en: {
-              lp: 'comment'
-            }
-          }, {
-            n: 'items',
-            en: {
-              lp: 'items'
-            },
-            ti: '.Items'
-          }, {
-            n: 'orderDate',
-            ti: 'Calendar',
-            an: {
-              lp: 'orderDate'
-            },
-            t: 'a'
+            ti: '.Items.Item'
           }]
       }, {
         ln: 'USAddress',
@@ -108,25 +85,48 @@ var PurchaseOrder_Module_Factory = function () {
             t: 'a'
           }]
       }, {
-        ln: 'Items',
+        ln: 'PurchaseOrderType',
         ps: [{
-            n: 'item',
-            col: true,
+            n: 'shipTo',
             en: {
-              lp: 'item'
+              lp: 'shipTo'
             },
-            ti: '.Items.Item'
+            ti: '.USAddress'
+          }, {
+            n: 'billTo',
+            en: {
+              lp: 'billTo'
+            },
+            ti: '.USAddress'
+          }, {
+            n: 'comment',
+            en: {
+              lp: 'comment'
+            }
+          }, {
+            n: 'items',
+            en: {
+              lp: 'items'
+            },
+            ti: '.Items'
+          }, {
+            n: 'orderDate',
+            ti: 'Calendar',
+            an: {
+              lp: 'orderDate'
+            },
+            t: 'a'
           }]
       }],
     eis: [{
         en: {
+          lp: 'comment'
+        }
+      }, {
+        en: {
           lp: 'purchaseOrder'
         },
         ti: '.PurchaseOrderType'
-      }, {
-        en: {
-          lp: 'comment'
-        }
       }]
   };
   return {
