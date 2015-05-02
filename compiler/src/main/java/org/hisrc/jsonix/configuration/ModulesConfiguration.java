@@ -146,7 +146,7 @@ public class ModulesConfiguration {
 		for (final ModuleConfiguration moduleConfiguration : moduleConfigurations) {
 			if (moduleConfiguration.getName() == null) {
 				moduleConfiguration
-						.setName(createModuleName(mappingConfigurations));
+						.setName(createModuleName(moduleConfiguration.getMappingConfigurations()));
 			}
 		}
 	}
