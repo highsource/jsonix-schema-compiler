@@ -7,7 +7,7 @@ public class JsonixJsonSchemaConstants {
 	private JsonixJsonSchemaConstants() {
 	}
 
-	public static final String JSONIX_BASE_URI = "http://highsource.github.io/jsonix";
+	public static final String JSONIX_BASE_URI = "http://www.jsonix.org";
 	public static final String JSONIX_JSONSCHEMAS_BASE_URI = JSONIX_BASE_URI
 			+ "/jsonschemas";
 

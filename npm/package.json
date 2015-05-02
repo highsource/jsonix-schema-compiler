@@ -7,7 +7,8 @@
 			"marshalling", "parse", "parsing", "serialize", "serializing",
 			"javascript objects", "dom", "util", "utility", "jaxb",
 			"jsonix", "jsonix-schema-compiler",
-			"xs", "xsd", "xml schema", "wsdl", "dtd", "relax ng", "relaxng", "relax ng compact", "relaxng compact"
+			"xs", "xsd", "xml schema", "wsdl", "dtd", "relax ng", "relaxng", "relax ng compact", "relaxng compact",
+			"jsonschema", "json schema"
 	],
 	"homepage" : "https://github.com/highsource/jsonix-schema-compiler",
 	"bugs" : {

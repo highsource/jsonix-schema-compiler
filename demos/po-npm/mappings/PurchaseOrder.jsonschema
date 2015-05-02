@@ -1,6 +1,6 @@
 
 {
-    "id":"https://cdn.rawgit.com/highsource/jsonix-schema-compiler/master/demos/po-npm/mappings/PurchaseOrder.jsonschema#",
+    "id":"PurchaseOrder.jsonschema#",
     "definitions":{
         "Items.Item":{
             "type":"object",

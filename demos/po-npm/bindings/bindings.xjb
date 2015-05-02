@@ -13,10 +13,10 @@
 		</jaxb:schemaBindings>
 
 		<jsonix:module name="PurchaseOrder">
-			<jsonix:mapping name="PO" package="org.hisrc.jsonix.demos.po" schemaId="https://cdn.rawgit.com/highsource/jsonix-schema-compiler/master/demos/po-npm/mappings/PurchaseOrder.jsonschema#"/>
+			<jsonix:mapping name="PO" package="org.hisrc.jsonix.demos.po" schemaId="PurchaseOrder.jsonschema#"/>
 			<jsonix:output naming="standard" fileName="${module.name}.standard.js"/>
 			<jsonix:output naming="compact" fileName="${module.name}.compact.js"/>
-			<jsonix:jsonSchema fileName="${module.name}.jsonschema"/>
+			<jsonix:jsonSchema/>
 		</jsonix:module>		
 	</jaxb:bindings>
 
