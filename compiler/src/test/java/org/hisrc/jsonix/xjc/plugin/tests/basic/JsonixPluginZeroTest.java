@@ -31,10 +31,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.hisrc.jsonix.xjc.plugin.tests;
+package org.hisrc.jsonix.xjc.plugin.tests.basic;
 
 import java.io.File;
-import java.net.URL;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +44,7 @@ import com.sun.tools.xjc.ModelLoader;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.model.Model;
 
-public class JsonixPluginTest {
+public class JsonixPluginZeroTest {
 
 	@Before
 	public void setUp() {
@@ -53,64 +52,15 @@ public class JsonixPluginTest {
 	}
 
 	@Test
-	public void compilesOWS_V_1_1_0() throws Exception {
+	public void compilesBasicZero() throws Exception {
 
-		new File("target/generated-sources/ows-v_1_1_0").mkdirs();
-
-		URL schema = getClass().getResource("/ogc/ows/1.1.0/owsAll.xsd");
-		URL binding = getClass().getResource("/ogc/ows-v_1_1_0.xjb");
-		final String[] arguments = new String[] { "-xmlschema",
-				schema.toExternalForm(), "-b", binding.toExternalForm(), "-d",
-				"target/generated-sources/ows-v_1_1_0", "-extension",
-				"-Xjsonix"
-
-		};
-
-		Options options = new Options();
-		options.parseArguments(arguments);
-		ConsoleErrorReporter receiver = new ConsoleErrorReporter();
-		Model model = ModelLoader.load(options, new JCodeModel(), receiver);
-		model.generateCode(options, receiver);
-		com.sun.codemodel.CodeWriter cw = options.createCodeWriter();
-		model.codeModel.build(cw);
-	}
-
-	@Test
-	public void compilesWFS_V_2_0() throws Exception {
-
-		new File("target/generated-sources/wfs-v_2_0").mkdirs();
-
-		URL schema = getClass().getResource("/ogc/wfs/2.0/wfs.xsd");
-		URL binding = getClass().getResource("/ogc/wfs-v_2_0.xjb");
-		final String[] arguments = new String[] { "-xmlschema",
-				schema.toExternalForm(), "-b", binding.toExternalForm(), "-d",
-				"target/generated-sources/wfs-v_2_0", "-extension", "-Xjsonix"
-
-		};
-
-		Options options = new Options();
-		options.parseArguments(arguments);
-		ConsoleErrorReporter receiver = new ConsoleErrorReporter();
-		Model model = ModelLoader.load(options, new JCodeModel(), receiver);
-		model.generateCode(options, receiver);
-		com.sun.codemodel.CodeWriter cw = options.createCodeWriter();
-		model.codeModel.build(cw);
-	}
-
-	@Test
-	public void compilesContext_V_1_1_0() throws Exception {
-
-		new File("target/generated-sources/context-v_1_1_0").mkdirs();
+		new File("target/generated-sources/basic/zero").mkdirs();
 
 		final String[] arguments = new String[] {
 				"-xmlschema",
-				getClass().getResource("/ogc/context/1.1.0/wmcAll.xsd")
-						.toExternalForm(),
-				"-b",
-				getClass().getResource("/ogc/context-v_1_1_0.xjb")
+				getClass().getResource("/basic/zero/schema.xsd")
 						.toExternalForm(), "-d",
-				"target/generated-sources/context-v_1_1_0", "-extension",
-				"-Xjsonix"
+				"target/generated-sources/basic/zero", "-extension", "-Xjsonix"
 
 		};
 

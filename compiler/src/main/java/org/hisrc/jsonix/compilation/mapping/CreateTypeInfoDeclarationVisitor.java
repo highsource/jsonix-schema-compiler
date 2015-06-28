@@ -113,7 +113,6 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.QNAME, "QName");
 		// XSD_TYPE_MAPPING.put(XmlSchemaConstants.NOTATION, "Notation");
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.DURATION, "Duration");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.DURATION, "String");
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.DATETIME, "DateTime");
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.TIME, "Time");
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.DATE, "Date");
