@@ -31,7 +31,7 @@ public class JsonSchemaKeywords {
 	public static final String properties = "properties";
 	public static final String additionalProperties = "additionalProperties";
 	public static final String patternProperties = "patternProperties";
-	public static final String required = "rminPropertiesequired";
+	public static final String required = "required";
 	public static final String minProperties = "minProperties";
 	public static final String maxProperties = "maxProperties";
 	public static final String dependencies = "dependencies";

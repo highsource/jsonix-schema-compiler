@@ -1,5 +1,6 @@
 package org.hisrc.jsonix.compilation.jsonschema;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,15 +14,21 @@ import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.jsonschema.JsonSchemaBuilder;
 import org.hisrc.jsonix.jsonschema.JsonSchemaConstants;
 import org.hisrc.jsonix.naming.StandardNaming;
+import org.hisrc.jsonix.xml.xsom.ParticleMultiplicityCounter;
+import org.hisrc.xml.xsom.XSFunctionApplier;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
+
+import com.sun.tools.xjc.model.Multiplicity;
 
 public class JsonSchemaClassInfoProducer<T, C extends T> implements
 		JsonSchemaTypeInfoProducer<MClassInfo<T, C>, T, C> {
 
 	private final JsonSchemaMappingCompiler<T, C> mappingCompiler;
 	private final Mapping<T, C> mapping;
+	private final XSFunctionApplier<Multiplicity> multiplicityCounter = new XSFunctionApplier<Multiplicity>(
+			ParticleMultiplicityCounter.INSTANCE);
 
 	public JsonSchemaClassInfoProducer(
 			JsonSchemaMappingCompiler<T, C> mappingCompiler) {
@@ -58,6 +65,14 @@ public class JsonSchemaClassInfoProducer<T, C extends T> implements
 				propertyInfoSchemas.size());
 		propertiesOrder.addAll(propertyInfoSchemas.keySet());
 		classInfoSchema.addProperties(propertyInfoSchemas);
+		for (MPropertyInfo<T, C> propertyInfo : classInfo.getProperties()) {
+			final Multiplicity multiplicity = multiplicityCounter
+					.apply(propertyInfo.getOrigin());
+			if (multiplicity != null && multiplicity.min != null
+					&& multiplicity.min.compareTo(BigInteger.ZERO) > 0) {
+				typeInfoSchema.addRequired(propertyInfo.getPrivateName());
+			}
+		}
 		typeInfoSchema.add(JsonixJsonSchemaConstants.TYPE_TYPE_PROPERTY_NAME,
 				StandardNaming.CLASS_INFO);
 		final QName typeName = classInfo.getTypeName();

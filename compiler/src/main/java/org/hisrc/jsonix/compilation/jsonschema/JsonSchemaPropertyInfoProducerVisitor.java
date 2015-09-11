@@ -10,6 +10,8 @@ import org.hisrc.jsonix.JsonixConstants;
 import org.hisrc.jsonix.jsonschema.JsonSchemaBuilder;
 import org.hisrc.jsonix.jsonschema.JsonSchemaConstants;
 import org.hisrc.jsonix.naming.StandardNaming;
+import org.hisrc.jsonix.xml.xsom.ParticleMultiplicityCounter;
+import org.hisrc.xml.xsom.XSFunctionApplier;
 import org.jvnet.jaxb2_commons.xml.bind.model.MAnyAttributePropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MAnyElementPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MAttributePropertyInfo;
@@ -25,10 +27,15 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MValuePropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MWrappable;
 
+import com.sun.tools.xjc.model.Multiplicity;
+
 public class JsonSchemaPropertyInfoProducerVisitor<T, C extends T> implements
 		MPropertyInfoVisitor<T, C, JsonSchemaBuilder> {
 
 	private final JsonSchemaClassInfoProducer<T, C> classInfoCompiler;
+
+	private final XSFunctionApplier<Multiplicity> multiplicityCounter = new XSFunctionApplier<Multiplicity>(
+			ParticleMultiplicityCounter.INSTANCE);
 
 	public JsonSchemaPropertyInfoProducerVisitor(
 			JsonSchemaClassInfoProducer<T, C> classInfoCompiler) {
@@ -52,7 +59,8 @@ public class JsonSchemaPropertyInfoProducerVisitor<T, C extends T> implements
 		final JsonSchemaBuilder itemTypeSchema = createTypeSchema(info
 				.getTypeInfo());
 		final JsonSchemaBuilder typeSchema = createPossiblyCollectionTypeSchema(
-				info.isCollection(), itemTypeSchema);
+				info, itemTypeSchema);
+
 		schema.addAllOf(typeSchema);
 		return schema;
 	}
@@ -67,7 +75,7 @@ public class JsonSchemaPropertyInfoProducerVisitor<T, C extends T> implements
 
 		final JsonSchemaBuilder itemTypeSchema = createElementTypeInfosSchema(info);
 		final JsonSchemaBuilder typeSchema = createPossiblyCollectionTypeSchema(
-				info.isCollection(), itemTypeSchema);
+				info, itemTypeSchema);
 		schema.addAllOf(typeSchema);
 		return schema;
 	}
@@ -98,8 +106,7 @@ public class JsonSchemaPropertyInfoProducerVisitor<T, C extends T> implements
 			itemTypeSchemas.add(createElementRefSchema(info));
 		}
 		final JsonSchemaBuilder typeSchema = createPossiblyCollectionTypeSchema(
-				info.isCollection(),
-				createPossiblyAnyOfTypeSchema(itemTypeSchemas));
+				info, createPossiblyAnyOfTypeSchema(itemTypeSchemas));
 		schema.addAllOf(typeSchema);
 		return schema;
 	}
@@ -128,8 +135,7 @@ public class JsonSchemaPropertyInfoProducerVisitor<T, C extends T> implements
 			itemTypeSchemas.addAll(createElementRefsSchema(info));
 		}
 		final JsonSchemaBuilder typeSchema = createPossiblyCollectionTypeSchema(
-				info.isCollection(),
-				createPossiblyAnyOfTypeSchema(itemTypeSchemas));
+				info, createPossiblyAnyOfTypeSchema(itemTypeSchemas));
 		schema.addAllOf(typeSchema);
 		return schema;
 	}
@@ -144,7 +150,7 @@ public class JsonSchemaPropertyInfoProducerVisitor<T, C extends T> implements
 		final JsonSchemaBuilder itemTypeSchema = createTypeSchema(info
 				.getTypeInfo());
 		final JsonSchemaBuilder typeSchema = createPossiblyCollectionTypeSchema(
-				info.isCollection(), itemTypeSchema);
+				info, itemTypeSchema);
 		schema.addAllOf(typeSchema);
 		return schema;
 	}
@@ -182,8 +188,7 @@ public class JsonSchemaPropertyInfoProducerVisitor<T, C extends T> implements
 			itemTypeSchemas.add(anyElementSchema);
 		}
 		final JsonSchemaBuilder typeSchema = createPossiblyCollectionTypeSchema(
-				info.isCollection(),
-				createPossiblyAnyOfTypeSchema(itemTypeSchemas));
+				info, createPossiblyAnyOfTypeSchema(itemTypeSchemas));
 		schema.addAllOf(typeSchema);
 		return schema;
 	}
@@ -198,7 +203,7 @@ public class JsonSchemaPropertyInfoProducerVisitor<T, C extends T> implements
 		final JsonSchemaBuilder itemTypeSchema = createTypeSchema(info
 				.getTypeInfo());
 		final JsonSchemaBuilder typeSchema = createPossiblyCollectionTypeSchema(
-				info.isCollection(), itemTypeSchema);
+				info, itemTypeSchema);
 		schema.addAllOf(typeSchema);
 		return schema;
 	}
@@ -334,12 +339,25 @@ public class JsonSchemaPropertyInfoProducerVisitor<T, C extends T> implements
 	}
 
 	private JsonSchemaBuilder createPossiblyCollectionTypeSchema(
-			boolean collection, final JsonSchemaBuilder itemTypeSchema) {
+			MPropertyInfo<T, C> propertyInfo,
+			final JsonSchemaBuilder itemTypeSchema) {
 		final JsonSchemaBuilder typeSchema;
-		if (collection) {
+		if (propertyInfo.isCollection()) {
 			typeSchema = new JsonSchemaBuilder();
 			typeSchema.addType(JsonSchemaConstants.ARRAY_TYPE).addItem(
 					itemTypeSchema);
+
+			final Multiplicity multiplicity = multiplicityCounter
+					.apply(propertyInfo.getOrigin());
+			if (multiplicity != null) {
+				if (multiplicity.min != null) {
+					typeSchema.addMinItems(multiplicity.min);
+				}
+				if (multiplicity.max != null) {
+					typeSchema.addMaxItems(multiplicity.max);
+				}
+			}
+
 		} else {
 			typeSchema = itemTypeSchema;
 		}
