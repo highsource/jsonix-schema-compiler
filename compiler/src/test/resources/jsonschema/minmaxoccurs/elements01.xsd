@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+	jaxb:extensionBindingPrefixes="xjc" jaxb:version="2.0">
+
+	<xs:annotation>
+		<xs:appinfo>
+			<jaxb:globalBindings typesafeEnumBase="xs:token" />
+			<jaxb:schemaBindings>
+				<jaxb:package name="test" />
+			</jaxb:schemaBindings>
+		</xs:appinfo>
+	</xs:annotation>
+
+	<xs:complexType name="es01">
+		<xs:sequence>
+			<xs:choice minOccurs="5" maxOccurs="10">
+				<xs:element name="a" type="xs:string" minOccurs="10"
+					maxOccurs="20" />
+				<xs:element name="b" type="xs:int" minOccurs="30"
+					maxOccurs="40" />
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="es02">
+		<xs:choice minOccurs="5" maxOccurs="10">
+			<xs:element name="a" type="xs:string" minOccurs="10"
+				maxOccurs="20" />
+			<xs:element name="b" type="xs:int" minOccurs="30"
+				maxOccurs="40" />
+		</xs:choice>
+	</xs:complexType>
+</xs:schema>
