@@ -1,5 +1,7 @@
 package org.hisrc.jsonix.compilation.mapping;
 
+import java.math.BigInteger;
+
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.Validate;
@@ -9,6 +11,8 @@ import org.hisrc.jscm.codemodel.expression.JSAssignmentExpression;
 import org.hisrc.jscm.codemodel.expression.JSMemberExpression;
 import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
 import org.hisrc.jsonix.naming.Naming;
+import org.hisrc.jsonix.xml.xsom.ParticleMultiplicityCounter;
+import org.hisrc.xml.xsom.XSFunctionApplier;
 import org.jvnet.jaxb2_commons.xml.bind.model.MAnyAttributePropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MAnyElementPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MAttributePropertyInfo;
@@ -29,12 +33,16 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MWildcard;
 import org.jvnet.jaxb2_commons.xml.bind.model.MWrappable;
 import org.jvnet.jaxb2_commons.xml.bind.model.util.DefaultTypeInfoVisitor;
 
+import com.sun.tools.xjc.model.Multiplicity;
+
 final class PropertyInfoVisitor<T, C extends T> implements
 		MPropertyInfoVisitor<T, C, JSObjectLiteral> {
 
 	private final JSCodeModel codeModel;
 	private final MappingCompiler<T, C> mappingCompiler;
 	private final Naming naming;
+	private final XSFunctionApplier<Multiplicity> multiplicityCounter = new XSFunctionApplier<Multiplicity>(
+			ParticleMultiplicityCounter.INSTANCE);
 
 	public PropertyInfoVisitor(MappingCompiler<T, C> mappingCompiler) {
 		Validate.notNull(mappingCompiler);
@@ -47,6 +55,28 @@ final class PropertyInfoVisitor<T, C extends T> implements
 			JSObjectLiteral options) {
 		options.append(naming.name(),
 				this.codeModel.string(propertyInfo.getPrivateName()));
+
+		final Multiplicity multiplicity = multiplicityCounter
+				.apply(propertyInfo.getOrigin());
+		if (multiplicity != null) {
+			if (multiplicity.min != null
+					&& !BigInteger.ZERO.equals(multiplicity.min)) {
+				options.append(naming.required(), this.codeModel._boolean(true));
+			}
+			if (propertyInfo.isCollection()) {
+				if (multiplicity.min != null) {
+					if (!BigInteger.ONE.equals(multiplicity.min)) {
+						options.append(naming.minOccurs(), this.codeModel
+								.integer(multiplicity.min.longValue()));
+					}
+				}
+				if (multiplicity.max != null) {
+					options.append(naming.maxOccurs(), this.codeModel
+							.integer(multiplicity.max.longValue()));
+				}
+			}
+		}
+
 		if (propertyInfo.isCollection()) {
 			options.append(naming.collection(), this.codeModel._boolean(true));
 		}

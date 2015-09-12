@@ -86,4 +86,9 @@ public interface Naming {
 
 	String localPart();
 
+	String required();
+
+	String minOccurs();
+
+	String maxOccurs();
 }

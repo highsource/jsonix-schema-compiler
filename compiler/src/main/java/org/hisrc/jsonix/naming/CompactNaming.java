@@ -48,6 +48,10 @@ public class CompactNaming implements Naming {
 	public static final String ELEMENT_REF = "er";
 	public static final String ELEMENT_REFS = "ers";
 
+	public static final String REQUIRED = "rq";
+	public static final String MINOCCURS = "mno";
+	public static final String MAXOCCURS = "mxo";
+
 	public static final String NAMING_NAME = "compact";
 
 	public CompactNaming() {
@@ -244,5 +248,20 @@ public class CompactNaming implements Naming {
 	@Override
 	public String typeInfos() {
 		return TYPE_INFOS;
+	}
+
+	@Override
+	public String required() {
+		return REQUIRED;
+	}
+
+	@Override
+	public String minOccurs() {
+		return MINOCCURS;
+	}
+
+	@Override
+	public String maxOccurs() {
+		return MAXOCCURS;
 	}
 }
