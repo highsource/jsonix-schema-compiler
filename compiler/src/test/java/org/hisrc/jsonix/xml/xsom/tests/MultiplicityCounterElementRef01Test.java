@@ -21,7 +21,7 @@ public class MultiplicityCounterElementRef01Test {
 	@Before
 	public void loadModel() throws Exception {
 		model = MModelInfoLoader.INSTANCE
-				.loadModel("jsonschema/minmaxoccurs/elementref01.xsd");
+				.loadModel("jsonschema/minmaxoccurs/elementRef01.xsd");
 	}
 
 	@Test
