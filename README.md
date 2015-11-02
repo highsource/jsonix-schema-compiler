@@ -6,8 +6,10 @@ Please refer to [Wiki](https://github.com/highsource/jsonix-schema-compiler/wiki
 
 ## Using in command-line
 
+Download `jsonix-schema-compiler-full-<VERSION>.jar` from [releases](https://github.com/highsource/jsonix-schema-compiler/releases) and run it with `java -jar` from the command line:
+
 ```
-java -jar jsonix-schema-compiler-full.jar
+java -jar jsonix-schema-compiler-full-<VERSION>.jar
   [-compact -logLevel TRACE]
   schema.xsd
   [-b bindings.xjb]
@@ -15,9 +17,57 @@ java -jar jsonix-schema-compiler-full.jar
 
 See [Command-Line Usage](https://github.com/highsource/jsonix-schema-compiler/wiki/Command-Line-Usage).
 
+## Using with NPM
+
+From the command line:
+
+```
+npm install jsonix-schema-compiler
+java -jar node_modules/jsonix-schema-compiler/lib/jsonix-schema-compiler-full.jar schema.xsd
+```
+
+Or add `jsonix-schema-compiler` as dependency and invoke in `scripts/prepublish`.
+
+```json
+ {
+    "name": "mypackage",
+    ...
+    "dependencies": {
+        ...
+        "jsonix": "<VERSION>",
+        "jsonix-schema-compiler": "<VERSION>"
+    },
+    "scripts": {
+    	...
+        "prepublish" : "java -jar node_modules/jsonix/lib/jsonix-schema-compiler-full.jar schema.xsd"
+    }
+}
+```
+
+See [NPM Usage](https://github.com/highsource/jsonix-schema-compiler/wiki/NPM-Usage).
+
 ## Using with Ant
 
-TBD
+* Include `jsonix-schema-compiler-plugin-<VERSION>.jar` into `xjc/classpath`.
+* Include `-Xjsonix` and further `-Xjsonix-...` [[command-line options|Command-Line usage]] into `arg/@line`.
+
+```xml
+<xjc destdir="${basedir}/target/generated-sources/xjc" extension="true">
+  <arg line="-Xjsonix -Xjsonix-compact"/>
+  <binding dir="${basedir}/src/main/resources">
+     <include name="**/*.xjb"/>
+  </binding>
+  <schema dir="${basedir}/src/main/resources">
+     <include name="**/*.xsd"/>
+  </schema>
+  <!-- Plugins -->
+  <classpath>
+    <fileset dir="${basedir}/lib">
+      <include name="jsonix-*.jar"/>
+    </fileset>
+  </classpath>
+</xjc>
+```
 
 See [Ant Usage](https://github.com/highsource/jsonix-schema-compiler/wiki/Ant-Usage).
 
