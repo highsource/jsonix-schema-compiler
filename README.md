@@ -7,8 +7,9 @@ Please refer to [Wiki](https://github.com/highsource/jsonix-schema-compiler/wiki
 ## Using in command-line
 
 ```
-java -jar jsonix-schema-compiler-full.jar
-  [-compact -logLevel TRACE]
+npm install jsonix-schema-compiler
+java -jar node_modules/jsonix-schema-compiler/lib/jsonix-schema-compiler-full.jar
+  [-compact -logLevel TRACE -generateJsonJsonChema]
   schema.xsd
   [-b bindings.xjb]
 ```
