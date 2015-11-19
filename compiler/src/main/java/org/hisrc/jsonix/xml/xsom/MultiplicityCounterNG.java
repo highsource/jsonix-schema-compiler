@@ -1,7 +1,6 @@
 package org.hisrc.jsonix.xml.xsom;
 
 import static com.sun.tools.xjc.model.Multiplicity.ONE;
-import static com.sun.tools.xjc.model.Multiplicity.ZERO;
 
 import java.math.BigInteger;
 
@@ -24,7 +23,8 @@ public class MultiplicityCounterNG implements XSTermFunction<Multiplicity> {
 		Multiplicity m = p.getTerm().apply(this);
 
 		BigInteger max;
-		if (m.max == null
+		if (m == null
+				|| m.max == null
 				|| (BigInteger.valueOf(XSParticle.UNBOUNDED).equals(p
 						.getMaxOccurs())))
 			max = null;
