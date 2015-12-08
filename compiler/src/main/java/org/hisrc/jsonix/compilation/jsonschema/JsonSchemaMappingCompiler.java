@@ -65,11 +65,25 @@ public class JsonSchemaMappingCompiler<T, C extends T> {
 
 			final JsonSchemaBuilder elementInfoSchema = new JsonSchemaBuilder();
 			elementInfoSchema.addType(JsonSchemaConstants.OBJECT_TYPE);
-			elementInfoSchema
+			final JsonSchemaBuilder qNameRef = new JsonSchemaBuilder()
+					.addRef(XmlSchemaJsonSchemaConstants.QNAME_TYPE_INFO_SCHEMA_REF);
+			final JsonSchemaBuilder nameConstant = new JsonSchemaBuilder();
+			nameConstant.addType(JsonSchemaConstants.OBJECT_TYPE);
+			nameConstant
 					.addProperty(
-							JsonixConstants.NAME_PROPERTY_NAME,
-							new JsonSchemaBuilder()
-									.addRef(XmlSchemaJsonSchemaConstants.QNAME_TYPE_INFO_SCHEMA_REF));
+							JsonixJsonSchemaConstants.LOCAL_PART_PROPERTY_NAME,
+							new JsonSchemaBuilder().addEnum(elementName
+									.getLocalPart()));
+			nameConstant.addProperty(
+					JsonixJsonSchemaConstants.NAMESPACE_URI_PROPERTY_NAME,
+					new JsonSchemaBuilder().addEnum(elementName
+							.getNamespaceURI()));
+
+			elementInfoSchema.addProperty(
+					JsonixConstants.NAME_PROPERTY_NAME,
+					new JsonSchemaBuilder().addAllOf(qNameRef).addAllOf(
+							nameConstant));
+
 			elementInfoSchema.addProperty(JsonixConstants.VALUE_PROPERTY_NAME,
 					createTypeInfoSchemaRef(typeInfo));
 
