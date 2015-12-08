@@ -85,7 +85,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> 
 		<jsonix-schema-compiler.version>${project.version}</jsonix-schema-compiler.version>
 		<jsonix-scripts.version>2.2.1</jsonix-scripts.version>
-		<jaxb2-basics.version>0.9.5</jaxb2-basics.version>
+		<jaxb2-basics.version>0.9.6-SNAPSHOT</jaxb2-basics.version>
 		<js-codemodel.version>1.1</js-codemodel.version>
 		<jaxb.version>2.2.11</jaxb.version>
 		<maven-jaxb2-plugin.version>0.13.0</maven-jaxb2-plugin.version>
