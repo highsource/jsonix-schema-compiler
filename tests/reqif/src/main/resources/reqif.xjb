@@ -1,0 +1,46 @@
+<jaxb:bindings version="1.0" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	xmlns:jsonix="http://jsonix.highsource.org/customizations"
+	jaxb:extensionBindingPrefixes="jsonix">
+
+	<jaxb:bindings 
+		schemaLocation="http://www.omg.org/spec/ReqIF/20110401/reqif.xsd" 
+		node="/xs:schema">
+
+		<jaxb:schemaBindings>
+			<jaxb:package name="org.omg.spec.reqif.v_20110401"/>
+		</jaxb:schemaBindings>
+
+		<jsonix:mapping package="org.omg.spec.reqif.v_20110401" name="ReqIF_20110401"/>
+
+		<jaxb:bindings node="xs:complexType[@name='SPECIFICATION']/xs:all/xs:element[@name='TYPE']/xs:complexType">
+			<jaxb:factoryMethod name="SpecificationTypeElement"/>
+		</jaxb:bindings>
+
+		<jaxb:bindings node="xs:complexType[@name='SPEC-RELATION']/xs:all/xs:element[@name='TYPE']/xs:complexType">
+			<jaxb:factoryMethod name="SpecRelationTypeElement"/>
+		</jaxb:bindings>
+
+		<jaxb:bindings node="xs:complexType[@name='SPEC-OBJECT']/xs:all/xs:element[@name='TYPE']/xs:complexType">
+			<jaxb:factoryMethod name="SpecObjectTypeElement"/>
+		</jaxb:bindings>
+
+		<jaxb:bindings node="xs:complexType[@name='RELATION-GROUP']/xs:all/xs:element[@name='TYPE']/xs:complexType">
+			<jaxb:factoryMethod name="RelationGroupTypeElement"/>
+		</jaxb:bindings>
+
+	</jaxb:bindings>
+
+	<jaxb:bindings 
+		schemaLocation="http://www.omg.org/spec/ReqIF/20110402/driver.xsd" 
+		node="/xs:schema">
+
+		<jaxb:schemaBindings>
+			<jaxb:package name="org.omg.spec.reqif.v_20110402.driver"/>
+		</jaxb:schemaBindings>
+
+		<jsonix:mapping package="org.omg.spec.reqif.v_20110402.driver" name="ReqIF_20110402_Driver"/>
+	</jaxb:bindings>
+
+
+</jaxb:bindings>

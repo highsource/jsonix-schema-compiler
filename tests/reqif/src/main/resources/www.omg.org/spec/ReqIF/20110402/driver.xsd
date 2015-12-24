@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://www.w3.org/1999/xhtml"
+    xmlns:xh11d="http://www.w3.org/1999/xhtml/datatypes/"
+    xmlns="http://www.w3.org/1999/xhtml"
+    elementFormDefault="qualified" >
+    
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2001/xml.xsd" />
+    
+    <xsd:import namespace="http://www.w3.org/1999/xhtml/datatypes/" 
+    	schemaLocation="http://www.w3.org/TR/xhtml-modularization/SCHEMA/xhtml-datatypes-1.xsd" />
+    	
+    <xsd:include schemaLocation="http://www.w3.org/TR/xhtml-modularization/SCHEMA/xhtml-framework-1.xsd" />
+    <xsd:include schemaLocation="http://www.w3.org/TR/xhtml-modularization/SCHEMA/xhtml-text-1.xsd" />
+    <xsd:include schemaLocation="http://www.w3.org/TR/xhtml-modularization/SCHEMA/xhtml-hypertext-1.xsd" />
+    <xsd:include schemaLocation="http://www.w3.org/TR/xhtml-modularization/SCHEMA/xhtml-list-1.xsd" />
+    <xsd:include schemaLocation="http://www.w3.org/TR/xhtml-modularization/SCHEMA/xhtml-edit-1.xsd" />
+    <xsd:include schemaLocation="http://www.w3.org/TR/xhtml-modularization/SCHEMA/xhtml-pres-1.xsd" />
+    <xsd:include schemaLocation="http://www.w3.org/TR/xhtml-modularization/SCHEMA/xhtml-inlstyle-1.xsd" />
+    <xsd:include schemaLocation="http://www.w3.org/TR/xhtml-modularization/SCHEMA/xhtml-object-1.xsd" />
+    <xsd:include schemaLocation="http://www.w3.org/TR/xhtml-modularization/SCHEMA/xhtml-table-1.xsd" />
+    
+    <xsd:attributeGroup name="xhtml.I18n.extra.attrib"/>
+    
+    <xsd:attributeGroup name="xhtml.Common.extra">
+        <xsd:attributeGroup ref="xhtml.style.attrib"/>
+    </xsd:attributeGroup>
+    
+    <xsd:attributeGroup name="xhtml.Core.extra.attrib"/>
+    
+    <xsd:attributeGroup name="xhtml.Global.core.extra.attrib"/>
+    
+    <xsd:attributeGroup name="xhtml.Global.I18n.extra.attrib"/>
+    
+    <xsd:attributeGroup name="xhtml.Global.Common.extra"/>
+    
+    <xsd:group name="xhtml.HeadOpts.mix">
+        <xsd:choice>
+            <xsd:element name="object" type="xhtml.object.type" />
+        </xsd:choice>
+    </xsd:group>
+    
+    <xsd:group name="xhtml.Edit.class">
+        <xsd:choice>
+            <xsd:element name="ins" type="xhtml.edit.type" />
+            <xsd:element name="del" type="xhtml.edit.type" />
+        </xsd:choice>
+    </xsd:group>
+    
+    <xsd:group name="xhtml.Misc.extra">
+        <xsd:sequence />
+    </xsd:group>
+    
+    <xsd:group name="xhtml.Misc.class">
+        <xsd:choice>
+            <xsd:group ref="xhtml.Edit.class" />
+            <xsd:group ref="xhtml.Misc.extra" />
+        </xsd:choice>
+    </xsd:group>
+    
+    <xsd:group name="xhtml.InlStruct.class">
+        <xsd:choice>
+            <xsd:element name="br" type="xhtml.br.type" />
+            <xsd:element name="span" type="xhtml.span.type" />
+        </xsd:choice>
+    </xsd:group>
+    
+    <xsd:group name="xhtml.InlPhras.class">
+        <xsd:choice>
+            <xsd:element name="em" type="xhtml.em.type" />
+            <xsd:element name="strong" type="xhtml.strong.type" />
+            <xsd:element name="dfn" type="xhtml.dfn.type" />
+            <xsd:element name="code" type="xhtml.code.type" />
+            <xsd:element name="samp" type="xhtml.samp.type" />
+            <xsd:element name="kbd" type="xhtml.kbd.type" />
+            <xsd:element name="var" type="xhtml.var.type" />
+            <xsd:element name="cite" type="xhtml.cite.type" />
+            <xsd:element name="abbr" type="xhtml.abbr.type" />
+            <xsd:element name="acronym" type="xhtml.acronym.type" />
+            <xsd:element name="q" type="xhtml.q.type" />
+        </xsd:choice>
+    </xsd:group>
+    
+    <xsd:group name="xhtml.InlPres.class">
+        <xsd:choice>
+            <xsd:element name="tt" type="xhtml.InlPres.type" />
+            <xsd:element name="i" type="xhtml.InlPres.type" />
+            <xsd:element name="b" type="xhtml.InlPres.type" />
+            <xsd:element name="big" type="xhtml.InlPres.type" />
+            <xsd:element name="small" type="xhtml.InlPres.type" />
+            <xsd:element name="sub" type="xhtml.InlPres.type" />
+            <xsd:element name="sup" type="xhtml.InlPres.type" />
+        </xsd:choice>
+    </xsd:group>
+    
+    <xsd:group name="xhtml.Anchor.class">
+        <xsd:sequence>
+            <xsd:element name="a" type="xhtml.a.type" />
+        </xsd:sequence>
+    </xsd:group>
+    
+    <xsd:group name="xhtml.InlSpecial.class">
+        <xsd:choice>
+            <xsd:element name="object" type="xhtml.object.type" />
+        </xsd:choice>
+    </xsd:group>
+    
+    <xsd:group name="xhtml.Inline.extra">
+        <xsd:sequence />
+    </xsd:group>
+    
+    <xsd:group name="xhtml.Inline.class">
+        <xsd:choice>
+            <xsd:group ref="xhtml.InlStruct.class" />
+            <xsd:group ref="xhtml.InlPhras.class" />
+            <xsd:group ref="xhtml.InlPres.class" />
+            <xsd:group ref="xhtml.Anchor.class" />
+            <xsd:group ref="xhtml.InlSpecial.class" />
+            <xsd:group ref="xhtml.Inline.extra" />
+        </xsd:choice>
+    </xsd:group>
+    
+    <xsd:group name="xhtml.InlNoRuby.class">
+        <xsd:choice>
+            <xsd:group ref="xhtml.InlStruct.class" />
+            <xsd:group ref="xhtml.InlPhras.class" />
+            <xsd:group ref="xhtml.InlPres.class" />
+            <xsd:group ref="xhtml.Anchor.class" />
+            <xsd:group ref="xhtml.InlSpecial.class" />
+            <xsd:group ref="xhtml.Inline.extra" />
+        </xsd:choice>
+    </xsd:group>
+    
+    <xsd:group name="xhtml.InlinePre.mix">
+        <xsd:choice>
+            <xsd:group ref="xhtml.InlStruct.class" />
+            <xsd:group ref="xhtml.InlPhras.class" />
+            <xsd:element name="tt" type="xhtml.InlPres.type" />
+            <xsd:element name="i" type="xhtml.InlPres.type" />
+            <xsd:element name="b" type="xhtml.InlPres.type" />
+            <xsd:group ref="xhtml.Anchor.class" />
+            <xsd:group ref="xhtml.Misc.class" />
+            <xsd:group ref="xhtml.Inline.extra" />
+        </xsd:choice>
+    </xsd:group>
+    
+    <xsd:group name="xhtml.InlNoAnchor.class">
+        <xsd:choice>
+            <xsd:group ref="xhtml.InlStruct.class" />
+            <xsd:group ref="xhtml.InlPhras.class" />
+            <xsd:group ref="xhtml.InlPres.class" />
+            <xsd:group ref="xhtml.InlSpecial.class" />
+            <xsd:group ref="xhtml.Inline.extra" />
+        </xsd:choice>
+    </xsd:group>
+    
+    <xsd:group name="xhtml.InlNoAnchor.mix">
+        <xsd:choice>
+            <xsd:group ref="xhtml.InlNoAnchor.class" />
+            <xsd:group ref="xhtml.Misc.class" />
+        </xsd:choice>
+    </xsd:group>
+    
+    <xsd:group name="xhtml.Inline.mix">
+        <xsd:choice>
+            <xsd:group ref="xhtml.Inline.class" />
+            <xsd:group ref="xhtml.Misc.class" />
+        </xsd:choice>
+    </xsd:group>
+    
+    <xsd:group name="xhtml.Heading.class">
+        <xsd:choice>
+            <xsd:element name="h1" type="xhtml.h1.type" />
+            <xsd:element name="h2" type="xhtml.h2.type" />
+            <xsd:element name="h3" type="xhtml.h3.type" />
+            <xsd:element name="h4" type="xhtml.h4.type" />
+            <xsd:element name="h5" type="xhtml.h5.type" />
+            <xsd:element name="h6" type="xhtml.h6.type" />
+        </xsd:choice>
+    </xsd:group>
+    
+    <xsd:group name="xhtml.List.class">
+        <xsd:choice>
+            <xsd:element name="ul" type="xhtml.ul.type" />
+            <xsd:element name="ol" type="xhtml.ol.type" />
+            <xsd:element name="dl" type="xhtml.dl.type" />
+        </xsd:choice>
+    </xsd:group>
+    
+    <xsd:group name="xhtml.Table.class">
+        <xsd:choice>
+            <xsd:element name="table" type="xhtml.table.type" />
+        </xsd:choice>
+    </xsd:group>
+    
+    <xsd:group name="xhtml.BlkStruct.class">
+        <xsd:choice>
+            <xsd:element name="p" type="xhtml.p.type" />
+            <xsd:element name="div" type="xhtml.div.type" />
+        </xsd:choice>
+    </xsd:group>
+    
+    <xsd:group name="xhtml.BlkPhras.class">
+        <xsd:choice>
+            <xsd:element name="pre" type="xhtml.pre.type" />
+            <xsd:element name="blockquote" type="xhtml.blockquote.type" />
+            <xsd:element name="address" type="xhtml.address.type" />
+        </xsd:choice>
+    </xsd:group>
+    
+    <xsd:group name="xhtml.BlkPres.class">
+        <xsd:sequence>
+            <xsd:element name="hr" type="xhtml.hr.type" />
+        </xsd:sequence>
+    </xsd:group>
+    
+    <xsd:group name="xhtml.BlkSpecial.class">
+        <xsd:choice>
+            <xsd:group ref="xhtml.Table.class" />
+        </xsd:choice>
+    </xsd:group>
+    
+    <xsd:group name="xhtml.Block.extra">
+        <xsd:sequence />
+    </xsd:group>
+    
+    <xsd:group name="xhtml.Block.class">
+        <xsd:choice>
+            <xsd:group ref="xhtml.BlkStruct.class" />
+            <xsd:group ref="xhtml.BlkPhras.class" />
+            <xsd:group ref="xhtml.BlkPres.class" />
+            <xsd:group ref="xhtml.BlkSpecial.class" />
+            <xsd:group ref="xhtml.Block.extra" />
+        </xsd:choice>
+    </xsd:group>
+    
+    <xsd:group name="xhtml.Block.mix">
+        <xsd:choice>
+            <xsd:group ref="xhtml.Heading.class" />
+            <xsd:group ref="xhtml.List.class" />
+            <xsd:group ref="xhtml.Block.class" />
+            <xsd:group ref="xhtml.Misc.class" />
+        </xsd:choice>
+    </xsd:group>
+    
+    <xsd:group name="xhtml.Flow.mix">
+        <xsd:choice>
+            <xsd:group ref="xhtml.Heading.class" />
+            <xsd:group ref="xhtml.List.class" />
+            <xsd:group ref="xhtml.Block.class" />
+            <xsd:group ref="xhtml.Inline.class" />
+            <xsd:group ref="xhtml.Misc.class" />
+        </xsd:choice>
+    </xsd:group>
+    
+    <xsd:group name="xhtml.BlkNoForm.mix">
+        <xsd:choice>
+            <xsd:group ref="xhtml.Heading.class" />
+            <xsd:group ref="xhtml.List.class" />
+            <xsd:group ref="xhtml.BlkStruct.class" />
+            <xsd:group ref="xhtml.BlkPhras.class" />
+            <xsd:group ref="xhtml.BlkPres.class" />
+            <xsd:group ref="xhtml.Table.class" />
+            <xsd:group ref="xhtml.Block.extra" />
+            <xsd:group ref="xhtml.Misc.class" />
+        </xsd:choice>
+    </xsd:group>
+    
+</xsd:schema>

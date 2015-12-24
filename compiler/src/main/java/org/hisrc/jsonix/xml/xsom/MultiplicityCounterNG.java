@@ -1,6 +1,7 @@
 package org.hisrc.jsonix.xml.xsom;
 
 import static com.sun.tools.xjc.model.Multiplicity.ONE;
+import static com.sun.tools.xjc.model.Multiplicity.ZERO;
 
 import java.math.BigInteger;
 
@@ -60,6 +61,10 @@ public class MultiplicityCounterNG implements XSTermFunction<Multiplicity> {
 			} else {
 				r = Multiplicity.group(r, m);
 			}
+		}
+		if (r == null)
+		{
+			return ZERO;
 		}
 		return r;
 	}

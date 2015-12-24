@@ -1,0 +1,893 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+    xmlns="http://www.w3.org/1999/xhtml" xmlns:REQIF="http://www.omg.org/spec/ReqIF/20110401/reqif.xsd"
+    xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:xsd="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified"
+    elementFormDefault="qualified" targetNamespace="http://www.omg.org/spec/ReqIF/20110401/reqif.xsd">
+  <xsd:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2001/xml.xsd"/>
+  <xsd:import namespace="http://www.w3.org/1999/xhtml" schemaLocation="http://www.omg.org/spec/ReqIF/20110402/driver.xsd"/>
+  <xsd:element name="REQ-IF" type="REQIF:REQ-IF"/>
+  <xsd:simpleType name="LOCAL-REF">
+    <xsd:restriction base="xsd:IDREF"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="GLOBAL-REF">
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <xsd:complexType name="ALTERNATIVE-ID">
+    <xsd:all/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:string" use="required"/>
+  </xsd:complexType>
+  <xsd:complexType name="ATTRIBUTE-DEFINITION-BOOLEAN">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ALTERNATIVE-ID">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ALTERNATIVE-ID" type="REQIF:ALTERNATIVE-ID"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="DEFAULT-VALUE">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ATTRIBUTE-VALUE-BOOLEAN" type="REQIF:ATTRIBUTE-VALUE-BOOLEAN"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="1" name="TYPE">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="DATATYPE-DEFINITION-BOOLEAN-REF" type="REQIF:LOCAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="DESC" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+    <xsd:attribute name="IS-EDITABLE" type="xsd:boolean" use="optional"/>
+    <xsd:attribute name="LAST-CHANGE" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="LONG-NAME" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="ATTRIBUTE-DEFINITION-DATE">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ALTERNATIVE-ID">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ALTERNATIVE-ID" type="REQIF:ALTERNATIVE-ID"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="DEFAULT-VALUE">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ATTRIBUTE-VALUE-DATE" type="REQIF:ATTRIBUTE-VALUE-DATE"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="1" name="TYPE">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="DATATYPE-DEFINITION-DATE-REF" type="REQIF:LOCAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="DESC" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+    <xsd:attribute name="IS-EDITABLE" type="xsd:boolean" use="optional"/>
+    <xsd:attribute name="LAST-CHANGE" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="LONG-NAME" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="ATTRIBUTE-DEFINITION-ENUMERATION">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="0" name="DEFAULT-VALUE">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ATTRIBUTE-VALUE-ENUMERATION" type="REQIF:ATTRIBUTE-VALUE-ENUMERATION"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ALTERNATIVE-ID">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ALTERNATIVE-ID" type="REQIF:ALTERNATIVE-ID"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="1" name="TYPE">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="DATATYPE-DEFINITION-ENUMERATION-REF" type="REQIF:LOCAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="DESC" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+    <xsd:attribute name="IS-EDITABLE" type="xsd:boolean" use="optional"/>
+    <xsd:attribute name="LAST-CHANGE" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="LONG-NAME" type="xsd:string" use="optional"/>
+    <xsd:attribute name="MULTI-VALUED" type="xsd:boolean" use="required"/>
+  </xsd:complexType>
+  <xsd:complexType name="ATTRIBUTE-DEFINITION-INTEGER">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ALTERNATIVE-ID">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ALTERNATIVE-ID" type="REQIF:ALTERNATIVE-ID"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="DEFAULT-VALUE">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ATTRIBUTE-VALUE-INTEGER" type="REQIF:ATTRIBUTE-VALUE-INTEGER"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="1" name="TYPE">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="DATATYPE-DEFINITION-INTEGER-REF" type="REQIF:LOCAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="DESC" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+    <xsd:attribute name="IS-EDITABLE" type="xsd:boolean" use="optional"/>
+    <xsd:attribute name="LAST-CHANGE" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="LONG-NAME" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="ATTRIBUTE-DEFINITION-REAL">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ALTERNATIVE-ID">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ALTERNATIVE-ID" type="REQIF:ALTERNATIVE-ID"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="DEFAULT-VALUE">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ATTRIBUTE-VALUE-REAL" type="REQIF:ATTRIBUTE-VALUE-REAL"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="1" name="TYPE">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="DATATYPE-DEFINITION-REAL-REF" type="REQIF:LOCAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="DESC" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+    <xsd:attribute name="IS-EDITABLE" type="xsd:boolean" use="optional"/>
+    <xsd:attribute name="LAST-CHANGE" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="LONG-NAME" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="ATTRIBUTE-DEFINITION-STRING">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ALTERNATIVE-ID">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ALTERNATIVE-ID" type="REQIF:ALTERNATIVE-ID"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="DEFAULT-VALUE">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ATTRIBUTE-VALUE-STRING" type="REQIF:ATTRIBUTE-VALUE-STRING"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="1" name="TYPE">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="DATATYPE-DEFINITION-STRING-REF" type="REQIF:LOCAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="DESC" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+    <xsd:attribute name="IS-EDITABLE" type="xsd:boolean" use="optional"/>
+    <xsd:attribute name="LAST-CHANGE" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="LONG-NAME" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="ATTRIBUTE-DEFINITION-XHTML">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ALTERNATIVE-ID">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ALTERNATIVE-ID" type="REQIF:ALTERNATIVE-ID"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="DEFAULT-VALUE">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ATTRIBUTE-VALUE-XHTML" type="REQIF:ATTRIBUTE-VALUE-XHTML"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="1" name="TYPE">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="DATATYPE-DEFINITION-XHTML-REF" type="REQIF:LOCAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="DESC" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+    <xsd:attribute name="IS-EDITABLE" type="xsd:boolean" use="optional"/>
+    <xsd:attribute name="LAST-CHANGE" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="LONG-NAME" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="ATTRIBUTE-VALUE-BOOLEAN">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="1" name="DEFINITION">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="ATTRIBUTE-DEFINITION-BOOLEAN-REF" type="REQIF:LOCAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="THE-VALUE" type="xsd:boolean" use="required"/>
+  </xsd:complexType>
+  <xsd:complexType name="ATTRIBUTE-VALUE-DATE">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="1" name="DEFINITION">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="ATTRIBUTE-DEFINITION-DATE-REF" type="REQIF:LOCAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="THE-VALUE" type="xsd:dateTime" use="required"/>
+  </xsd:complexType>
+  <xsd:complexType name="ATTRIBUTE-VALUE-ENUMERATION">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="1" name="DEFINITION">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="ATTRIBUTE-DEFINITION-ENUMERATION-REF" type="REQIF:LOCAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="VALUES">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="ENUM-VALUE-REF" type="REQIF:LOCAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+  </xsd:complexType>
+  <xsd:complexType name="ATTRIBUTE-VALUE-INTEGER">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="1" name="DEFINITION">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="ATTRIBUTE-DEFINITION-INTEGER-REF" type="REQIF:LOCAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="THE-VALUE" type="xsd:integer" use="required"/>
+  </xsd:complexType>
+  <xsd:complexType name="ATTRIBUTE-VALUE-REAL">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="1" name="DEFINITION">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="ATTRIBUTE-DEFINITION-REAL-REF" type="REQIF:LOCAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="THE-VALUE" type="xsd:double" use="required"/>
+  </xsd:complexType>
+  <xsd:complexType name="ATTRIBUTE-VALUE-STRING">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="1" name="DEFINITION">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="ATTRIBUTE-DEFINITION-STRING-REF" type="REQIF:LOCAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="THE-VALUE" type="xsd:string" use="required"/>
+  </xsd:complexType>
+  <xsd:complexType name="ATTRIBUTE-VALUE-XHTML">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="1" name="THE-VALUE" type="REQIF:XHTML-CONTENT"/>
+      <xsd:element maxOccurs="1" minOccurs="0" name="THE-ORIGINAL-VALUE" type="REQIF:XHTML-CONTENT"/>
+      <xsd:element maxOccurs="1" minOccurs="1" name="DEFINITION">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="ATTRIBUTE-DEFINITION-XHTML-REF" type="REQIF:LOCAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="IS-SIMPLIFIED" type="xsd:boolean" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="DATATYPE-DEFINITION-BOOLEAN">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ALTERNATIVE-ID">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ALTERNATIVE-ID" type="REQIF:ALTERNATIVE-ID"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="DESC" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+    <xsd:attribute name="LAST-CHANGE" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="LONG-NAME" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="DATATYPE-DEFINITION-DATE">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ALTERNATIVE-ID">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ALTERNATIVE-ID" type="REQIF:ALTERNATIVE-ID"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="DESC" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+    <xsd:attribute name="LAST-CHANGE" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="LONG-NAME" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="DATATYPE-DEFINITION-ENUMERATION">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ALTERNATIVE-ID">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ALTERNATIVE-ID" type="REQIF:ALTERNATIVE-ID"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="SPECIFIED-VALUES">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="ENUM-VALUE" type="REQIF:ENUM-VALUE"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="DESC" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+    <xsd:attribute name="LAST-CHANGE" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="LONG-NAME" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="DATATYPE-DEFINITION-INTEGER">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ALTERNATIVE-ID">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ALTERNATIVE-ID" type="REQIF:ALTERNATIVE-ID"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="DESC" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+    <xsd:attribute name="LAST-CHANGE" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="LONG-NAME" type="xsd:string" use="optional"/>
+    <xsd:attribute name="MAX" type="xsd:integer" use="required"/>
+    <xsd:attribute name="MIN" type="xsd:integer" use="required"/>
+  </xsd:complexType>
+  <xsd:complexType name="DATATYPE-DEFINITION-REAL">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ALTERNATIVE-ID">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ALTERNATIVE-ID" type="REQIF:ALTERNATIVE-ID"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="ACCURACY" type="xsd:integer" use="required"/>
+    <xsd:attribute name="DESC" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+    <xsd:attribute name="LAST-CHANGE" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="LONG-NAME" type="xsd:string" use="optional"/>
+    <xsd:attribute name="MAX" type="xsd:double" use="required"/>
+    <xsd:attribute name="MIN" type="xsd:double" use="required"/>
+  </xsd:complexType>
+  <xsd:complexType name="DATATYPE-DEFINITION-STRING">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ALTERNATIVE-ID">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ALTERNATIVE-ID" type="REQIF:ALTERNATIVE-ID"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="DESC" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+    <xsd:attribute name="LAST-CHANGE" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="LONG-NAME" type="xsd:string" use="optional"/>
+    <xsd:attribute name="MAX-LENGTH" type="xsd:integer" use="required"/>
+  </xsd:complexType>
+  <xsd:complexType name="DATATYPE-DEFINITION-XHTML">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ALTERNATIVE-ID">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ALTERNATIVE-ID" type="REQIF:ALTERNATIVE-ID"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="DESC" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+    <xsd:attribute name="LAST-CHANGE" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="LONG-NAME" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="EMBEDDED-VALUE">
+    <xsd:all/>
+    <xsd:attribute name="KEY" type="xsd:integer" use="required"/>
+    <xsd:attribute name="OTHER-CONTENT" type="xsd:string" use="required"/>
+  </xsd:complexType>
+  <xsd:complexType name="ENUM-VALUE">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ALTERNATIVE-ID">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ALTERNATIVE-ID" type="REQIF:ALTERNATIVE-ID"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="1" name="PROPERTIES">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="EMBEDDED-VALUE" type="REQIF:EMBEDDED-VALUE"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="DESC" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+    <xsd:attribute name="LAST-CHANGE" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="LONG-NAME" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="RELATION-GROUP">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ALTERNATIVE-ID">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ALTERNATIVE-ID" type="REQIF:ALTERNATIVE-ID"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="1" name="SOURCE-SPECIFICATION">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="SPECIFICATION-REF" type="REQIF:GLOBAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="SPEC-RELATIONS">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="SPEC-RELATION-REF" type="REQIF:LOCAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="1" name="TARGET-SPECIFICATION">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="SPECIFICATION-REF" type="REQIF:GLOBAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="1" name="TYPE">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="RELATION-GROUP-TYPE-REF" type="REQIF:LOCAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="DESC" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+    <xsd:attribute name="LAST-CHANGE" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="LONG-NAME" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="RELATION-GROUP-TYPE">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ALTERNATIVE-ID">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ALTERNATIVE-ID" type="REQIF:ALTERNATIVE-ID"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="SPEC-ATTRIBUTES">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="ATTRIBUTE-DEFINITION-BOOLEAN" type="REQIF:ATTRIBUTE-DEFINITION-BOOLEAN"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-DATE" type="REQIF:ATTRIBUTE-DEFINITION-DATE"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-ENUMERATION" type="REQIF:ATTRIBUTE-DEFINITION-ENUMERATION"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-INTEGER" type="REQIF:ATTRIBUTE-DEFINITION-INTEGER"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-REAL" type="REQIF:ATTRIBUTE-DEFINITION-REAL"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-STRING" type="REQIF:ATTRIBUTE-DEFINITION-STRING"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-XHTML" type="REQIF:ATTRIBUTE-DEFINITION-XHTML"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="DESC" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+    <xsd:attribute name="LAST-CHANGE" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="LONG-NAME" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="REQ-IF">
+    <xsd:sequence>
+      <xsd:element maxOccurs="1" minOccurs="1" name="THE-HEADER">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="REQ-IF-HEADER" type="REQIF:REQ-IF-HEADER"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="1" name="CORE-CONTENT">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="REQ-IF-CONTENT" type="REQIF:REQ-IF-CONTENT"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="TOOL-EXTENSIONS">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="REQ-IF-TOOL-EXTENSION" type="REQIF:REQ-IF-TOOL-EXTENSION"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute ref="xml:lang" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="REQ-IF-CONTENT">
+    <xsd:sequence>
+      <xsd:element maxOccurs="1" minOccurs="0" name="DATATYPES">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="DATATYPE-DEFINITION-BOOLEAN" type="REQIF:DATATYPE-DEFINITION-BOOLEAN"/>
+            <xsd:element name="DATATYPE-DEFINITION-DATE" type="REQIF:DATATYPE-DEFINITION-DATE"/>
+            <xsd:element name="DATATYPE-DEFINITION-ENUMERATION" type="REQIF:DATATYPE-DEFINITION-ENUMERATION"/>
+            <xsd:element name="DATATYPE-DEFINITION-INTEGER" type="REQIF:DATATYPE-DEFINITION-INTEGER"/>
+            <xsd:element name="DATATYPE-DEFINITION-REAL" type="REQIF:DATATYPE-DEFINITION-REAL"/>
+            <xsd:element name="DATATYPE-DEFINITION-STRING" type="REQIF:DATATYPE-DEFINITION-STRING"/>
+            <xsd:element name="DATATYPE-DEFINITION-XHTML" type="REQIF:DATATYPE-DEFINITION-XHTML"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="SPEC-TYPES">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="RELATION-GROUP-TYPE" type="REQIF:RELATION-GROUP-TYPE"/>
+            <xsd:element name="SPEC-OBJECT-TYPE" type="REQIF:SPEC-OBJECT-TYPE"/>
+            <xsd:element name="SPEC-RELATION-TYPE" type="REQIF:SPEC-RELATION-TYPE"/>
+            <xsd:element name="SPECIFICATION-TYPE" type="REQIF:SPECIFICATION-TYPE"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="SPEC-OBJECTS">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="SPEC-OBJECT" type="REQIF:SPEC-OBJECT"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="SPEC-RELATIONS">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="SPEC-RELATION" type="REQIF:SPEC-RELATION"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="SPECIFICATIONS">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="SPECIFICATION" type="REQIF:SPECIFICATION"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="SPEC-RELATION-GROUPS">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="RELATION-GROUP" type="REQIF:RELATION-GROUP"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="REQ-IF-HEADER">
+    <xsd:sequence>
+      <xsd:element maxOccurs="1" minOccurs="0" name="COMMENT" type="xsd:string"/>
+      <xsd:element maxOccurs="1" minOccurs="1" name="CREATION-TIME" type="xsd:dateTime"/>
+      <xsd:element maxOccurs="1" minOccurs="0" name="REPOSITORY-ID" type="xsd:string"/>
+      <xsd:element maxOccurs="1" minOccurs="1" name="REQ-IF-TOOL-ID" type="xsd:string"/>
+      <xsd:element fixed="1.0" maxOccurs="1" minOccurs="1" name="REQ-IF-VERSION" type="xsd:string"/>
+      <xsd:element maxOccurs="1" minOccurs="1" name="SOURCE-TOOL-ID" type="xsd:string"/>
+      <xsd:element maxOccurs="1" minOccurs="1" name="TITLE" type="xsd:string"/>
+    </xsd:sequence>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+  </xsd:complexType>
+  <xsd:complexType name="SPEC-HIERARCHY">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ALTERNATIVE-ID">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ALTERNATIVE-ID" type="REQIF:ALTERNATIVE-ID"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="CHILDREN">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="SPEC-HIERARCHY" type="REQIF:SPEC-HIERARCHY"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="EDITABLE-ATTS">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="ATTRIBUTE-DEFINITION-BOOLEAN-REF" type="REQIF:LOCAL-REF"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-DATE-REF" type="REQIF:LOCAL-REF"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-ENUMERATION-REF" type="REQIF:LOCAL-REF"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-INTEGER-REF" type="REQIF:LOCAL-REF"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-REAL-REF" type="REQIF:LOCAL-REF"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-STRING-REF" type="REQIF:LOCAL-REF"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-XHTML-REF" type="REQIF:LOCAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="1" name="OBJECT">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="SPEC-OBJECT-REF" type="REQIF:LOCAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="DESC" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+    <xsd:attribute name="IS-EDITABLE" type="xsd:boolean" use="optional"/>
+    <xsd:attribute name="IS-TABLE-INTERNAL" type="xsd:boolean" use="optional"/>
+    <xsd:attribute name="LAST-CHANGE" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="LONG-NAME" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="SPEC-OBJECT">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ALTERNATIVE-ID">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ALTERNATIVE-ID" type="REQIF:ALTERNATIVE-ID"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="VALUES">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="ATTRIBUTE-VALUE-BOOLEAN" type="REQIF:ATTRIBUTE-VALUE-BOOLEAN"/>
+            <xsd:element name="ATTRIBUTE-VALUE-DATE" type="REQIF:ATTRIBUTE-VALUE-DATE"/>
+            <xsd:element name="ATTRIBUTE-VALUE-ENUMERATION" type="REQIF:ATTRIBUTE-VALUE-ENUMERATION"/>
+            <xsd:element name="ATTRIBUTE-VALUE-INTEGER" type="REQIF:ATTRIBUTE-VALUE-INTEGER"/>
+            <xsd:element name="ATTRIBUTE-VALUE-REAL" type="REQIF:ATTRIBUTE-VALUE-REAL"/>
+            <xsd:element name="ATTRIBUTE-VALUE-STRING" type="REQIF:ATTRIBUTE-VALUE-STRING"/>
+            <xsd:element name="ATTRIBUTE-VALUE-XHTML" type="REQIF:ATTRIBUTE-VALUE-XHTML"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="1" name="TYPE">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="SPEC-OBJECT-TYPE-REF" type="REQIF:LOCAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="DESC" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+    <xsd:attribute name="LAST-CHANGE" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="LONG-NAME" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="SPEC-OBJECT-TYPE">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ALTERNATIVE-ID">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ALTERNATIVE-ID" type="REQIF:ALTERNATIVE-ID"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="SPEC-ATTRIBUTES">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="ATTRIBUTE-DEFINITION-BOOLEAN" type="REQIF:ATTRIBUTE-DEFINITION-BOOLEAN"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-DATE" type="REQIF:ATTRIBUTE-DEFINITION-DATE"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-ENUMERATION" type="REQIF:ATTRIBUTE-DEFINITION-ENUMERATION"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-INTEGER" type="REQIF:ATTRIBUTE-DEFINITION-INTEGER"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-REAL" type="REQIF:ATTRIBUTE-DEFINITION-REAL"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-STRING" type="REQIF:ATTRIBUTE-DEFINITION-STRING"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-XHTML" type="REQIF:ATTRIBUTE-DEFINITION-XHTML"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="DESC" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+    <xsd:attribute name="LAST-CHANGE" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="LONG-NAME" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="SPEC-RELATION">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ALTERNATIVE-ID">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ALTERNATIVE-ID" type="REQIF:ALTERNATIVE-ID"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="VALUES">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="ATTRIBUTE-VALUE-BOOLEAN" type="REQIF:ATTRIBUTE-VALUE-BOOLEAN"/>
+            <xsd:element name="ATTRIBUTE-VALUE-DATE" type="REQIF:ATTRIBUTE-VALUE-DATE"/>
+            <xsd:element name="ATTRIBUTE-VALUE-ENUMERATION" type="REQIF:ATTRIBUTE-VALUE-ENUMERATION"/>
+            <xsd:element name="ATTRIBUTE-VALUE-INTEGER" type="REQIF:ATTRIBUTE-VALUE-INTEGER"/>
+            <xsd:element name="ATTRIBUTE-VALUE-REAL" type="REQIF:ATTRIBUTE-VALUE-REAL"/>
+            <xsd:element name="ATTRIBUTE-VALUE-STRING" type="REQIF:ATTRIBUTE-VALUE-STRING"/>
+            <xsd:element name="ATTRIBUTE-VALUE-XHTML" type="REQIF:ATTRIBUTE-VALUE-XHTML"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="1" name="SOURCE">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="SPEC-OBJECT-REF" type="REQIF:GLOBAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="1" name="TARGET">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="SPEC-OBJECT-REF" type="REQIF:GLOBAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="1" name="TYPE">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="SPEC-RELATION-TYPE-REF" type="REQIF:LOCAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="DESC" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+    <xsd:attribute name="LAST-CHANGE" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="LONG-NAME" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="SPEC-RELATION-TYPE">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ALTERNATIVE-ID">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ALTERNATIVE-ID" type="REQIF:ALTERNATIVE-ID"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="SPEC-ATTRIBUTES">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="ATTRIBUTE-DEFINITION-BOOLEAN" type="REQIF:ATTRIBUTE-DEFINITION-BOOLEAN"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-DATE" type="REQIF:ATTRIBUTE-DEFINITION-DATE"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-ENUMERATION" type="REQIF:ATTRIBUTE-DEFINITION-ENUMERATION"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-INTEGER" type="REQIF:ATTRIBUTE-DEFINITION-INTEGER"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-REAL" type="REQIF:ATTRIBUTE-DEFINITION-REAL"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-STRING" type="REQIF:ATTRIBUTE-DEFINITION-STRING"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-XHTML" type="REQIF:ATTRIBUTE-DEFINITION-XHTML"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="DESC" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+    <xsd:attribute name="LAST-CHANGE" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="LONG-NAME" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="SPECIFICATION">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ALTERNATIVE-ID">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ALTERNATIVE-ID" type="REQIF:ALTERNATIVE-ID"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="VALUES">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="ATTRIBUTE-VALUE-BOOLEAN" type="REQIF:ATTRIBUTE-VALUE-BOOLEAN"/>
+            <xsd:element name="ATTRIBUTE-VALUE-DATE" type="REQIF:ATTRIBUTE-VALUE-DATE"/>
+            <xsd:element name="ATTRIBUTE-VALUE-ENUMERATION" type="REQIF:ATTRIBUTE-VALUE-ENUMERATION"/>
+            <xsd:element name="ATTRIBUTE-VALUE-INTEGER" type="REQIF:ATTRIBUTE-VALUE-INTEGER"/>
+            <xsd:element name="ATTRIBUTE-VALUE-REAL" type="REQIF:ATTRIBUTE-VALUE-REAL"/>
+            <xsd:element name="ATTRIBUTE-VALUE-STRING" type="REQIF:ATTRIBUTE-VALUE-STRING"/>
+            <xsd:element name="ATTRIBUTE-VALUE-XHTML" type="REQIF:ATTRIBUTE-VALUE-XHTML"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="CHILDREN">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="SPEC-HIERARCHY" type="REQIF:SPEC-HIERARCHY"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="1" name="TYPE">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="1">
+            <xsd:element name="SPECIFICATION-TYPE-REF" type="REQIF:LOCAL-REF"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="DESC" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+    <xsd:attribute name="LAST-CHANGE" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="LONG-NAME" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="SPECIFICATION-TYPE">
+    <xsd:all>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ALTERNATIVE-ID">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="1" minOccurs="0">
+            <xsd:element name="ALTERNATIVE-ID" type="REQIF:ALTERNATIVE-ID"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element maxOccurs="1" minOccurs="0" name="SPEC-ATTRIBUTES">
+        <xsd:complexType>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="ATTRIBUTE-DEFINITION-BOOLEAN" type="REQIF:ATTRIBUTE-DEFINITION-BOOLEAN"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-DATE" type="REQIF:ATTRIBUTE-DEFINITION-DATE"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-ENUMERATION" type="REQIF:ATTRIBUTE-DEFINITION-ENUMERATION"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-INTEGER" type="REQIF:ATTRIBUTE-DEFINITION-INTEGER"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-REAL" type="REQIF:ATTRIBUTE-DEFINITION-REAL"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-STRING" type="REQIF:ATTRIBUTE-DEFINITION-STRING"/>
+            <xsd:element name="ATTRIBUTE-DEFINITION-XHTML" type="REQIF:ATTRIBUTE-DEFINITION-XHTML"/>
+          </xsd:choice>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+    <xsd:attribute name="DESC" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDENTIFIER" type="xsd:ID" use="required"/>
+    <xsd:attribute name="LAST-CHANGE" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="LONG-NAME" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="REQ-IF-TOOL-EXTENSION">
+    <xsd:sequence>
+      <xsd:any namespace="##other" processContents="lax" maxOccurs="unbounded" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="XHTML-CONTENT">
+    <xsd:group ref="xhtml.BlkStruct.class"/>
+  </xsd:complexType>
+</xsd:schema>
