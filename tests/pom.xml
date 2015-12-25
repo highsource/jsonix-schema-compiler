@@ -12,7 +12,6 @@
 		<module>filter</module>
 		<module>wps</module>
 		<module>zero</module>
-		<module>reqif</module>
 	</modules>
 	<build>
 		<pluginManagement>
