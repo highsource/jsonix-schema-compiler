@@ -1,0 +1,28 @@
+<jaxb:bindings version="1.0"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" 
+	xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" 
+	xmlns:jsonix="http://jsonix.highsource.org/customizations"
+	jaxb:extensionBindingPrefixes="xjc jsonix">
+
+	<jaxb:bindings schemaLocation="schema.xsd" 
+		node="/xs:schema">
+		<jaxb:globalBindings
+			fixedAttributeAsConstantProperty="false"
+			typesafeEnumBase="xs:string"
+			typesafeEnumMemberName="generateName" 
+			generateIsSetMethod="true">
+		</jaxb:globalBindings>
+		<jaxb:schemaBindings>
+			<jaxb:package name="org.hisrc.jsonix.tests.issues"/>
+		</jaxb:schemaBindings>
+
+		<jsonix:mapping
+			package="org.hisrc.jsonix.tests.issues"
+			name="Issues"/>
+
+	</jaxb:bindings>
+
+</jaxb:bindings>
+
+
