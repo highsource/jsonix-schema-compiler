@@ -6,7 +6,7 @@
 	elementFormDefault="qualified"
 	attributeFormDefault="unqualified">
 
-	<xs:complexType name="issueGH60Type">
+	<xs:complexType name="issueGH60AType">
 		<xs:sequence>
 			<xs:element name="base64Binary" type="xs:base64Binary" minOccurs="0"/>
 			<xs:element name="hexBinary" type="xs:hexBinary" minOccurs="0"/>
@@ -59,6 +59,39 @@
 			<xs:element name="NMTOKEN" type="xs:NMTOKEN" minOccurs="0"/>
 			<xs:element name="NMTOKENS" type="xs:NMTOKENS" minOccurs="0"/>
 		</xs:sequence>
+	</xs:complexType>
+
+	<xs:simpleType name="issueGH60BType">
+		<xs:restriction base="xs:language">
+			<xs:enumeration value="en"/>
+			<xs:enumeration value="de"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="issueGH60CType">
+		<xs:sequence>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element name="a" type="xs:unsignedByte"/>
+				<xs:element name="b" type="xs:boolean"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="issueGH60DType">
+		<xs:sequence>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element name="a" type="xs:unsignedByte"/>
+				<xs:element name="b" type="xs:unsignedByte"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="issueGH61Type">
+		<xs:simpleContent>
+			<xs:extension base="xs:anySimpleType">
+				<xs:attribute name="codeSpace" type="xs:anyURI"/>
+			</xs:extension>
+		</xs:simpleContent>
 	</xs:complexType>
 
 </xs:schema>

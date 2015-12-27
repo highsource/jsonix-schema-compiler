@@ -26,8 +26,8 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MElementsPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MMixable;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfoVisitor;
+import org.jvnet.jaxb2_commons.xml.bind.model.MSingleTypePropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MTyped;
 import org.jvnet.jaxb2_commons.xml.bind.model.MValuePropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MWildcard;
 import org.jvnet.jaxb2_commons.xml.bind.model.MWrappable;
@@ -82,15 +82,15 @@ final class PropertyInfoVisitor<T, C extends T> implements
 		}
 	}
 
-	private void createTypedOptions(MTyped<T, C> info,
-			final JSObjectLiteral options) {
+	private <M extends MElementTypeInfo<T, C, O>, O> void createTypedOptions(
+			final M info, final JSObjectLiteral options) {
 		final MTypeInfo<T, C> typeInfo = info.getTypeInfo();
 
 		typeInfo.acceptTypeInfoVisitor(new DefaultTypeInfoVisitor<T, C, Void>() {
 			@Override
 			public Void visitTypeInfo(MTypeInfo<T, C> typeInfo) {
 				final JSAssignmentExpression typeInfoDeclaration = PropertyInfoVisitor.this.mappingCompiler
-						.getTypeInfoDeclaration(typeInfo);
+						.getTypeInfoDeclaration(info, typeInfo);
 				if (!typeInfoDeclaration
 						.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor(
 								"String"))) {
@@ -104,7 +104,31 @@ final class PropertyInfoVisitor<T, C extends T> implements
 				return super.visitBuiltinLeafInfo(info);
 			}
 		});
+	}
 
+	private void createTypedOptions(
+			final MSingleTypePropertyInfo<T, C> propertyInfo,
+			final JSObjectLiteral options) {
+		final MTypeInfo<T, C> typeInfo = propertyInfo.getTypeInfo();
+
+		typeInfo.acceptTypeInfoVisitor(new DefaultTypeInfoVisitor<T, C, Void>() {
+			@Override
+			public Void visitTypeInfo(MTypeInfo<T, C> typeInfo) {
+				final JSAssignmentExpression typeInfoDeclaration = PropertyInfoVisitor.this.mappingCompiler
+						.getTypeInfoDeclaration(propertyInfo, typeInfo);
+				if (!typeInfoDeclaration
+						.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor(
+								"String"))) {
+					options.append(naming.typeInfo(), typeInfoDeclaration);
+				}
+				return null;
+			}
+
+			@Override
+			public Void visitBuiltinLeafInfo(MBuiltinLeafInfo<T, C> info) {
+				return super.visitBuiltinLeafInfo(info);
+			}
+		});
 	}
 
 	private void createWrappableOptions(MWrappable info, JSObjectLiteral options) {
@@ -115,16 +139,17 @@ final class PropertyInfoVisitor<T, C extends T> implements
 		}
 	}
 
-	private void createElementTypeInfoOptions(MElementTypeInfo<T, C> info,
-			JSObjectLiteral options) {
+	private <M extends MElementTypeInfo<T, C, O>, O> void createElementTypeInfoOptions(
+			M info, JSObjectLiteral options) {
 		final QName elementName = info.getElementName();
 		options.append(naming.elementName(),
 				mappingCompiler.createElementNameExpression(elementName));
 		createTypedOptions(info, options);
 	}
 
-	private void createElementTypeInfoOptions(MElementTypeInfo<T, C> info,
-			String privateName, QName elementName, JSObjectLiteral options) {
+	private <M extends MElementTypeInfo<T, C, O>, O> void createElementTypeInfoOptions(
+			M info, String privateName, QName elementName,
+			JSObjectLiteral options) {
 		JSMemberExpression elementNameExpression = mappingCompiler
 				.createElementNameExpression(elementName);
 		if (!elementNameExpression
@@ -173,13 +198,12 @@ final class PropertyInfoVisitor<T, C extends T> implements
 		return options;
 	}
 
-	private void createElementTypeInfosOptions(MElementTypeInfos<T, C> info,
-			JSObjectLiteral options) {
+	private <M extends MElementTypeInfo<T, C, O>, O> void createElementTypeInfosOptions(
+			MElementTypeInfos<T, C, M, O> info, JSObjectLiteral options) {
 		if (!info.getElementTypeInfos().isEmpty()) {
 			final JSArrayLiteral elementTypeInfos = this.codeModel.array();
 			options.append(naming.elementTypeInfos(), elementTypeInfos);
-			for (MElementTypeInfo<T, C> elementTypeInfo : info
-					.getElementTypeInfos()) {
+			for (M elementTypeInfo : info.getElementTypeInfos()) {
 				final JSObjectLiteral elementTypeInfoOptions = this.codeModel
 						.object();
 				createElementTypeInfoOptions(elementTypeInfo,

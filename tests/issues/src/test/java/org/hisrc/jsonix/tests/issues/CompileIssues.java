@@ -32,7 +32,8 @@ public class CompileIssues {
 				"-b", binding.toExternalForm(),
 				"-d", "target/generated-sources/xjc",
 				"-extension",
-				"-Xjsonix"
+				"-Xjsonix",
+				"-Xjsonix-generateJsonSchema"
 
 		};
 

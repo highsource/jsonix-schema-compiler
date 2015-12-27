@@ -57,11 +57,16 @@ import org.hisrc.jsonix.naming.Naming;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.MElementTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MEnumConstantInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.origin.MClassInfoOrigin;
+import org.jvnet.jaxb2_commons.xml.bind.model.origin.MEnumLeafInfoOrigin;
+import org.jvnet.jaxb2_commons.xml.bind.model.origin.MOriginated;
+import org.jvnet.jaxb2_commons.xml.bind.model.origin.MPropertyInfoOrigin;
 
 public class MappingCompiler<T, C extends T> {
 	public static final String DEFAULT_SCOPED_NAME_DELIMITER = ".";
@@ -224,10 +229,10 @@ public class MappingCompiler<T, C extends T> {
 
 		}
 
-		final MClassTypeInfo<T, C> baseTypeInfo = classInfo.getBaseTypeInfo();
+		final MClassTypeInfo<T, C, ?> baseTypeInfo = classInfo.getBaseTypeInfo();
 		if (baseTypeInfo != null) {
 			classInfoMapping.append(naming.baseTypeInfo(),
-					getTypeInfoDeclaration(baseTypeInfo));
+					getTypeInfoDeclaration(classInfo, baseTypeInfo));
 		}
 		final JSArrayLiteral ps = compilePropertyInfos(classInfo);
 		if (!ps.getElements().isEmpty()) {
@@ -244,7 +249,8 @@ public class MappingCompiler<T, C extends T> {
 
 		final MTypeInfo<T, C> baseTypeInfo = enumLeafInfo.getBaseTypeInfo();
 		if (baseTypeInfo != null) {
-			final JSAssignmentExpression baseTypeInfoDeclaration = getTypeInfoDeclaration(baseTypeInfo);
+			final JSAssignmentExpression baseTypeInfoDeclaration = getTypeInfoDeclaration(
+					enumLeafInfo, baseTypeInfo);
 			if (!baseTypeInfoDeclaration
 					.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor(
 							"String"))) {
@@ -287,11 +293,12 @@ public class MappingCompiler<T, C extends T> {
 
 	private JSObjectLiteral compileElementInfo(MElementInfo<T, C> elementInfo) {
 		MTypeInfo<T, C> typeInfo = elementInfo.getTypeInfo();
-		MTypeInfo<T, C> scope = elementInfo.getScope();
+		MClassInfo<T, C> scope = elementInfo.getScope();
 		QName substitutionHead = elementInfo.getSubstitutionHead();
 
 		final JSObjectLiteral value = this.codeModel.object();
-		JSAssignmentExpression typeInfoDeclaration = getTypeInfoDeclaration(typeInfo);
+		JSAssignmentExpression typeInfoDeclaration = getTypeInfoDeclaration(
+				elementInfo, typeInfo);
 		QName elementName = elementInfo.getElementName();
 		value.append(naming.elementName(),
 				createElementNameExpression(elementName));
@@ -304,7 +311,8 @@ public class MappingCompiler<T, C extends T> {
 		}
 
 		if (scope != null) {
-			value.append(naming.scope(), getTypeInfoDeclaration(scope));
+			value.append(naming.scope(),
+					getTypeInfoDeclaration(elementInfo, scope));
 		}
 		if (substitutionHead != null) {
 			value.append(naming.substitutionHead(),
@@ -349,9 +357,35 @@ public class MappingCompiler<T, C extends T> {
 	}
 
 	public JSAssignmentExpression getTypeInfoDeclaration(
-			MTypeInfo<T, C> typeInfo) {
+			MClassInfo<T, C> classInfo, MTypeInfo<T, C> typeInfo) {
+		return getTypeInfoDeclaration(
+				(MOriginated<MClassInfoOrigin>) classInfo, typeInfo);
+	}
+
+	public JSAssignmentExpression getTypeInfoDeclaration(
+			MEnumLeafInfo<T, C> enumLeafInfo, MTypeInfo<T, C> typeInfo) {
+		return getTypeInfoDeclaration(
+				(MOriginated<MEnumLeafInfoOrigin>) enumLeafInfo, typeInfo);
+	}
+
+	public JSAssignmentExpression getTypeInfoDeclaration(
+			MPropertyInfo<T, C> propertyInfo, MTypeInfo<T, C> typeInfo) {
+
+		return getTypeInfoDeclaration(
+				(MOriginated<MPropertyInfoOrigin>) propertyInfo, typeInfo);
+
+	}
+
+	public <M extends MElementTypeInfo<T, C, O>, O> JSAssignmentExpression getTypeInfoDeclaration(
+			M elementInfo, MTypeInfo<T, C> typeInfo) {
+		return getTypeInfoDeclaration((MOriginated<O>) elementInfo, typeInfo);
+	}
+
+	public <O> JSAssignmentExpression getTypeInfoDeclaration(
+			MOriginated<O> originated, MTypeInfo<T, C> typeInfo) {
+
 		return typeInfo
-				.acceptTypeInfoVisitor(new CreateTypeInfoDeclarationVisitor<T, C>(
-						this));
+				.acceptTypeInfoVisitor(new CreateTypeInfoDeclarationVisitor<T, C, O>(
+						this, originated));
 	}
 }

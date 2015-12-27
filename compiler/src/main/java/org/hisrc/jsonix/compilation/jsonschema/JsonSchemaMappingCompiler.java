@@ -13,6 +13,7 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.origin.MOriginated;
 
 public class JsonSchemaMappingCompiler<T, C extends T> {
 
@@ -61,7 +62,7 @@ public class JsonSchemaMappingCompiler<T, C extends T> {
 		for (MElementInfo<T, C> elementInfo : mapping.getElementInfos()) {
 			final QName elementName = elementInfo.getElementName();
 			final MTypeInfo<T, C> typeInfo = elementInfo.getTypeInfo();
-			final MTypeInfo<T, C> scope = elementInfo.getScope();
+			final MClassInfo<T, C> scope = elementInfo.getScope();
 
 			final JsonSchemaBuilder elementInfoSchema = new JsonSchemaBuilder();
 			elementInfoSchema.addType(JsonSchemaConstants.OBJECT_TYPE);
@@ -85,7 +86,7 @@ public class JsonSchemaMappingCompiler<T, C extends T> {
 							nameConstant));
 
 			elementInfoSchema.addProperty(JsonixConstants.VALUE_PROPERTY_NAME,
-					createTypeInfoSchemaRef(typeInfo));
+					createTypeInfoSchemaRef(elementInfo, typeInfo));
 
 			elementInfoSchema
 					.add(JsonixJsonSchemaConstants.ELEMENT_NAME_PROPERTY_NAME,
@@ -97,7 +98,7 @@ public class JsonSchemaMappingCompiler<T, C extends T> {
 			if (scope != null) {
 				elementInfoSchema.add(
 						JsonixJsonSchemaConstants.SCOPE_PROPERTY_NAME,
-						createTypeInfoSchemaRef(scope));
+						createTypeInfoSchemaRef(scope, scope));
 			}
 			schema.addAnyOf(elementInfoSchema);
 		}
@@ -129,9 +130,10 @@ public class JsonSchemaMappingCompiler<T, C extends T> {
 		}
 	}
 
-	public JsonSchemaBuilder createTypeInfoSchemaRef(MTypeInfo<T, C> typeInfo) {
+	public <M extends MOriginated<O>, O> JsonSchemaBuilder createTypeInfoSchemaRef(
+			M originated, MTypeInfo<T, C> typeInfo) {
 		return typeInfo
-				.acceptTypeInfoVisitor(new JsonSchemaRefTypeInfoProducerVisitor<T, C>(
-						this));
+				.acceptTypeInfoVisitor(new JsonSchemaRefTypeInfoProducerVisitor<T, C, O>(
+						this, originated));
 	}
 }

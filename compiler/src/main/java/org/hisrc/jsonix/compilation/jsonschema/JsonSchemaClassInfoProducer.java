@@ -48,11 +48,11 @@ public class JsonSchemaClassInfoProducer<T, C extends T> implements
 		final String localName = classInfo
 				.getContainerLocalName(JsonixConstants.DEFAULT_SCOPED_NAME_DELIMITER);
 		classInfoSchema.addTitle(localName);
-		final MClassTypeInfo<T, C> baseTypeInfo = classInfo.getBaseTypeInfo();
+		final MClassTypeInfo<T, C, ?> baseTypeInfo = classInfo.getBaseTypeInfo();
 		final JsonSchemaBuilder typeInfoSchema;
 		if (baseTypeInfo != null) {
 			final JsonSchemaBuilder baseTypeInfoSchema = mappingCompiler
-					.createTypeInfoSchemaRef(baseTypeInfo);
+					.createTypeInfoSchemaRef(baseTypeInfo, baseTypeInfo);
 			typeInfoSchema = new JsonSchemaBuilder();
 			typeInfoSchema.addAllOf(baseTypeInfoSchema);
 			typeInfoSchema.addAllOf(classInfoSchema);

@@ -15,17 +15,22 @@ import org.hisrc.xml.xsom.XSFunctionApplier;
 import org.jvnet.jaxb2_commons.xml.bind.model.MAnyAttributePropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MAnyElementPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MAttributePropertyInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.MElement;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementRefPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementRefsPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementTypeInfos;
+import org.jvnet.jaxb2_commons.xml.bind.model.MElementTypeRef;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementsPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfoVisitor;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MValuePropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MWrappable;
+import org.jvnet.jaxb2_commons.xml.bind.model.origin.MElementOrigin;
+import org.jvnet.jaxb2_commons.xml.bind.model.origin.MElementTypeRefOrigin;
+import org.jvnet.jaxb2_commons.xml.bind.model.origin.MOriginated;
 
 import com.sun.tools.xjc.model.Multiplicity;
 
@@ -56,7 +61,7 @@ public class JsonSchemaPropertyInfoProducerVisitor<T, C extends T> implements
 		addElementNameSchema(info.getElementName(), schema);
 		addWrappableSchema(info, schema);
 
-		final JsonSchemaBuilder itemTypeSchema = createTypeSchema(info
+		final JsonSchemaBuilder itemTypeSchema = createTypeSchema(info, info
 				.getTypeInfo());
 		final JsonSchemaBuilder typeSchema = createPossiblyCollectionTypeSchema(
 				info, itemTypeSchema);
@@ -147,7 +152,7 @@ public class JsonSchemaPropertyInfoProducerVisitor<T, C extends T> implements
 		addPropertyInfoSchema(info, schema);
 		addPropertyInfoTypeSchema(StandardNaming.VALUE, schema);
 
-		final JsonSchemaBuilder itemTypeSchema = createTypeSchema(info
+		final JsonSchemaBuilder itemTypeSchema = createTypeSchema(info, info
 				.getTypeInfo());
 		final JsonSchemaBuilder typeSchema = createPossiblyCollectionTypeSchema(
 				info, itemTypeSchema);
@@ -200,7 +205,7 @@ public class JsonSchemaPropertyInfoProducerVisitor<T, C extends T> implements
 		addPropertyInfoSchema(info, schema);
 		addPropertyInfoTypeSchema(StandardNaming.ATTRIBUTE, schema);
 		addAttributeNameSchema(info.getAttributeName(), schema);
-		final JsonSchemaBuilder itemTypeSchema = createTypeSchema(info
+		final JsonSchemaBuilder itemTypeSchema = createTypeSchema(info, info
 				.getTypeInfo());
 		final JsonSchemaBuilder typeSchema = createPossiblyCollectionTypeSchema(
 				info, itemTypeSchema);
@@ -271,12 +276,12 @@ public class JsonSchemaPropertyInfoProducerVisitor<T, C extends T> implements
 	}
 
 	private JsonSchemaBuilder createElementTypeInfosSchema(
-			MElementTypeInfos<T, C> info) {
+			MElementTypeInfos<T, C, MElementTypeRef<T, C>, MElementTypeRefOrigin> info) {
 
 		final JsonSchemaBuilder schema = new JsonSchemaBuilder();
 
 		if (!info.getElementTypeInfos().isEmpty()) {
-			for (MElementTypeInfo<T, C> elementTypeInfo : info
+			for (MElementTypeRef<T, C> elementTypeInfo : info
 					.getElementTypeInfos()) {
 				final JsonSchemaBuilder elementTypeInfoSchema = createElementTypeInfoSchema(elementTypeInfo);
 				schema.addAnyOf(elementTypeInfoSchema);
@@ -286,24 +291,24 @@ public class JsonSchemaPropertyInfoProducerVisitor<T, C extends T> implements
 	}
 
 	private JsonSchemaBuilder createElementTypeInfoSchema(
-			MElementTypeInfo<T, C> elementTypeInfo) {
+			MElementTypeRef<T, C> elementTypeInfo) {
 		final JsonSchemaBuilder elementTypeInfoSchema = new JsonSchemaBuilder();
 		addElementNameSchema(elementTypeInfo.getElementName(),
 				elementTypeInfoSchema);
-		elementTypeInfoSchema.addAnyOf(createTypeSchema(elementTypeInfo
+		elementTypeInfoSchema.addAnyOf(createTypeSchema(elementTypeInfo, elementTypeInfo
 				.getTypeInfo()));
 		return elementTypeInfoSchema;
 	}
 
 	private List<JsonSchemaBuilder> createElementRefsSchema(
-			MElementTypeInfos<T, C> info) {
+			MElementTypeInfos<T, C, MElement<T, C>, MElementOrigin> info) {
 
-		final List<MElementTypeInfo<T, C>> elementTypeInfos = info
+		final List<MElement<T, C>> elementTypeInfos = info
 				.getElementTypeInfos();
 		final List<JsonSchemaBuilder> schemas = new ArrayList<JsonSchemaBuilder>(
 				elementTypeInfos.size());
 
-		for (MElementTypeInfo<T, C> elementTypeInfo : elementTypeInfos) {
+		for (MElement<T, C> elementTypeInfo : elementTypeInfos) {
 			final JsonSchemaBuilder elementTypeInfoSchema = createElementRefSchema(elementTypeInfo);
 			schemas.add(elementTypeInfoSchema);
 		}
@@ -311,8 +316,8 @@ public class JsonSchemaPropertyInfoProducerVisitor<T, C extends T> implements
 
 	}
 
-	private JsonSchemaBuilder createElementRefSchema(
-			MElementTypeInfo<T, C> elementTypeInfo) {
+	private <M extends MElementTypeInfo<T, C, O>, O> JsonSchemaBuilder createElementRefSchema(
+			M elementTypeInfo) {
 		final JsonSchemaBuilder schema = new JsonSchemaBuilder();
 		addElementNameSchema(elementTypeInfo.getElementName(), schema);
 		schema.addType(JsonSchemaConstants.OBJECT_TYPE);
@@ -321,7 +326,7 @@ public class JsonSchemaPropertyInfoProducerVisitor<T, C extends T> implements
 				new JsonSchemaBuilder()
 						.addRef(XmlSchemaJsonSchemaConstants.QNAME_TYPE_INFO_SCHEMA_REF));
 		schema.addProperty(JsonixConstants.VALUE_PROPERTY_NAME,
-				createTypeSchema(elementTypeInfo.getTypeInfo()));
+				createTypeSchema(elementTypeInfo, elementTypeInfo.getTypeInfo()));
 		return schema;
 	}
 
@@ -364,8 +369,9 @@ public class JsonSchemaPropertyInfoProducerVisitor<T, C extends T> implements
 		return typeSchema;
 	}
 
-	private JsonSchemaBuilder createTypeSchema(MTypeInfo<T, C> typeInfo) {
+	private <M extends MOriginated<O>, O> JsonSchemaBuilder createTypeSchema(
+			M originated, MTypeInfo<T, C> typeInfo) {
 		return getClassInfoCompiler().getMappingCompiler()
-				.createTypeInfoSchemaRef(typeInfo);
+				.createTypeInfoSchemaRef(originated, typeInfo);
 	}
 }

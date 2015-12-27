@@ -7,11 +7,13 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MAnyAttributePropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MAnyElementPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MAttributePropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.MElement;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementRefPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementRefsPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementTypeInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.MElementTypeRef;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementsPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfoVisitor;
@@ -93,8 +95,7 @@ public final class PropertyInfoGraphBuilder<T, C extends T> implements
 			MElementsPropertyInfo<T, C> info) {
 		// Elements property has a "soft" dependency types of its elements
 		// That is, some of these types may be excluded
-		for (MElementTypeInfo<T, C> elementTypeInfo : info
-				.getElementTypeInfos()) {
+		for (MElementTypeRef<T, C> elementTypeInfo : info.getElementTypeInfos()) {
 			addSoftDependencyOnType(vertex, elementTypeInfo);
 		}
 		return vertex;
@@ -112,8 +113,7 @@ public final class PropertyInfoGraphBuilder<T, C extends T> implements
 	@Override
 	public PropertyInfoVertex<T, C> visitElementRefsPropertyInfo(
 			MElementRefsPropertyInfo<T, C> info) {
-		for (MElementTypeInfo<T, C> elementTypeInfo : info
-				.getElementTypeInfos()) {
+		for (MElement<T, C> elementTypeInfo : info.getElementTypeInfos()) {
 			// Element references property has "soft" dependencies on the
 			// types
 			// of its elements
@@ -123,9 +123,8 @@ public final class PropertyInfoGraphBuilder<T, C extends T> implements
 		return vertex;
 	}
 
-	private void addSubstitutionHeadDependencies(
-			MElementTypeInfo<T, C> elementTypeInfo,
-			PropertyInfoVertex<T, C> propertyInfoVertex) {
+	private <M extends MElementTypeInfo<T, C, O>, O> void addSubstitutionHeadDependencies(
+			M elementTypeInfo, PropertyInfoVertex<T, C> propertyInfoVertex) {
 		final MClassInfo<T, C> classInfo = propertyInfoVertex.getClassInfo();
 		final QName elementName = elementTypeInfo.getElementName();
 		for (MElementInfo<T, C> elementInfo : this.modelInfo.getElementInfos()) {
@@ -136,7 +135,8 @@ public final class PropertyInfoGraphBuilder<T, C extends T> implements
 						.elementInfo(elementInfo);
 				modelInfoGraphBuilder.addSoftDependency(elementInfoVertex,
 						propertyInfoVertex);
-				modelInfoGraphBuilder.addSoftDependency(propertyInfoVertex, elementInfoVertex);
+				modelInfoGraphBuilder.addSoftDependency(propertyInfoVertex,
+						elementInfoVertex);
 			}
 		}
 	}

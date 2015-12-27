@@ -34,6 +34,8 @@
 package org.hisrc.jsonix.compilation.mapping;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -44,6 +46,8 @@ import org.hisrc.jscm.codemodel.expression.JSAssignmentExpression;
 import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
 import org.hisrc.jsonix.definition.Modules;
 import org.hisrc.jsonix.naming.Naming;
+import org.hisrc.jsonix.xml.xsom.CollectSimpleTypeNamesVisitor;
+import org.hisrc.xml.xsom.SchemaComponentAware;
 import org.jvnet.jaxb2_commons.xml.bind.model.MBuiltinLeafInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassRef;
@@ -55,9 +59,12 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MList;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackagedTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfoVisitor;
 import org.jvnet.jaxb2_commons.xml.bind.model.MWildcardTypeInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.origin.MOriginated;
 import org.jvnet.jaxb2_commons.xmlschema.XmlSchemaConstants;
 
-final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
+import com.sun.xml.xsom.XSComponent;
+
+final class CreateTypeInfoDeclarationVisitor<T, C extends T, O> implements
 		MTypeInfoVisitor<T, C, JSAssignmentExpression> {
 
 	private static final String IDREFS_TYPE_INFO_NAME = "IDREFS";
@@ -75,11 +82,11 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.LANGUAGE, "Language");
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.NAME, "Name");
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.NCNAME, "NCName");
-		// XSD_TYPE_MAPPING.put(XmlSchemaConstants.ID, "Id");
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ID, "ID");
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ID, "String");
-		// XSD_TYPE_MAPPING.put(XmlSchemaConstants.IDREF, "Idref");
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.IDREF, "IDREF");
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.IDREF, "String");
-		// XSD_TYPE_MAPPING.put(XmlSchemaConstants.IDREFS, "Idrefs");
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.IDREFS, "IDREFS");
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.IDREFS, "Strings");
 		// XSD_TYPE_MAPPING.put(XmlSchemaConstants.ENTITY, "Entity");
 		// XSD_TYPE_MAPPING.put(XmlSchemaConstants.ENTITIES, "Entities");
@@ -108,7 +115,7 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.POSITIVEINTEGER,
 				"PositiveInteger");
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.DOUBLE, "Double");
-		// XSD_TYPE_MAPPING.put(XmlSchemaConstants.ANYURI, "AnyURI");
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ANYURI, "AnyURI");
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ANYURI, "String");
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.QNAME, "QName");
 		// XSD_TYPE_MAPPING.put(XmlSchemaConstants.NOTATION, "Notation");
@@ -122,11 +129,6 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.GDAY, "GDay");
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.GMONTH, "GMonth");
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.CALENDAR, "Calendar");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.GYEARMONTH, "String");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.GYEAR, "String");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.GMONTHDAY, "String");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.GDAY, "String");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.GMONTH, "String");
 		// XSD_TYPE_MAPPING.put(XmlSchemaConstants.CALENDAR, "String");
 	}
 
@@ -134,13 +136,17 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
 	private final Modules<T, C> mappingNameResolver;
 	private final Naming naming;
 	private final String mappingName;
+	private final MOriginated<O> originated;
 
-	CreateTypeInfoDeclarationVisitor(MappingCompiler<T, C> mappingCompiler) {
+	CreateTypeInfoDeclarationVisitor(MappingCompiler<T, C> mappingCompiler,
+			MOriginated<O> originated) {
 		Validate.notNull(mappingCompiler);
+		Validate.notNull(originated);
 		this.mappingNameResolver = mappingCompiler.getModules();
 		this.codeModel = mappingCompiler.getCodeModel();
 		this.naming = mappingCompiler.getNaming();
 		this.mappingName = mappingCompiler.getMapping().getMappingName();
+		this.originated = originated;
 	}
 
 	private JSAssignmentExpression createTypeInfoDeclaration(
@@ -185,13 +191,29 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T> implements
 
 	public JSAssignmentExpression visitBuiltinLeafInfo(
 			MBuiltinLeafInfo<T, C> info) {
-		final String name = XSD_TYPE_MAPPING.get(info.getTypeName());
-		if (name != null) {
-			return this.codeModel.string(name);
-		} else {
-			// TODO unsupported builtin
-			return null;
+
+		final O origin = this.originated.getOrigin();
+
+		final List<QName> simpleTypeNames = new LinkedList<QName>();
+		if (origin instanceof SchemaComponentAware) {
+			final XSComponent component = ((SchemaComponentAware) origin)
+					.getSchemaComponent();
+			if (component != null) {
+				final CollectSimpleTypeNamesVisitor visitor = new CollectSimpleTypeNamesVisitor();
+				component.visit(visitor);
+				simpleTypeNames.addAll(visitor.getTypeNames());
+			}
 		}
+
+		simpleTypeNames.add(info.getTypeName());
+
+		for (QName candidateName : simpleTypeNames) {
+			final String name = XSD_TYPE_MAPPING.get(candidateName);
+			if (name != null) {
+				return this.codeModel.string(name);
+			}
+		}
+		return null;
 	}
 
 	public JSAssignmentExpression visitWildcardTypeInfo(

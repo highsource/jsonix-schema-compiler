@@ -5,9 +5,9 @@ import java.text.MessageFormat;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.Validate;
+import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 
 public class ElementInfoVertex<T, C extends T> extends InfoVertex<T,C> {
 
@@ -59,7 +59,7 @@ public class ElementInfoVertex<T, C extends T> extends InfoVertex<T,C> {
 	@Override
 	public String toString() {
 		final QName elementName = this.elementInfo.getElementName();
-		final MTypeInfo<T, C> scope = elementInfo.getScope();
+		final MClassInfo<T, C> scope = elementInfo.getScope();
 		return MessageFormat.format(
 				"Element [{0}], scope [{1}]",
 				elementName.toString(),

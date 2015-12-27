@@ -1,6 +1,8 @@
 package org.hisrc.jsonix.compilation.jsonschema;
 
 import java.text.MessageFormat;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -13,6 +15,8 @@ import org.hisrc.jsonix.definition.Modules;
 import org.hisrc.jsonix.jsonschema.JsonSchemaBuilder;
 import org.hisrc.jsonix.jsonschema.JsonSchemaConstants;
 import org.hisrc.jsonix.jsonschema.JsonSchemaKeywords;
+import org.hisrc.jsonix.xml.xsom.CollectSimpleTypeNamesVisitor;
+import org.hisrc.xml.xsom.SchemaComponentAware;
 import org.jvnet.jaxb2_commons.xml.bind.model.MBuiltinLeafInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassRef;
@@ -24,20 +28,27 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MList;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackagedTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfoVisitor;
 import org.jvnet.jaxb2_commons.xml.bind.model.MWildcardTypeInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.origin.MOriginated;
 
-public class JsonSchemaRefTypeInfoProducerVisitor<T, C extends T> implements
+import com.sun.xml.xsom.XSComponent;
+
+public class JsonSchemaRefTypeInfoProducerVisitor<T, C extends T, O> implements
 		MTypeInfoVisitor<T, C, JsonSchemaBuilder> {
 
 	private final JsonSchemaMappingCompiler<T, C> mappingCompiler;
+	private final MOriginated<O> originated;
 	private final Modules<T, C> modules;
 	private final Module<T, C> module;
 	private final Mapping<T, C> mapping;
 	private final Map<QName, String> typeNameSchemaRefs;
 
 	public JsonSchemaRefTypeInfoProducerVisitor(
-			JsonSchemaMappingCompiler<T, C> mappingCompiler) {
+			JsonSchemaMappingCompiler<T, C> mappingCompiler,
+			MOriginated<O> originated) {
 		Validate.notNull(mappingCompiler);
+		Validate.notNull(originated);
 		this.mappingCompiler = mappingCompiler;
+		this.originated = originated;
 		this.modules = mappingCompiler.getModules();
 		this.module = mappingCompiler.getModule();
 		this.mapping = mappingCompiler.getMapping();
@@ -96,17 +107,33 @@ public class JsonSchemaRefTypeInfoProducerVisitor<T, C extends T> implements
 
 	@Override
 	public JsonSchemaBuilder visitBuiltinLeafInfo(MBuiltinLeafInfo<T, C> info) {
-		final QName typeName = info.getTypeName();
-		final String $ref = this.typeNameSchemaRefs.get(typeName);
-		final JsonSchemaBuilder schema = new JsonSchemaBuilder();
-		if ($ref != null) {
-			return schema.addRef($ref);
-		} else {
-			return schema
-					.addDescription(MessageFormat
-							.format("WARNING, the type [{0}] is not supported, using the lax schema {}.",
-									typeName));
+
+		final O origin = this.originated.getOrigin();
+
+		final List<QName> simpleTypeNames = new LinkedList<QName>();
+		if (origin instanceof SchemaComponentAware) {
+			final XSComponent component = ((SchemaComponentAware) origin)
+					.getSchemaComponent();
+			if (component != null) {
+				final CollectSimpleTypeNamesVisitor visitor = new CollectSimpleTypeNamesVisitor();
+				component.visit(visitor);
+				simpleTypeNames.addAll(visitor.getTypeNames());
+			}
 		}
+
+		simpleTypeNames.add(info.getTypeName());
+
+		final JsonSchemaBuilder schema = new JsonSchemaBuilder();
+		for (QName candidateName : simpleTypeNames) {
+			final String $ref = this.typeNameSchemaRefs.get(candidateName);
+			if ($ref != null) {
+				return schema.addRef($ref);
+			}
+		}
+		return schema
+				.addDescription(MessageFormat
+						.format("WARNING, the type [{0}] is not supported, using the lax schema {}.",
+								info.getTypeName()));
 	}
 
 	@Override

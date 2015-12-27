@@ -34,7 +34,7 @@ public class JsonSchemaEnumLeafInfoProducer<T, C extends T> implements
 		final MTypeInfo<T, C> baseTypeInfo = enumLeafInfo.getBaseTypeInfo();
 		final JsonSchemaBuilder typeInfoSchema;
 		final JsonSchemaBuilder baseTypeInfoSchema = mappingCompiler
-				.createTypeInfoSchemaRef(baseTypeInfo);
+				.createTypeInfoSchemaRef(enumLeafInfo, baseTypeInfo);
 		typeInfoSchema = new JsonSchemaBuilder();
 		typeInfoSchema.addAllOf(baseTypeInfoSchema);
 
