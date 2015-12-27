@@ -1,6 +1,6 @@
 {
 	"name" : "jsonix-schema-compiler",
-	"version" : "2.3.8-SNAPSHOT",
+	"version" : "2.3.8",
 	"description" : "Jsonix Schema Compiler generates Jsonix mappings from XML Schemas",
 	"keywords" : [
 			"json", "xml", "unmarshal", "unmarshalling", "marshal",
