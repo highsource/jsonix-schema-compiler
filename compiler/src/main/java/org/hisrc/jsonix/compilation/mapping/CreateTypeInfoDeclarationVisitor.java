@@ -163,8 +163,7 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T, O> implements
 	}
 
 	public JSAssignmentExpression visitEnumLeafInfo(MEnumLeafInfo<T, C> info) {
-		// TODO why not create type info declaration???
-		return info.getBaseTypeInfo().acceptTypeInfoVisitor(this);
+		return createTypeInfoDeclaration(info);
 	}
 
 	public JSAssignmentExpression visitClassInfo(MClassInfo<T, C> info) {
