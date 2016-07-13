@@ -214,14 +214,6 @@
 		</xs:complexContent>
 	</xs:complexType>
 
-	<xs:element name="enum" type="enumType"/>
-	<xs:simpleType name="enumType">
-		<xs:restriction base="xs:token">
-			<xs:enumeration value="Male"/>
-			<xs:enumeration value="Female"/>
-		</xs:restriction>
-	</xs:simpleType>
-
 	<xs:complexType name="abstractBaseType" abstract="true"/>
 
 	<xs:complexType name="extendedMixedType">
@@ -231,5 +223,348 @@
 	</xs:complexType>
 
 	<xs:element name="abstractElement" abstract="true"/>
+
+
+    <!-- Enumerations -->
+    <xs:element name="base64BinaryEnum" type="base64BinaryEnumType"/>
+    <xs:simpleType name="base64BinaryEnumType">
+        <xs:restriction base="xs:base64Binary">
+            <xs:enumeration value="aGVyb25neWFuZy5jb20="/>
+            <xs:enumeration value="QQ=="/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="hexBinaryEnum" type="hexBinaryEnumType"/>
+    <xs:simpleType name="hexBinaryEnumType">
+        <xs:restriction base="xs:hexBinary">
+            <xs:enumeration value="0FB7"/>
+            <xs:enumeration value="A4D98C"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="durationEnum" type="durationEnumType"/>
+    <xs:simpleType name="durationEnumType">
+        <xs:restriction base="xs:duration">
+            <xs:enumeration value="P1Y2M3DT10H30M"/>
+            <xs:enumeration value="-P120D"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="dateTimeEnum" type="dateTimeEnumType"/>
+    <xs:simpleType name="dateTimeEnumType">
+        <xs:restriction base="xs:dateTime">
+            <xs:enumeration value="1999-05-31T13:20:00-05:00"/>
+            <xs:enumeration value="2016-07-13T11:00:00-05:00"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="dateEnum" type="dateEnumType"/>
+    <xs:simpleType name="dateEnumType">
+        <xs:restriction base="xs:date">
+            <xs:enumeration value="1999-05-31"/>
+            <xs:enumeration value="2016-07-13"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="timeEnum" type="timeEnumType"/>
+    <xs:simpleType name="timeEnumType">
+        <xs:restriction base="xs:time">
+            <xs:enumeration value="13:20:00-05:00"/>
+            <xs:enumeration value="11:28:00+06:00"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="gYearMonthEnum" type="gYearMonthEnumType"/>
+    <xs:simpleType name="gYearMonthEnumType">
+        <xs:restriction base="xs:gYearMonth">
+            <xs:enumeration value="1999-05"/>
+            <xs:enumeration value="2016-07"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="gYearEnum" type="gYearEnumType"/>
+    <xs:simpleType name="gYearEnumType">
+        <xs:restriction base="xs:gYear">
+            <xs:enumeration value="1999"/>
+            <xs:enumeration value="2016"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="gMonthDayEnum" type="gMonthDayEnumType"/>
+    <xs:simpleType name="gMonthDayEnumType">
+        <xs:restriction base="xs:gMonthDay">
+            <xs:enumeration value="--05-31"/>
+            <xs:enumeration value="--07-13"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="gDayEnum" type="gDayEnumType"/>
+    <xs:simpleType name="gDayEnumType">
+        <xs:restriction base="xs:gDay">
+            <xs:enumeration value="---01"/>
+            <xs:enumeration value="---31"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="gMonthEnum" type="gMonthEnumType"/>
+    <xs:simpleType name="gMonthEnumType">
+        <xs:restriction base="xs:gMonth">
+            <xs:enumeration value="--05--"/>
+            <xs:enumeration value="--12--"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="floatEnum" type="floatEnumType"/>
+    <xs:simpleType name="floatEnumType">
+        <xs:restriction base="xs:float">
+            <xs:enumeration value="1267.43233"/>
+            <xs:enumeration value="12.78e-2"/>
+            <xs:enumeration value="12"/>
+            <xs:enumeration value="INF"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="doubleEnum" type="doubleEnumType"/>
+    <xs:simpleType name="doubleEnumType">
+        <xs:restriction base="xs:double">
+            <xs:enumeration value="1267.43233"/>
+            <xs:enumeration value="12.78e20"/>
+            <xs:enumeration value="12"/>
+            <xs:enumeration value="-INF"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="decimalEnum" type="decimalEnumType"/>
+    <xs:simpleType name="decimalEnumType">
+        <xs:restriction base="xs:decimal">
+            <xs:enumeration value="+1267.43233"/>
+            <xs:enumeration value="-12.7820"/>
+            <xs:enumeration value="12"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="integerEnum" type="integerEnumType"/>
+    <xs:simpleType name="integerEnumType">
+        <xs:restriction base="xs:integer">
+            <xs:enumeration value="-1321532"/>
+            <xs:enumeration value="245234623"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="longEnum" type="longEnumType"/>
+    <xs:simpleType name="longEnumType">
+        <xs:restriction base="xs:long">
+            <xs:enumeration value="9223372036854775807"/>
+            <xs:enumeration value="-9223372036854775808"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="intEnum" type="intEnumType"/>
+    <xs:simpleType name="intEnumType">
+        <xs:restriction base="xs:int">
+            <xs:enumeration value="2147483647"/>
+            <xs:enumeration value="-2147483648"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="shortEnum" type="shortEnumType"/>
+    <xs:simpleType name="shortEnumType">
+        <xs:restriction base="xs:short">
+            <xs:enumeration value="32767"/>
+            <xs:enumeration value="-32768"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="byteEnum" type="byteEnumType"/>
+    <xs:simpleType name="byteEnumType">
+        <xs:restriction base="xs:byte">
+            <xs:enumeration value="127"/>
+            <xs:enumeration value="-128"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="unsignedLongEnum" type="unsignedLongEnumType"/>
+    <xs:simpleType name="unsignedLongEnumType">
+        <xs:restriction base="xs:unsignedLong">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="18446744073709551615"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="unsignedIntEnum" type="unsignedIntEnumType"/>
+    <xs:simpleType name="unsignedIntEnumType">
+        <xs:restriction base="xs:unsignedInt">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="4294967295"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="unsignedShortEnum" type="unsignedShortEnumType"/>
+    <xs:simpleType name="unsignedShortEnumType">
+        <xs:restriction base="xs:unsignedShort">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="65535"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="unsignedByteEnum" type="unsignedByteEnumType"/>
+    <xs:simpleType name="unsignedByteEnumType">
+        <xs:restriction base="xs:unsignedByte">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="255"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="nonNegativeIntegerEnum" type="nonNegativeIntegerEnumType"/>
+    <xs:simpleType name="nonNegativeIntegerEnumType">
+        <xs:restriction base="xs:nonNegativeInteger">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="12678967543233"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="nonPositiveIntegerEnum" type="nonPositiveIntegerEnumType"/>
+    <xs:simpleType name="nonPositiveIntegerEnumType">
+        <xs:restriction base="xs:nonPositiveInteger">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="-100000"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="positiveIntegerEnum" type="positiveIntegerEnumType"/>
+    <xs:simpleType name="positiveIntegerEnumType">
+        <xs:restriction base="xs:positiveInteger">
+            <xs:enumeration value="1"/>
+            <xs:enumeration value="12678967543233"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="negativeIntegerEnum" type="negativeIntegerEnumType"/>
+    <xs:simpleType name="negativeIntegerEnumType">
+        <xs:restriction base="xs:negativeInteger">
+            <xs:enumeration value="-1"/>
+            <xs:enumeration value="-12678967543233"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="anyURIEnum" type="anyURIEnumType"/>
+    <xs:simpleType name="anyURIEnumType">
+        <xs:restriction base="xs:anyURI">
+            <xs:enumeration value="/some/relative/path"/>
+            <xs:enumeration value="http://somedomain.com/absolute/path#withHash"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="QNameEnum" type="QNameEnumType"/>
+    <xs:simpleType name="QNameEnumType">
+        <xs:restriction base="xs:QName">
+            <xs:enumeration value="anyURIEnum"/>
+            <xs:enumeration value="xs:QName"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="stringEnum" type="stringEnumType"/>
+    <xs:simpleType name="stringEnumType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Apple"/>
+            <xs:enumeration value="Bear"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="normalizedStringEnum" type="normalizedStringEnumType"/>
+    <xs:simpleType name="normalizedStringEnumType">
+        <xs:restriction base="xs:normalizedString">
+            <xs:enumeration value="\tApple\n"/>
+            <xs:enumeration value="\tBear\n"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="tokenEnum" type="tokenEnumType"/>
+    <xs:simpleType name="tokenEnumType">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="Édition française."/>
+            <xs:enumeration value="PB&amp;J"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="languageEnum" type="languageEnumType"/>
+    <xs:simpleType name="languageEnumType">
+        <xs:restriction base="xs:language">
+            <xs:enumeration value="zh"/>
+            <xs:enumeration value="en-US"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="NameEnum" type="NameEnumType"/>
+    <xs:simpleType name="NameEnumType">
+        <xs:restriction base="xs:Name">
+            <xs:enumeration value="languageEnum"/>
+            <xs:enumeration value="xs:QName"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="NCNameEnum" type="NCNameEnumType"/>
+    <xs:simpleType name="NCNameEnumType">
+        <xs:restriction base="xs:NCName">
+            <xs:enumeration value="NCNameEnum"/>
+            <xs:enumeration value="some-element"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="IDEnum" type="IDEnumType"/>
+    <xs:simpleType name="IDEnumType">
+        <xs:restriction base="xs:ID">
+            <xs:enumeration value="IDEnum"/>
+            <xs:enumeration value="anyElementStrict"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="IDREFEnum" type="IDREFEnumType"/>
+    <xs:simpleType name="IDREFEnumType">
+        <xs:restriction base="xs:IDREF">
+            <xs:enumeration value="IDEnum"/>
+            <xs:enumeration value="anyElementStrict"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="IDREFSEnum" type="IDREFSEnumType"/>
+    <xs:simpleType name="IDREFSEnumType">
+        <xs:restriction base="xs:IDREFS">
+            <xs:enumeration value="IDEnum some-other-id"/>
+            <xs:enumeration value="anyElementStrict _and-anotherId"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="ENTITYEnum" type="ENTITYEnumType"/>
+    <xs:simpleType name="ENTITYEnumType">
+        <xs:restriction base="xs:ENTITY">
+            <xs:enumeration value="IDEnum"/>
+            <xs:enumeration value="anyElementStrict"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="ENTITIESEnum" type="ENTITIESEnumType"/>
+    <xs:simpleType name="ENTITIESEnumType">
+        <xs:restriction base="xs:ENTITIES">
+            <xs:enumeration value="IDEnum some-other-id"/>
+            <xs:enumeration value="anyElementStrict _and-anotherId"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="NMTOKENEnum" type="NMTOKENEnumType"/>
+    <xs:simpleType name="NMTOKENEnumType">
+        <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="ABCD"/>
+            <xs:enumeration value="123_456"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="NMTOKENSEnum" type="NMTOKENSEnumType"/>
+    <xs:simpleType name="NMTOKENSEnumType">
+        <xs:restriction base="xs:NMTOKENS">
+            <xs:enumeration value="ABCD 123"/>
+            <xs:enumeration value="123_456"/>
+        </xs:restriction>
+    </xs:simpleType>
 
 </xs:schema>
