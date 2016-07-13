@@ -43,7 +43,6 @@ import javax.xml.namespace.QName;
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jscm.codemodel.JSCodeModel;
 import org.hisrc.jscm.codemodel.expression.JSAssignmentExpression;
-import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
 import org.hisrc.jsonix.definition.Modules;
 import org.hisrc.jsonix.naming.Naming;
 import org.hisrc.jsonix.xml.xsom.CollectSimpleTypeNamesVisitor;
@@ -56,147 +55,108 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MID;
 import org.jvnet.jaxb2_commons.xml.bind.model.MIDREF;
 import org.jvnet.jaxb2_commons.xml.bind.model.MIDREFS;
 import org.jvnet.jaxb2_commons.xml.bind.model.MList;
-import org.jvnet.jaxb2_commons.xml.bind.model.MPackagedTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfoVisitor;
 import org.jvnet.jaxb2_commons.xml.bind.model.MWildcardTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.origin.MOriginated;
 import org.jvnet.jaxb2_commons.xmlschema.XmlSchemaConstants;
 
+import com.sun.javadoc.Type;
 import com.sun.xml.xsom.XSComponent;
 
-final class CreateTypeInfoDeclarationVisitor<T, C extends T, O> implements
-		MTypeInfoVisitor<T, C, JSAssignmentExpression> {
+public class CreateTypeInfoDeclarationVisitor<T, C extends T, O>
+		implements MTypeInfoVisitor<T, C, TypeInfoCompiler<T, C>> {
 
 	private static final String IDREFS_TYPE_INFO_NAME = "IDREFS";
 	private static final String IDREF_TYPE_INFO_NAME = "IDREF";
 	private static final String ID_TYPE_INFO_NAME = "ID";
 
-	private static Map<QName, String> XSD_TYPE_MAPPING = new HashMap<QName, String>();
+	private Map<QName, TypeInfoCompiler<T, C>> XSD_TYPE_MAPPING = new HashMap<QName, TypeInfoCompiler<T, C>>();
 	{
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ANYTYPE, "AnyType");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ANYSIMPLETYPE, "AnySimpleType");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.STRING, "String");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.NORMALIZEDSTRING,
-				"NormalizedString");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.TOKEN, "Token");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.LANGUAGE, "Language");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.NAME, "Name");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.NCNAME, "NCName");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ID, "ID");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ID, "String");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.IDREF, "IDREF");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.IDREF, "String");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.IDREFS, "IDREFS");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.IDREFS, "Strings");
-		// XSD_TYPE_MAPPING.put(XmlSchemaConstants.ENTITY, "Entity");
-		// XSD_TYPE_MAPPING.put(XmlSchemaConstants.ENTITIES, "Entities");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.NMTOKEN, "NMToken");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.NMTOKENS, "NMTokens");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.BOOLEAN, "Boolean");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.BASE64BINARY, "Base64Binary");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.HEXBINARY, "HexBinary");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.FLOAT, "Float");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.DECIMAL, "Decimal");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.INTEGER, "Integer");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.NONPOSITIVEINTEGER,
-				"NonPositiveInteger");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.NEGATIVEINTEGER,
-				"NegativeInteger");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.LONG, "Long");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.INT, "Int");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.SHORT, "Short");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.BYTE, "Byte");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.NONNEGATIVEINTEGER,
-				"NonNegativeInteger");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.UNSIGNEDLONG, "UnsignedLong");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.UNSIGNEDINT, "UnsignedInt");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.UNSIGNEDSHORT, "UnsignedShort");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.UNSIGNEDBYTE, "UnsignedByte");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.POSITIVEINTEGER,
-				"PositiveInteger");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.DOUBLE, "Double");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ANYURI, "AnyURI");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ANYURI, "String");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.QNAME, "QName");
-		// XSD_TYPE_MAPPING.put(XmlSchemaConstants.NOTATION, "Notation");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.DURATION, "Duration");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.DATETIME, "DateTime");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.TIME, "Time");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.DATE, "Date");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.GYEARMONTH, "GYearMonth");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.GYEAR, "GYear");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.GMONTHDAY, "GMonthDay");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.GDAY, "GDay");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.GMONTH, "GMonth");
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.CALENDAR, "Calendar");
-		// XSD_TYPE_MAPPING.put(XmlSchemaConstants.CALENDAR, "String");
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ANYTYPE, new BuiltinLeafInfoCompiler<T, C, O>("AnyType"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ANYSIMPLETYPE, new BuiltinLeafInfoCompiler<T, C, O>("AnySimpleType"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.STRING, new BuiltinLeafInfoCompiler<T, C, O>("String"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.NORMALIZEDSTRING, new BuiltinLeafInfoCompiler<T, C, O>("NormalizedString"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.TOKEN, new BuiltinLeafInfoCompiler<T, C, O>("Token"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.LANGUAGE, new BuiltinLeafInfoCompiler<T, C, O>("Language"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.NAME, new BuiltinLeafInfoCompiler<T, C, O>("Name"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.NCNAME, new BuiltinLeafInfoCompiler<T, C, O>("NCName"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ID, new BuiltinLeafInfoCompiler<T, C, O>("ID"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ID, new BuiltinLeafInfoCompiler<T, C, O>("String"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.IDREF, new BuiltinLeafInfoCompiler<T, C, O>("IDREF"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.IDREF, new BuiltinLeafInfoCompiler<T, C, O>("String"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.IDREFS, new BuiltinLeafInfoCompiler<T, C, O>("IDREFS"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.IDREFS, new BuiltinLeafInfoCompiler<T, C, O>("Strings"));
+		// XSD_TYPE_MAPPING.put(XmlSchemaConstants.ENTITY, new BuiltinLeafInfoCompiler<T, C, O>("Entity"));
+		// XSD_TYPE_MAPPING.put(XmlSchemaConstants.ENTITIES, new BuiltinLeafInfoCompiler<T, C, O>("Entities"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.NMTOKEN, new BuiltinLeafInfoCompiler<T, C, O>("NMToken"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.NMTOKENS, new BuiltinLeafInfoCompiler<T, C, O>("NMTokens"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.BOOLEAN, new BuiltinLeafInfoCompiler<T, C, O>("Boolean"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.BASE64BINARY, new BuiltinLeafInfoCompiler<T, C, O>("Base64Binary"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.HEXBINARY, new BuiltinLeafInfoCompiler<T, C, O>("HexBinary"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.FLOAT, new BuiltinLeafInfoCompiler<T, C, O>("Float"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.DECIMAL, new BuiltinLeafInfoCompiler<T, C, O>("Decimal"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.INTEGER, new BuiltinLeafInfoCompiler<T, C, O>("Integer"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.NONPOSITIVEINTEGER, new BuiltinLeafInfoCompiler<T, C, O>("NonPositiveInteger"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.NEGATIVEINTEGER, new BuiltinLeafInfoCompiler<T, C, O>("NegativeInteger"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.LONG, new BuiltinLeafInfoCompiler<T, C, O>("Long"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.INT, new BuiltinLeafInfoCompiler<T, C, O>("Int"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.SHORT, new BuiltinLeafInfoCompiler<T, C, O>("Short"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.BYTE, new BuiltinLeafInfoCompiler<T, C, O>("Byte"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.NONNEGATIVEINTEGER, new BuiltinLeafInfoCompiler<T, C, O>("NonNegativeInteger"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.UNSIGNEDLONG, new BuiltinLeafInfoCompiler<T, C, O>("UnsignedLong"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.UNSIGNEDINT, new BuiltinLeafInfoCompiler<T, C, O>("UnsignedInt"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.UNSIGNEDSHORT, new BuiltinLeafInfoCompiler<T, C, O>("UnsignedShort"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.UNSIGNEDBYTE, new BuiltinLeafInfoCompiler<T, C, O>("UnsignedByte"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.POSITIVEINTEGER, new BuiltinLeafInfoCompiler<T, C, O>("PositiveInteger"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.DOUBLE, new BuiltinLeafInfoCompiler<T, C, O>("Double"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ANYURI, new BuiltinLeafInfoCompiler<T, C, O>("AnyURI"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ANYURI, new BuiltinLeafInfoCompiler<T, C, O>("String"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.QNAME, new BuiltinLeafInfoCompiler<T, C, O>("QName"));
+		// XSD_TYPE_MAPPING.put(XmlSchemaConstants.NOTATION, new BuiltinLeafInfoCompiler<T, C, O>("Notation"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.DURATION, new BuiltinLeafInfoCompiler<T, C, O>("Duration"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.DATETIME, new BuiltinLeafInfoCompiler<T, C, O>("DateTime"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.TIME, new BuiltinLeafInfoCompiler<T, C, O>("Time"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.DATE, new BuiltinLeafInfoCompiler<T, C, O>("Date"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.GYEARMONTH, new BuiltinLeafInfoCompiler<T, C, O>("GYearMonth"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.GYEAR, new BuiltinLeafInfoCompiler<T, C, O>("GYear"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.GMONTHDAY, new BuiltinLeafInfoCompiler<T, C, O>("GMonthDay"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.GDAY, new BuiltinLeafInfoCompiler<T, C, O>("GDay"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.GMONTH, new BuiltinLeafInfoCompiler<T, C, O>("GMonth"));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.CALENDAR, new BuiltinLeafInfoCompiler<T, C, O>("Calendar"));
+		// XSD_TYPE_MAPPING.put(XmlSchemaConstants.CALENDAR, new BuiltinLeafInfoCompiler<T, C, O>("String"));
 	}
 
-	private final JSCodeModel codeModel;
-	private final Modules<T, C> mappingNameResolver;
-	private final Naming naming;
-	private final String mappingName;
 	private final MOriginated<O> originated;
 
-	CreateTypeInfoDeclarationVisitor(MappingCompiler<T, C> mappingCompiler,
-			MOriginated<O> originated) {
-		Validate.notNull(mappingCompiler);
+	CreateTypeInfoDeclarationVisitor(MOriginated<O> originated) {
 		Validate.notNull(originated);
-		this.mappingNameResolver = mappingCompiler.getModules();
-		this.codeModel = mappingCompiler.getCodeModel();
-		this.naming = mappingCompiler.getNaming();
-		this.mappingName = mappingCompiler.getMapping().getMappingName();
 		this.originated = originated;
 	}
 
-	private JSAssignmentExpression createTypeInfoDeclaration(
-			MPackagedTypeInfo<T, C> info) {
-		final String typeInfoMappingName = this.mappingNameResolver
-				.getMappingName(info.getPackageInfo().getPackageName());
-		final String spaceName = typeInfoMappingName.equals(this.mappingName) ? ""
-				: typeInfoMappingName;
-		final String typeInfoName = spaceName
-				+ "."
-				+ info.getContainerLocalName(MappingCompiler.DEFAULT_SCOPED_NAME_DELIMITER);
-		return this.codeModel.string(typeInfoName);
-
+	public TypeInfoCompiler<T, C> visitEnumLeafInfo(MEnumLeafInfo<T, C> info) {
+		return new PackagedTypeInfoCompiler<T, C>(info);
 	}
 
-	public JSAssignmentExpression visitEnumLeafInfo(MEnumLeafInfo<T, C> info) {
-		return createTypeInfoDeclaration(info);
-	}
-
-	public JSAssignmentExpression visitClassInfo(MClassInfo<T, C> info) {
-		return createTypeInfoDeclaration(info);
+	public TypeInfoCompiler<T, C> visitClassInfo(MClassInfo<T, C> info) {
+		return new PackagedTypeInfoCompiler<T, C>(info);
 	}
 
 	@Override
-	public JSAssignmentExpression visitClassRef(MClassRef<T, C> info) {
-		return createTypeInfoDeclaration(info);
+	public TypeInfoCompiler<T, C> visitClassRef(MClassRef<T, C> info) {
+		return new PackagedTypeInfoCompiler<T, C>(info);
 	}
 
-	public JSAssignmentExpression visitList(MList<T, C> info) {
-		final JSObjectLiteral list = this.codeModel.object();
-		list.append(naming.type(), this.codeModel.string(naming.list()));
-		final JSAssignmentExpression typeInfoDeclaration = info
-				.getItemTypeInfo().acceptTypeInfoVisitor(this);
-		if (!typeInfoDeclaration
-				.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor(
-						"String"))) {
-			list.append(naming.baseTypeInfo(), typeInfoDeclaration);
-		}
-		return list;
+	public TypeInfoCompiler<T, C> visitList(MList<T, C> info) {
+		return new ListCompiler<T, C>(info, info.getItemTypeInfo().acceptTypeInfoVisitor(this));
 	}
 
-	public JSAssignmentExpression visitBuiltinLeafInfo(
-			MBuiltinLeafInfo<T, C> info) {
+	public TypeInfoCompiler<T, C> visitBuiltinLeafInfo(MBuiltinLeafInfo<T, C> info) {
 
 		final O origin = this.originated.getOrigin();
 
 		final List<QName> simpleTypeNames = new LinkedList<QName>();
 		if (origin instanceof SchemaComponentAware) {
-			final XSComponent component = ((SchemaComponentAware) origin)
-					.getSchemaComponent();
+			final XSComponent component = ((SchemaComponentAware) origin).getSchemaComponent();
 			if (component != null) {
 				final CollectSimpleTypeNamesVisitor visitor = new CollectSimpleTypeNamesVisitor();
 				component.visit(visitor);
@@ -207,32 +167,31 @@ final class CreateTypeInfoDeclarationVisitor<T, C extends T, O> implements
 		simpleTypeNames.add(info.getTypeName());
 
 		for (QName candidateName : simpleTypeNames) {
-			final String name = XSD_TYPE_MAPPING.get(candidateName);
-			if (name != null) {
-				return this.codeModel.string(name);
+			final TypeInfoCompiler<T, C> typeInfoCompiler = XSD_TYPE_MAPPING.get(candidateName);
+			if (typeInfoCompiler != null) {
+				return typeInfoCompiler;
 			}
 		}
 		return null;
 	}
 
-	public JSAssignmentExpression visitWildcardTypeInfo(
-			MWildcardTypeInfo<T, C> info) {
+	public TypeInfoCompiler<T, C> visitWildcardTypeInfo(MWildcardTypeInfo<T, C> info) {
 		// TODO ????
 		return null;
 	}
 
 	@Override
-	public JSAssignmentExpression visitID(MID<T, C> info) {
-		return this.codeModel.string(ID_TYPE_INFO_NAME);
+	public TypeInfoCompiler<T, C> visitID(MID<T, C> info) {
+		return new BuiltinLeafInfoCompiler<T, C, O>(ID_TYPE_INFO_NAME);
 	}
 
 	@Override
-	public JSAssignmentExpression visitIDREF(MIDREF<T, C> info) {
-		return this.codeModel.string(IDREF_TYPE_INFO_NAME);
+	public TypeInfoCompiler<T, C> visitIDREF(MIDREF<T, C> info) {
+		return new BuiltinLeafInfoCompiler<T, C, O>(IDREF_TYPE_INFO_NAME);
 	}
 
 	@Override
-	public JSAssignmentExpression visitIDREFS(MIDREFS<T, C> info) {
-		return this.codeModel.string(IDREFS_TYPE_INFO_NAME);
+	public TypeInfoCompiler<T, C> visitIDREFS(MIDREFS<T, C> info) {
+		return new BuiltinLeafInfoCompiler<T, C, O>(IDREFS_TYPE_INFO_NAME);
 	}
 }

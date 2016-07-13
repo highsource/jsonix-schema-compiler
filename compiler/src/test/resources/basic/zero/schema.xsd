@@ -7,7 +7,7 @@
 	
 	<xs:annotation>
 		<xs:appinfo>
-			<jaxb:globalBindings typesafeEnumBase="xs:token"/>
+			<jaxb:globalBindings typesafeEnumBase="xs:string xs:boolean xs:float xs:decimal xs:double xs:anyURI"/>
 			<jaxb:schemaBindings>
 				<jaxb:package name="org.hisrc.jsonix.tests.zero"/>
 			</jaxb:schemaBindings>
@@ -225,6 +225,63 @@
 	<xs:element name="abstractElement" abstract="true"/>
 
 
+	<xs:element name="simpleEnumTypes" type="simpleEnumTypesType"/>
+	<xs:complexType name="simpleEnumTypesType">
+		<xs:sequence>
+			<xs:element name="base64Binary" type="base64BinaryEnumType" minOccurs="0"/>
+			<xs:element name="hexBinary" type="hexBinaryEnumType" minOccurs="0"/>
+			<xs:element name="duration" type="durationEnumType" minOccurs="0"/>
+			<xs:element name="dateTime" type="dateTimeEnumType" minOccurs="0"/>
+			<xs:element name="date" type="dateEnumType" minOccurs="0"/>
+			<xs:element name="time" type="timeEnumType" minOccurs="0"/>
+			<xs:element name="gYearMonth" type="gYearMonthEnumType" minOccurs="0"/>
+			<xs:element name="gYear" type="gYearEnumType" minOccurs="0"/>
+			<xs:element name="gMonthDay" type="gMonthDayEnumType" minOccurs="0"/>
+			<xs:element name="gDay" type="gDayEnumType" minOccurs="0"/>
+			<xs:element name="gMonth" type="gMonthEnumType" minOccurs="0"/>
+			<xs:element name="float" type="floatEnumType" minOccurs="0"/>
+			<xs:element name="double" type="doubleEnumType" minOccurs="0"/>
+			<xs:element name="decimal" type="decimalEnumType" minOccurs="0"/>
+			<xs:element name="integer" type="integerEnumType" minOccurs="0"/>
+			<xs:element name="long" type="longEnumType" minOccurs="0"/>
+			<xs:element name="int" type="intEnumType" minOccurs="0"/>
+			<xs:element name="short" type="shortEnumType" minOccurs="0"/>
+			<xs:element name="byte" type="byteEnumType" minOccurs="0"/>
+			<xs:element name="unsignedLong" type="unsignedLongEnumType" minOccurs="0"/>
+			<xs:element name="unsignedInt" type="unsignedIntEnumType" minOccurs="0"/>
+			<xs:element name="unsignedShort" type="unsignedShortEnumType" minOccurs="0"/>
+			<xs:element name="unsignedByte" type="unsignedByteEnumType" minOccurs="0"/>
+			<xs:element name="nonNegativeInteger" type="nonNegativeIntegerEnumType" minOccurs="0"/>
+			<xs:element name="nonPositiveInteger" type="nonPositiveIntegerEnumType" minOccurs="0"/>
+			<xs:element name="positiveInteger" type="positiveIntegerEnumType" 
+				minOccurs="0"/>
+			<xs:element name="negativeInteger" type="negativeIntegerEnumType" 
+				minOccurs="0"/>
+			<!-- Not allowed by XML Schema -->
+			<!-- xs:element name="boolean" type="booleanEnumType" minOccurs="0"/ -->
+			<xs:element name="anyURI" type="anyURIEnumType" minOccurs="0"/>
+			<xs:element name="QName" type="QNameEnumType" minOccurs="0"/>
+			<!-- 
+			<xs:element name="NOTATION" type="NOTATIONEnumType" minOccurs="0"/>
+			 -->
+
+			<xs:element name="string" type="stringEnumType" minOccurs="0"/>
+			<xs:element name="normalizedString" type="normalizedStringEnumType" 
+				minOccurs="0"/>
+			<xs:element name="token" type="tokenEnumType" minOccurs="0"/>
+			<xs:element name="language" type="languageEnumType" minOccurs="0"/>
+			<xs:element name="Name" type="NameEnumType" minOccurs="0"/>
+			<xs:element name="NCName" type="NCNameEnumType" minOccurs="0"/>
+			<xs:element name="ID" type="IDEnumType" minOccurs="0"/>
+			<xs:element name="IDREF" type="IDREFEnumType" minOccurs="0"/>
+			<xs:element name="IDREFS" type="IDREFSEnumType"/>
+			<xs:element name="ENTITY" type="ENTITYEnumType" minOccurs="0"/>
+			<xs:element name="ENTITIES" type="ENTITIESEnumType" minOccurs="0"/>
+			<xs:element name="NMTOKEN" type="NMTOKENEnumType" minOccurs="0"/>
+			<xs:element name="NMTOKENS" type="NMTOKENSEnumType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+
     <!-- Enumerations -->
     <xs:element name="base64BinaryEnum" type="base64BinaryEnumType"/>
     <xs:simpleType name="base64BinaryEnumType">
@@ -309,8 +366,8 @@
     <xs:element name="gMonthEnum" type="gMonthEnumType"/>
     <xs:simpleType name="gMonthEnumType">
         <xs:restriction base="xs:gMonth">
-            <xs:enumeration value="--05--"/>
-            <xs:enumeration value="--12--"/>
+            <xs:enumeration value="--05"/>
+            <xs:enumeration value="--12"/>
         </xs:restriction>
     </xs:simpleType>
 
@@ -422,7 +479,7 @@
             <xs:enumeration value="12678967543233"/>
         </xs:restriction>
     </xs:simpleType>
-
+    
     <xs:element name="nonPositiveIntegerEnum" type="nonPositiveIntegerEnumType"/>
     <xs:simpleType name="nonPositiveIntegerEnumType">
         <xs:restriction base="xs:nonPositiveInteger">

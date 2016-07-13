@@ -83,8 +83,8 @@ public class MappingCompiler<T, C extends T> {
 	private Mapping<T, C> mapping;
 	private Output output;
 
-	public MappingCompiler(JSCodeModel codeModel, Modules<T, C> modules,
-			Module<T, C> module, Output output, Mapping<T, C> mapping) {
+	public MappingCompiler(JSCodeModel codeModel, Modules<T, C> modules, Module<T, C> module, Output output,
+			Mapping<T, C> mapping) {
 		Validate.notNull(codeModel);
 		Validate.notNull(modules);
 		Validate.notNull(module);
@@ -95,10 +95,8 @@ public class MappingCompiler<T, C extends T> {
 		this.mapping = mapping;
 		this.mappingName = mapping.getMappingName();
 		this.targetNamespaceURI = mapping.getTargetNamespaceURI();
-		this.defaultElementNamespaceURI = mapping
-				.getDefaultElementNamespaceURI();
-		this.defaultAttributeNamespaceURI = mapping
-				.getDefaultAttributeNamespaceURI();
+		this.defaultElementNamespaceURI = mapping.getDefaultElementNamespaceURI();
+		this.defaultAttributeNamespaceURI = mapping.getDefaultAttributeNamespaceURI();
 
 		this.output = output;
 		this.naming = output.getNaming();
@@ -131,13 +129,11 @@ public class MappingCompiler<T, C extends T> {
 		mappingBody.append(naming.name(), codeModel.string(this.mappingName));
 
 		if (!(this.targetNamespaceURI.equals(this.defaultElementNamespaceURI))) {
-			mappingBody.append(naming.targetNamespaceURI(),
-					codeModel.string(this.targetNamespaceURI));
+			mappingBody.append(naming.targetNamespaceURI(), codeModel.string(this.targetNamespaceURI));
 		}
 
 		if (!StringUtils.isEmpty(this.defaultElementNamespaceURI)) {
-			mappingBody.append(naming.defaultElementNamespaceURI(),
-					codeModel.string(this.defaultElementNamespaceURI));
+			mappingBody.append(naming.defaultElementNamespaceURI(), codeModel.string(this.defaultElementNamespaceURI));
 		}
 
 		if (!StringUtils.isEmpty(this.defaultAttributeNamespaceURI)) {
@@ -165,16 +161,12 @@ public class MappingCompiler<T, C extends T> {
 	}
 
 	private void compileDependencies(JSArrayLiteral dependencies) {
-		final Collection<MappingDependency<T, C>> mappingDependencies = mapping
-				.getDirectDependencies();
+		final Collection<MappingDependency<T, C>> mappingDependencies = mapping.getDirectDependencies();
 		final Set<String> mappingDependencyNames = new LinkedHashSet<String>();
 		for (final MappingDependency<T, C> mappingDependency : mappingDependencies) {
-			final MPackageInfo dependencyPackageInfo = mappingDependency
-					.getPackageInfo();
-			final String dependencyPackageName = dependencyPackageInfo
-					.getPackageName();
-			final String dependencyMappingName = modules
-					.getMappingName(dependencyPackageName);
+			final MPackageInfo dependencyPackageInfo = mappingDependency.getPackageInfo();
+			final String dependencyPackageName = dependencyPackageInfo.getPackageName();
+			final String dependencyMappingName = modules.getMappingName(dependencyPackageName);
 			mappingDependencyNames.add(dependencyMappingName);
 		}
 		for (final String mappingDependencyName : mappingDependencyNames) {
@@ -196,10 +188,8 @@ public class MappingCompiler<T, C extends T> {
 
 	private JSObjectLiteral compileClassInfo(MClassInfo<T, C> classInfo) {
 		final JSObjectLiteral classInfoMapping = this.codeModel.object();
-		final String localName = classInfo
-				.getContainerLocalName(DEFAULT_SCOPED_NAME_DELIMITER);
-		classInfoMapping.append(naming.localName(),
-				this.codeModel.string(localName));
+		final String localName = classInfo.getContainerLocalName(DEFAULT_SCOPED_NAME_DELIMITER);
+		classInfoMapping.append(naming.localName(), this.codeModel.string(localName));
 		final String targetNamespace = mapping.getTargetNamespaceURI();
 		final QName defaultTypeName = new QName(targetNamespace, localName);
 		final QName typeName = classInfo.getTypeName();
@@ -208,20 +198,14 @@ public class MappingCompiler<T, C extends T> {
 			final JSAssignmentExpression typeNameExpression;
 			if (typeName == null) {
 				typeNameExpression = getCodeModel()._null();
-			} else if (defaultTypeName.getNamespaceURI().equals(
-					typeName.getNamespaceURI())) {
-				typeNameExpression = getCodeModel().string(
-						typeName.getLocalPart());
+			} else if (defaultTypeName.getNamespaceURI().equals(typeName.getNamespaceURI())) {
+				typeNameExpression = getCodeModel().string(typeName.getLocalPart());
 			} else {
 				final JSObjectLiteral typeNameObject = getCodeModel().object();
-				typeNameObject.append(naming.namespaceURI(), getCodeModel()
-						.string(typeName.getNamespaceURI()));
-				typeNameObject.append(naming.localPart(), getCodeModel()
-						.string(typeName.getLocalPart()));
-				if (!XMLConstants.DEFAULT_NS_PREFIX
-						.equals(typeName.getPrefix())) {
-					typeNameObject.append(naming.prefix(), getCodeModel()
-							.string(typeName.getPrefix()));
+				typeNameObject.append(naming.namespaceURI(), getCodeModel().string(typeName.getNamespaceURI()));
+				typeNameObject.append(naming.localPart(), getCodeModel().string(typeName.getLocalPart()));
+				if (!XMLConstants.DEFAULT_NS_PREFIX.equals(typeName.getPrefix())) {
+					typeNameObject.append(naming.prefix(), getCodeModel().string(typeName.getPrefix()));
 				}
 				typeNameExpression = typeNameObject;
 			}
@@ -231,8 +215,7 @@ public class MappingCompiler<T, C extends T> {
 
 		final MClassTypeInfo<T, C, ?> baseTypeInfo = classInfo.getBaseTypeInfo();
 		if (baseTypeInfo != null) {
-			classInfoMapping.append(naming.baseTypeInfo(),
-					getTypeInfoDeclaration(classInfo, baseTypeInfo));
+			classInfoMapping.append(naming.baseTypeInfo(), getTypeInfoDeclaration(classInfo, baseTypeInfo));
 		}
 		final JSArrayLiteral ps = compilePropertyInfos(classInfo);
 		if (!ps.getElements().isEmpty()) {
@@ -244,16 +227,14 @@ public class MappingCompiler<T, C extends T> {
 	private JSObjectLiteral compileEnumLeafInfo(MEnumLeafInfo<T, C> enumLeafInfo) {
 		final JSObjectLiteral mapping = this.codeModel.object();
 		mapping.append(naming.type(), this.codeModel.string(naming.enumInfo()));
-		mapping.append(naming.localName(), this.codeModel.string(enumLeafInfo
-				.getContainerLocalName(DEFAULT_SCOPED_NAME_DELIMITER)));
+		mapping.append(naming.localName(),
+				this.codeModel.string(enumLeafInfo.getContainerLocalName(DEFAULT_SCOPED_NAME_DELIMITER)));
 
 		final MTypeInfo<T, C> baseTypeInfo = enumLeafInfo.getBaseTypeInfo();
 		if (baseTypeInfo != null) {
-			final JSAssignmentExpression baseTypeInfoDeclaration = getTypeInfoDeclaration(
-					enumLeafInfo, baseTypeInfo);
+			final JSAssignmentExpression baseTypeInfoDeclaration = getTypeInfoDeclaration(enumLeafInfo, baseTypeInfo);
 			if (!baseTypeInfoDeclaration
-					.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor(
-							"String"))) {
+					.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor("String"))) {
 				mapping.append(naming.baseTypeInfo(), baseTypeInfoDeclaration);
 			}
 		}
@@ -266,21 +247,16 @@ public class MappingCompiler<T, C extends T> {
 		for (MPropertyInfo<T, C> propertyInfo : classInfo.getProperties()) {
 			if (mapping.getPropertyInfos().contains(propertyInfo)) {
 				propertyInfoMappings
-						.append(propertyInfo
-								.acceptPropertyInfoVisitor(new PropertyInfoVisitor<T, C>(
-										this)));
+						.append(propertyInfo.acceptPropertyInfoVisitor(new PropertyInfoVisitor<T, C>(this)));
 			}
 		}
 		return propertyInfoMappings;
 	}
 
-	private JSArrayLiteral compileEnumConstrantInfos(
-			MEnumLeafInfo<T, C> enumLeafInfo) {
+	private JSArrayLiteral compileEnumConstrantInfos(MEnumLeafInfo<T, C> enumLeafInfo) {
 		final JSArrayLiteral mappings = this.codeModel.array();
-		for (MEnumConstantInfo<T, C> enumConstantInfo : enumLeafInfo
-				.getConstants()) {
-			mappings.append(this.codeModel.string(enumConstantInfo
-					.getLexicalValue()));
+		for (MEnumConstantInfo<T, C> enumConstantInfo : enumLeafInfo.getConstants()) {
+			mappings.append(this.codeModel.string(enumConstantInfo.getLexicalValue()));
 		}
 		return mappings;
 	}
@@ -297,26 +273,20 @@ public class MappingCompiler<T, C extends T> {
 		QName substitutionHead = elementInfo.getSubstitutionHead();
 
 		final JSObjectLiteral value = this.codeModel.object();
-		JSAssignmentExpression typeInfoDeclaration = getTypeInfoDeclaration(
-				elementInfo, typeInfo);
+		JSAssignmentExpression typeInfoDeclaration = getTypeInfoDeclaration(elementInfo, typeInfo);
 		QName elementName = elementInfo.getElementName();
-		value.append(naming.elementName(),
-				createElementNameExpression(elementName));
+		value.append(naming.elementName(), createElementNameExpression(elementName));
 		if (typeInfoDeclaration != null) {
-			if (!typeInfoDeclaration
-					.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor(
-							"String"))) {
+			if (!typeInfoDeclaration.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor("String"))) {
 				value.append(naming.typeInfo(), typeInfoDeclaration);
 			}
 		}
 
 		if (scope != null) {
-			value.append(naming.scope(),
-					getTypeInfoDeclaration(elementInfo, scope));
+			value.append(naming.scope(), getTypeInfoDeclaration(elementInfo, scope));
 		}
 		if (substitutionHead != null) {
-			value.append(naming.substitutionHead(),
-					createElementNameExpression(substitutionHead));
+			value.append(naming.substitutionHead(), createElementNameExpression(substitutionHead));
 		}
 		return value;
 	}
@@ -332,11 +302,9 @@ public class MappingCompiler<T, C extends T> {
 	}
 
 	@SuppressWarnings("deprecation")
-	private JSMemberExpression createNameExpression(final QName name,
-			final String defaultNamespaceURI) {
+	private JSMemberExpression createNameExpression(final QName name, final String defaultNamespaceURI) {
 		final String draftNamespaceURI = name.getNamespaceURI();
-		final String namespaceURI = StringUtils.isEmpty(draftNamespaceURI) ? null
-				: draftNamespaceURI;
+		final String namespaceURI = StringUtils.isEmpty(draftNamespaceURI) ? null : draftNamespaceURI;
 
 		if (ObjectUtils.equals(defaultNamespaceURI, namespaceURI)) {
 			return this.codeModel.string(name.getLocalPart());
@@ -344,48 +312,38 @@ public class MappingCompiler<T, C extends T> {
 
 			final JSObjectLiteral nameExpression = this.codeModel.object();
 
-			nameExpression.append(naming.localPart(),
-					this.codeModel.string(name.getLocalPart()));
+			nameExpression.append(naming.localPart(), this.codeModel.string(name.getLocalPart()));
 
 			if (!StringUtils.isEmpty(namespaceURI)) {
-				nameExpression.append(naming.namespaceURI(),
-						this.codeModel.string(namespaceURI));
+				nameExpression.append(naming.namespaceURI(), this.codeModel.string(namespaceURI));
 
 			}
 			return nameExpression;
 		}
 	}
 
-	public JSAssignmentExpression getTypeInfoDeclaration(
-			MClassInfo<T, C> classInfo, MTypeInfo<T, C> typeInfo) {
-		return getTypeInfoDeclaration(
-				(MOriginated<MClassInfoOrigin>) classInfo, typeInfo);
+	public JSAssignmentExpression getTypeInfoDeclaration(MClassInfo<T, C> classInfo, MTypeInfo<T, C> typeInfo) {
+		return getTypeInfoDeclaration((MOriginated<MClassInfoOrigin>) classInfo, typeInfo);
 	}
 
-	public JSAssignmentExpression getTypeInfoDeclaration(
-			MEnumLeafInfo<T, C> enumLeafInfo, MTypeInfo<T, C> typeInfo) {
-		return getTypeInfoDeclaration(
-				(MOriginated<MEnumLeafInfoOrigin>) enumLeafInfo, typeInfo);
+	public JSAssignmentExpression getTypeInfoDeclaration(MEnumLeafInfo<T, C> enumLeafInfo, MTypeInfo<T, C> typeInfo) {
+		return getTypeInfoDeclaration((MOriginated<MEnumLeafInfoOrigin>) enumLeafInfo, typeInfo);
 	}
 
-	public JSAssignmentExpression getTypeInfoDeclaration(
-			MPropertyInfo<T, C> propertyInfo, MTypeInfo<T, C> typeInfo) {
+	public JSAssignmentExpression getTypeInfoDeclaration(MPropertyInfo<T, C> propertyInfo, MTypeInfo<T, C> typeInfo) {
 
-		return getTypeInfoDeclaration(
-				(MOriginated<MPropertyInfoOrigin>) propertyInfo, typeInfo);
+		return getTypeInfoDeclaration((MOriginated<MPropertyInfoOrigin>) propertyInfo, typeInfo);
 
 	}
 
-	public <M extends MElementTypeInfo<T, C, O>, O> JSAssignmentExpression getTypeInfoDeclaration(
-			M elementInfo, MTypeInfo<T, C> typeInfo) {
+	public <M extends MElementTypeInfo<T, C, O>, O> JSAssignmentExpression getTypeInfoDeclaration(M elementInfo,
+			MTypeInfo<T, C> typeInfo) {
 		return getTypeInfoDeclaration((MOriginated<O>) elementInfo, typeInfo);
 	}
 
-	public <O> JSAssignmentExpression getTypeInfoDeclaration(
-			MOriginated<O> originated, MTypeInfo<T, C> typeInfo) {
+	public <O> JSAssignmentExpression getTypeInfoDeclaration(MOriginated<O> originated, MTypeInfo<T, C> typeInfo) {
 
-		return typeInfo
-				.acceptTypeInfoVisitor(new CreateTypeInfoDeclarationVisitor<T, C, O>(
-						this, originated));
+		return typeInfo.acceptTypeInfoVisitor(new CreateTypeInfoDeclarationVisitor<T, C, O>(originated))
+				.createTypeInfoDeclaration(this);
 	}
 }
