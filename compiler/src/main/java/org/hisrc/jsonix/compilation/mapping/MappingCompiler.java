@@ -48,6 +48,7 @@ import org.hisrc.jscm.codemodel.expression.JSArrayLiteral;
 import org.hisrc.jscm.codemodel.expression.JSAssignmentExpression;
 import org.hisrc.jscm.codemodel.expression.JSMemberExpression;
 import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
+import org.hisrc.jsonix.compilation.typeinfo.TypeInfoCompiler;
 import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.definition.MappingDependency;
 import org.hisrc.jsonix.definition.Module;
@@ -215,7 +216,8 @@ public class MappingCompiler<T, C extends T> {
 
 		final MClassTypeInfo<T, C, ?> baseTypeInfo = classInfo.getBaseTypeInfo();
 		if (baseTypeInfo != null) {
-			classInfoMapping.append(naming.baseTypeInfo(), getTypeInfoDeclaration(classInfo, baseTypeInfo));
+			classInfoMapping.append(naming.baseTypeInfo(),
+					getTypeInfoCompiler(classInfo, baseTypeInfo).createTypeInfoDeclaration(this));
 		}
 		final JSArrayLiteral ps = compilePropertyInfos(classInfo);
 		if (!ps.getElements().isEmpty()) {
@@ -232,13 +234,18 @@ public class MappingCompiler<T, C extends T> {
 
 		final MTypeInfo<T, C> baseTypeInfo = enumLeafInfo.getBaseTypeInfo();
 		if (baseTypeInfo != null) {
-			final JSAssignmentExpression baseTypeInfoDeclaration = getTypeInfoDeclaration(enumLeafInfo, baseTypeInfo);
+			final TypeInfoCompiler<T, C> baseTypeInfoCompiler = getTypeInfoCompiler(enumLeafInfo, baseTypeInfo);
+			final JSAssignmentExpression baseTypeInfoDeclaration = baseTypeInfoCompiler.createTypeInfoDeclaration(this);
 			if (!baseTypeInfoDeclaration
 					.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor("String"))) {
 				mapping.append(naming.baseTypeInfo(), baseTypeInfoDeclaration);
 			}
+			final JSArrayLiteral values = this.codeModel.array();
+			for (MEnumConstantInfo<T, C> enumConstantInfo : enumLeafInfo.getConstants()) {
+				values.append(baseTypeInfoCompiler.createValue(this.codeModel, enumConstantInfo.getLexicalValue()));
+			}
+			mapping.append(naming.values(), values);
 		}
-		mapping.append(naming.values(), compileEnumConstrantInfos(enumLeafInfo));
 		return mapping;
 	}
 
@@ -253,14 +260,6 @@ public class MappingCompiler<T, C extends T> {
 		return propertyInfoMappings;
 	}
 
-	private JSArrayLiteral compileEnumConstrantInfos(MEnumLeafInfo<T, C> enumLeafInfo) {
-		final JSArrayLiteral mappings = this.codeModel.array();
-		for (MEnumConstantInfo<T, C> enumConstantInfo : enumLeafInfo.getConstants()) {
-			mappings.append(this.codeModel.string(enumConstantInfo.getLexicalValue()));
-		}
-		return mappings;
-	}
-
 	private void compileElementInfos(JSArrayLiteral eis) {
 		for (MElementInfo<T, C> elementInfo : mapping.getElementInfos()) {
 			eis.append(compileElementInfo(elementInfo));
@@ -273,7 +272,8 @@ public class MappingCompiler<T, C extends T> {
 		QName substitutionHead = elementInfo.getSubstitutionHead();
 
 		final JSObjectLiteral value = this.codeModel.object();
-		JSAssignmentExpression typeInfoDeclaration = getTypeInfoDeclaration(elementInfo, typeInfo);
+		JSAssignmentExpression typeInfoDeclaration = getTypeInfoCompiler(elementInfo, typeInfo)
+				.createTypeInfoDeclaration(this);
 		QName elementName = elementInfo.getElementName();
 		value.append(naming.elementName(), createElementNameExpression(elementName));
 		if (typeInfoDeclaration != null) {
@@ -283,7 +283,7 @@ public class MappingCompiler<T, C extends T> {
 		}
 
 		if (scope != null) {
-			value.append(naming.scope(), getTypeInfoDeclaration(elementInfo, scope));
+			value.append(naming.scope(), getTypeInfoCompiler(elementInfo, scope).createTypeInfoDeclaration(this));
 		}
 		if (substitutionHead != null) {
 			value.append(naming.substitutionHead(), createElementNameExpression(substitutionHead));
@@ -322,28 +322,25 @@ public class MappingCompiler<T, C extends T> {
 		}
 	}
 
-	public JSAssignmentExpression getTypeInfoDeclaration(MClassInfo<T, C> classInfo, MTypeInfo<T, C> typeInfo) {
-		return getTypeInfoDeclaration((MOriginated<MClassInfoOrigin>) classInfo, typeInfo);
+	public TypeInfoCompiler<T, C> getTypeInfoCompiler(MClassInfo<T, C> classInfo, MTypeInfo<T, C> typeInfo) {
+		return getTypeInfoCompiler((MOriginated<MClassInfoOrigin>) classInfo, typeInfo);
 	}
 
-	public JSAssignmentExpression getTypeInfoDeclaration(MEnumLeafInfo<T, C> enumLeafInfo, MTypeInfo<T, C> typeInfo) {
-		return getTypeInfoDeclaration((MOriginated<MEnumLeafInfoOrigin>) enumLeafInfo, typeInfo);
+	public TypeInfoCompiler<T, C> getTypeInfoCompiler(MEnumLeafInfo<T, C> enumLeafInfo, MTypeInfo<T, C> typeInfo) {
+		return getTypeInfoCompiler((MOriginated<MEnumLeafInfoOrigin>) enumLeafInfo, typeInfo);
 	}
 
-	public JSAssignmentExpression getTypeInfoDeclaration(MPropertyInfo<T, C> propertyInfo, MTypeInfo<T, C> typeInfo) {
-
-		return getTypeInfoDeclaration((MOriginated<MPropertyInfoOrigin>) propertyInfo, typeInfo);
-
+	public TypeInfoCompiler<T, C> getTypeInfoCompiler(MPropertyInfo<T, C> propertyInfo, MTypeInfo<T, C> typeInfo) {
+		return getTypeInfoCompiler((MOriginated<MPropertyInfoOrigin>) propertyInfo, typeInfo);
 	}
 
-	public <M extends MElementTypeInfo<T, C, O>, O> JSAssignmentExpression getTypeInfoDeclaration(M elementInfo,
+	public <M extends MElementTypeInfo<T, C, O>, O> TypeInfoCompiler<T, C> getTypeInfoCompiler(M elementInfo,
 			MTypeInfo<T, C> typeInfo) {
-		return getTypeInfoDeclaration((MOriginated<O>) elementInfo, typeInfo);
+		return getTypeInfoCompiler((MOriginated<O>) elementInfo, typeInfo);
 	}
 
-	public <O> JSAssignmentExpression getTypeInfoDeclaration(MOriginated<O> originated, MTypeInfo<T, C> typeInfo) {
+	public <O> TypeInfoCompiler<T, C> getTypeInfoCompiler(MOriginated<O> originated, MTypeInfo<T, C> typeInfo) {
 
-		return typeInfo.acceptTypeInfoVisitor(new CreateTypeInfoDeclarationVisitor<T, C, O>(originated))
-				.createTypeInfoDeclaration(this);
+		return typeInfo.acceptTypeInfoVisitor(new CreateTypeInfoCompilerTypeInfoVisitor<T, C, O>(originated));
 	}
 }

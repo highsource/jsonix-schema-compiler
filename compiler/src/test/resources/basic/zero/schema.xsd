@@ -7,7 +7,7 @@
 	
 	<xs:annotation>
 		<xs:appinfo>
-			<jaxb:globalBindings typesafeEnumBase="xs:string xs:boolean xs:float xs:decimal xs:double xs:anyURI"/>
+			<jaxb:globalBindings typesafeEnumBase="xs:decimal"/>
 			<jaxb:schemaBindings>
 				<jaxb:package name="org.hisrc.jsonix.tests.zero"/>
 			</jaxb:schemaBindings>
@@ -288,6 +288,7 @@
         <xs:restriction base="xs:base64Binary">
             <xs:enumeration value="aGVyb25neWFuZy5jb20="/>
             <xs:enumeration value="QQ=="/>
+            <xs:enumeration value="1g=="/>
         </xs:restriction>
     </xs:simpleType>
 

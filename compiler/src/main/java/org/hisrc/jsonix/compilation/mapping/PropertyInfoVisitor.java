@@ -1,6 +1,7 @@
 package org.hisrc.jsonix.compilation.mapping;
 
 import java.math.BigInteger;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -10,8 +11,12 @@ import org.hisrc.jscm.codemodel.expression.JSArrayLiteral;
 import org.hisrc.jscm.codemodel.expression.JSAssignmentExpression;
 import org.hisrc.jscm.codemodel.expression.JSMemberExpression;
 import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
+import org.hisrc.jsonix.compilation.typeinfo.TypeInfoCompiler;
 import org.hisrc.jsonix.naming.Naming;
+import org.hisrc.jsonix.xml.xsom.CollectEnumerationValuesVisitor;
+import org.hisrc.jsonix.xml.xsom.CollectSimpleTypeNamesVisitor;
 import org.hisrc.jsonix.xml.xsom.ParticleMultiplicityCounter;
+import org.hisrc.xml.xsom.SchemaComponentAware;
 import org.hisrc.xml.xsom.XSFunctionApplier;
 import org.jvnet.jaxb2_commons.xml.bind.model.MAnyAttributePropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MAnyElementPropertyInfo;
@@ -31,12 +36,14 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MValuePropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MWildcard;
 import org.jvnet.jaxb2_commons.xml.bind.model.MWrappable;
+import org.jvnet.jaxb2_commons.xml.bind.model.origin.MOriginated;
 import org.jvnet.jaxb2_commons.xml.bind.model.util.DefaultTypeInfoVisitor;
 
 import com.sun.tools.xjc.model.Multiplicity;
+import com.sun.xml.xsom.XSComponent;
+import com.sun.xml.xsom.XmlString;
 
-final class PropertyInfoVisitor<T, C extends T> implements
-		MPropertyInfoVisitor<T, C, JSObjectLiteral> {
+final class PropertyInfoVisitor<T, C extends T> implements MPropertyInfoVisitor<T, C, JSObjectLiteral> {
 
 	private final JSCodeModel codeModel;
 	private final MappingCompiler<T, C> mappingCompiler;
@@ -51,28 +58,22 @@ final class PropertyInfoVisitor<T, C extends T> implements
 		this.naming = mappingCompiler.getNaming();
 	}
 
-	private void createPropertyInfoOptions(MPropertyInfo<T, C> propertyInfo,
-			JSObjectLiteral options) {
-		options.append(naming.name(),
-				this.codeModel.string(propertyInfo.getPrivateName()));
+	private void createPropertyInfoOptions(MPropertyInfo<T, C> propertyInfo, JSObjectLiteral options) {
+		options.append(naming.name(), this.codeModel.string(propertyInfo.getPrivateName()));
 
-		final Multiplicity multiplicity = multiplicityCounter
-				.apply(propertyInfo.getOrigin());
+		final Multiplicity multiplicity = multiplicityCounter.apply(propertyInfo.getOrigin());
 		if (multiplicity != null) {
-			if (multiplicity.min != null
-					&& !BigInteger.ZERO.equals(multiplicity.min)) {
+			if (multiplicity.min != null && !BigInteger.ZERO.equals(multiplicity.min)) {
 				options.append(naming.required(), this.codeModel._boolean(true));
 			}
 			if (propertyInfo.isCollection()) {
 				if (multiplicity.min != null) {
 					if (!BigInteger.ONE.equals(multiplicity.min)) {
-						options.append(naming.minOccurs(), this.codeModel
-								.integer(multiplicity.min.longValue()));
+						options.append(naming.minOccurs(), this.codeModel.integer(multiplicity.min.longValue()));
 					}
 				}
 				if (multiplicity.max != null) {
-					options.append(naming.maxOccurs(), this.codeModel
-							.integer(multiplicity.max.longValue()));
+					options.append(naming.maxOccurs(), this.codeModel.integer(multiplicity.max.longValue()));
 				}
 			}
 		}
@@ -82,20 +83,45 @@ final class PropertyInfoVisitor<T, C extends T> implements
 		}
 	}
 
-	private <M extends MElementTypeInfo<T, C, O>, O> void createTypedOptions(
-			final M info, final JSObjectLiteral options) {
+	private <M extends MElementTypeInfo<T, C, O>, O> void createTypedOptions(final M info,
+			final JSObjectLiteral options) {
 		final MTypeInfo<T, C> typeInfo = info.getTypeInfo();
 
 		typeInfo.acceptTypeInfoVisitor(new DefaultTypeInfoVisitor<T, C, Void>() {
 			@Override
 			public Void visitTypeInfo(MTypeInfo<T, C> typeInfo) {
-				final JSAssignmentExpression typeInfoDeclaration = PropertyInfoVisitor.this.mappingCompiler
-						.getTypeInfoDeclaration(info, typeInfo);
+				final TypeInfoCompiler<T, C> typeInfoCompiler = PropertyInfoVisitor.this.mappingCompiler
+						.getTypeInfoCompiler(info, typeInfo);
+				final JSAssignmentExpression typeInfoDeclaration = typeInfoCompiler.createTypeInfoDeclaration(PropertyInfoVisitor.this.mappingCompiler);
 				if (!typeInfoDeclaration
-						.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor(
-								"String"))) {
+						.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor("String"))) {
 					options.append(naming.typeInfo(), typeInfoDeclaration);
 				}
+				
+				if (info instanceof MOriginated)
+				{
+					MOriginated<?> originated = (MOriginated<?>) info;
+					Object origin = originated.getOrigin();
+					if (origin instanceof SchemaComponentAware) {
+						final XSComponent component = ((SchemaComponentAware) origin).getSchemaComponent();
+						if (component != null) {
+							
+							final CollectEnumerationValuesVisitor collectEnumerationValuesVisitor = new CollectEnumerationValuesVisitor();
+							component.visit(collectEnumerationValuesVisitor);
+							final List<XmlString> enumerationValues = collectEnumerationValuesVisitor.getValues();
+							if (!enumerationValues.isEmpty())
+							{
+								final JSArrayLiteral values = PropertyInfoVisitor.this.codeModel.array();
+								for (XmlString enumerationValue : enumerationValues)
+								{
+									values.append(typeInfoCompiler.createValue(codeModel, enumerationValue));
+								}
+								options.append(naming.values(), values);
+							}
+						}
+					}
+				}
+				
 				return null;
 			}
 
@@ -106,19 +132,17 @@ final class PropertyInfoVisitor<T, C extends T> implements
 		});
 	}
 
-	private void createTypedOptions(
-			final MSingleTypePropertyInfo<T, C> propertyInfo,
-			final JSObjectLiteral options) {
+	private void createTypedOptions(final MSingleTypePropertyInfo<T, C> propertyInfo, final JSObjectLiteral options) {
 		final MTypeInfo<T, C> typeInfo = propertyInfo.getTypeInfo();
 
 		typeInfo.acceptTypeInfoVisitor(new DefaultTypeInfoVisitor<T, C, Void>() {
 			@Override
 			public Void visitTypeInfo(MTypeInfo<T, C> typeInfo) {
 				final JSAssignmentExpression typeInfoDeclaration = PropertyInfoVisitor.this.mappingCompiler
-						.getTypeInfoDeclaration(propertyInfo, typeInfo);
+						.getTypeInfoCompiler(propertyInfo, typeInfo)
+						.createTypeInfoDeclaration(PropertyInfoVisitor.this.mappingCompiler);
 				if (!typeInfoDeclaration
-						.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor(
-								"String"))) {
+						.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor("String"))) {
 					options.append(naming.typeInfo(), typeInfoDeclaration);
 				}
 				return null;
@@ -134,27 +158,22 @@ final class PropertyInfoVisitor<T, C extends T> implements
 	private void createWrappableOptions(MWrappable info, JSObjectLiteral options) {
 		final QName wrapperElementName = info.getWrapperElementName();
 		if (wrapperElementName != null) {
-			options.append(naming.wrapperElementName(), mappingCompiler
-					.createElementNameExpression(wrapperElementName));
+			options.append(naming.wrapperElementName(),
+					mappingCompiler.createElementNameExpression(wrapperElementName));
 		}
 	}
 
-	private <M extends MElementTypeInfo<T, C, O>, O> void createElementTypeInfoOptions(
-			M info, JSObjectLiteral options) {
+	private <M extends MElementTypeInfo<T, C, O>, O> void createElementTypeInfoOptions(M info,
+			JSObjectLiteral options) {
 		final QName elementName = info.getElementName();
-		options.append(naming.elementName(),
-				mappingCompiler.createElementNameExpression(elementName));
+		options.append(naming.elementName(), mappingCompiler.createElementNameExpression(elementName));
 		createTypedOptions(info, options);
 	}
 
-	private <M extends MElementTypeInfo<T, C, O>, O> void createElementTypeInfoOptions(
-			M info, String privateName, QName elementName,
-			JSObjectLiteral options) {
-		JSMemberExpression elementNameExpression = mappingCompiler
-				.createElementNameExpression(elementName);
-		if (!elementNameExpression
-				.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor(
-						privateName))) {
+	private <M extends MElementTypeInfo<T, C, O>, O> void createElementTypeInfoOptions(M info, String privateName,
+			QName elementName, JSObjectLiteral options) {
+		JSMemberExpression elementNameExpression = mappingCompiler.createElementNameExpression(elementName);
+		if (!elementNameExpression.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor(privateName))) {
 			options.append(naming.elementName(), elementNameExpression);
 		}
 		createTypedOptions(info, options);
@@ -165,8 +184,7 @@ final class PropertyInfoVisitor<T, C extends T> implements
 			options.append(naming.allowDom(), this.codeModel._boolean(false));
 		}
 		if (!info.isTypedObjectAllowed()) {
-			options.append(naming.allowTypedObject(),
-					this.codeModel._boolean(false));
+			options.append(naming.allowTypedObject(), this.codeModel._boolean(false));
 		}
 	}
 
@@ -176,20 +194,17 @@ final class PropertyInfoVisitor<T, C extends T> implements
 		}
 	}
 
-	public JSObjectLiteral visitElementPropertyInfo(
-			MElementPropertyInfo<T, C> info) {
+	public JSObjectLiteral visitElementPropertyInfo(MElementPropertyInfo<T, C> info) {
 		JSObjectLiteral options = this.codeModel.object();
 		// options.append(naming.type(),
 		// this.codeModel.string(naming.element()));
 		createPropertyInfoOptions(info, options);
 		createWrappableOptions(info, options);
-		createElementTypeInfoOptions(info, info.getPrivateName(),
-				info.getElementName(), options);
+		createElementTypeInfoOptions(info, info.getPrivateName(), info.getElementName(), options);
 		return options;
 	}
 
-	public JSObjectLiteral visitElementsPropertyInfo(
-			MElementsPropertyInfo<T, C> info) {
+	public JSObjectLiteral visitElementsPropertyInfo(MElementsPropertyInfo<T, C> info) {
 		JSObjectLiteral options = this.codeModel.object();
 		createPropertyInfoOptions(info, options);
 		createWrappableOptions(info, options);
@@ -204,28 +219,23 @@ final class PropertyInfoVisitor<T, C extends T> implements
 			final JSArrayLiteral elementTypeInfos = this.codeModel.array();
 			options.append(naming.elementTypeInfos(), elementTypeInfos);
 			for (M elementTypeInfo : info.getElementTypeInfos()) {
-				final JSObjectLiteral elementTypeInfoOptions = this.codeModel
-						.object();
-				createElementTypeInfoOptions(elementTypeInfo,
-						elementTypeInfoOptions);
+				final JSObjectLiteral elementTypeInfoOptions = this.codeModel.object();
+				createElementTypeInfoOptions(elementTypeInfo, elementTypeInfoOptions);
 				elementTypeInfos.append(elementTypeInfoOptions);
 			}
 		}
 	}
 
-	public JSObjectLiteral visitAnyElementPropertyInfo(
-			MAnyElementPropertyInfo<T, C> info) {
+	public JSObjectLiteral visitAnyElementPropertyInfo(MAnyElementPropertyInfo<T, C> info) {
 		JSObjectLiteral options = this.codeModel.object();
 		createPropertyInfoOptions(info, options);
 		createWildcardOptions(info, options);
 		createMixableOptions(info, options);
-		options.append(naming.type(),
-				this.codeModel.string(naming.anyElement()));
+		options.append(naming.type(), this.codeModel.string(naming.anyElement()));
 		return options;
 	}
 
-	public JSObjectLiteral visitAttributePropertyInfo(
-			MAttributePropertyInfo<T, C> info) {
+	public JSObjectLiteral visitAttributePropertyInfo(MAttributePropertyInfo<T, C> info) {
 		JSObjectLiteral options = this.codeModel.object();
 		createPropertyInfoOptions(info, options);
 		createTypedOptions(info, options);
@@ -233,20 +243,17 @@ final class PropertyInfoVisitor<T, C extends T> implements
 		final JSMemberExpression attributeNameExpression = mappingCompiler
 				.createAttributeNameExpression(info.getAttributeName());
 		if (!attributeNameExpression
-				.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor(
-						info.getPrivateName()))) {
+				.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor(info.getPrivateName()))) {
 			options.append(naming.attributeName(), attributeNameExpression);
 		}
 		options.append(naming.type(), this.codeModel.string(naming.attribute()));
 		return options;
 	}
 
-	public JSObjectLiteral visitAnyAttributePropertyInfo(
-			MAnyAttributePropertyInfo<T, C> info) {
+	public JSObjectLiteral visitAnyAttributePropertyInfo(MAnyAttributePropertyInfo<T, C> info) {
 		JSObjectLiteral options = this.codeModel.object();
 		createPropertyInfoOptions(info, options);
-		options.append(naming.type(),
-				this.codeModel.string(naming.anyAttribute()));
+		options.append(naming.type(), this.codeModel.string(naming.anyAttribute()));
 		return options;
 	}
 
@@ -258,30 +265,25 @@ final class PropertyInfoVisitor<T, C extends T> implements
 		return options;
 	}
 
-	public JSObjectLiteral visitElementRefPropertyInfo(
-			MElementRefPropertyInfo<T, C> info) {
+	public JSObjectLiteral visitElementRefPropertyInfo(MElementRefPropertyInfo<T, C> info) {
 		JSObjectLiteral options = this.codeModel.object();
 		createPropertyInfoOptions(info, options);
 		createMixableOptions(info, options);
 		createWrappableOptions(info, options);
 		createWildcardOptions(info, options);
-		createElementTypeInfoOptions(info, info.getPrivateName(),
-				info.getElementName(), options);
-		options.append(naming.type(),
-				this.codeModel.string(naming.elementRef()));
+		createElementTypeInfoOptions(info, info.getPrivateName(), info.getElementName(), options);
+		options.append(naming.type(), this.codeModel.string(naming.elementRef()));
 		return options;
 	}
 
-	public JSObjectLiteral visitElementRefsPropertyInfo(
-			MElementRefsPropertyInfo<T, C> info) {
+	public JSObjectLiteral visitElementRefsPropertyInfo(MElementRefsPropertyInfo<T, C> info) {
 		JSObjectLiteral options = this.codeModel.object();
 		createPropertyInfoOptions(info, options);
 		createMixableOptions(info, options);
 		createWrappableOptions(info, options);
 		createWildcardOptions(info, options);
 		createElementTypeInfosOptions(info, options);
-		options.append(naming.type(),
-				this.codeModel.string(naming.elementRefs()));
+		options.append(naming.type(), this.codeModel.string(naming.elementRefs()));
 		return options;
 	}
 }

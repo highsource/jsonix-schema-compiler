@@ -122,9 +122,4 @@ public class CollectSimpleTypeNamesVisitor implements XSVisitor {
 			// simpleType.getSimpleBaseType()
 		}
 	}
-
-	private void todo(String comment) {
-		// logger.error((comment == null ? "" : comment + " ")
-		// + "Not yet supported.");
-	}
 }
