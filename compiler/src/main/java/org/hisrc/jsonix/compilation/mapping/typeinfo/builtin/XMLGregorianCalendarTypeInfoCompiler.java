@@ -1,22 +1,24 @@
-package org.hisrc.jsonix.compilation.typeinfo.builtin;
+package org.hisrc.jsonix.compilation.mapping.typeinfo.builtin;
 
 import javax.xml.datatype.DatatypeConstants;
-import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.namespace.QName;
 
 import org.hisrc.jscm.codemodel.JSCodeModel;
 import org.hisrc.jscm.codemodel.expression.JSAssignmentExpression;
 import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
-import org.hisrc.jsonix.compilation.typeinfo.BuiltinLeafInfoCompiler;
+import org.hisrc.jsonix.compilation.mapping.MappingCompiler;
+import org.hisrc.jsonix.compilation.mapping.typeinfo.BuiltinLeafInfoCompiler;
 
 public class XMLGregorianCalendarTypeInfoCompiler<T, C extends T, O> extends BuiltinLeafInfoCompiler<T, C, O> {
 
-	public XMLGregorianCalendarTypeInfoCompiler(String name) {
-		super(name);
+	public XMLGregorianCalendarTypeInfoCompiler(String name, QName qualifiedName) {
+		super(name, qualifiedName);
 	}
 
 	@Override
-	public JSAssignmentExpression createValue(JSCodeModel codeModel, String item) {
+	public JSAssignmentExpression createValue(MappingCompiler<T, C> mappingCompiler, String item) {
+		final JSCodeModel codeModel = mappingCompiler.getCodeModel();
 		final JSObjectLiteral result = codeModel.object();
 		final XMLGregorianCalendar calendar = datatypeFactory.newXMLGregorianCalendar(item);
 		if (calendar.getYear() != DatatypeConstants.FIELD_UNDEFINED) {

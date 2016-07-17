@@ -1,4 +1,4 @@
-package org.hisrc.jsonix.compilation.typeinfo;
+package org.hisrc.jsonix.compilation.mapping.typeinfo;
 
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jscm.codemodel.JSCodeModel;
@@ -9,7 +9,7 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MPackagedTypeInfo;
 
 import com.sun.xml.xsom.XmlString;
 
-public class PackagedTypeInfoCompiler<T, C extends T> implements TypeInfoCompiler<T, C> {
+public abstract class PackagedTypeInfoCompiler<T, C extends T> implements TypeInfoCompiler<T, C> {
 
 	private final MPackagedTypeInfo<T, C> typeInfo;
 
@@ -31,14 +31,14 @@ public class PackagedTypeInfoCompiler<T, C extends T> implements TypeInfoCompile
 				+ this.typeInfo.getContainerLocalName(MappingCompiler.DEFAULT_SCOPED_NAME_DELIMITER);
 		return codeModel.string(typeInfoName);
 	}
-	
+
 	@Override
-	public JSAssignmentExpression createValue(JSCodeModel codeModel, XmlString item) {
-		throw new UnsupportedOperationException();
+	public JSAssignmentExpression createValue(MappingCompiler<T, C> mappingCompiler, XmlString item) {
+		return createValue(mappingCompiler, item.value);
 	}
-	
+
 	@Override
-	public JSAssignmentExpression createValue(JSCodeModel codeModel, String item) {
-		throw new UnsupportedOperationException();
+	public JSAssignmentExpression createValue(MappingCompiler<T, C> mappingCompiler, String item) {
+		return null;
 	}
 }

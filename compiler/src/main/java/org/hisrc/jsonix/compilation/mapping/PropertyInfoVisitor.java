@@ -11,10 +11,9 @@ import org.hisrc.jscm.codemodel.expression.JSArrayLiteral;
 import org.hisrc.jscm.codemodel.expression.JSAssignmentExpression;
 import org.hisrc.jscm.codemodel.expression.JSMemberExpression;
 import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
-import org.hisrc.jsonix.compilation.typeinfo.TypeInfoCompiler;
+import org.hisrc.jsonix.compilation.mapping.typeinfo.TypeInfoCompiler;
 import org.hisrc.jsonix.naming.Naming;
 import org.hisrc.jsonix.xml.xsom.CollectEnumerationValuesVisitor;
-import org.hisrc.jsonix.xml.xsom.CollectSimpleTypeNamesVisitor;
 import org.hisrc.jsonix.xml.xsom.ParticleMultiplicityCounter;
 import org.hisrc.xml.xsom.SchemaComponentAware;
 import org.hisrc.xml.xsom.XSFunctionApplier;
@@ -43,7 +42,7 @@ import com.sun.tools.xjc.model.Multiplicity;
 import com.sun.xml.xsom.XSComponent;
 import com.sun.xml.xsom.XmlString;
 
-final class PropertyInfoVisitor<T, C extends T> implements MPropertyInfoVisitor<T, C, JSObjectLiteral> {
+public final class PropertyInfoVisitor<T, C extends T> implements MPropertyInfoVisitor<T, C, JSObjectLiteral> {
 
 	private final JSCodeModel codeModel;
 	private final MappingCompiler<T, C> mappingCompiler;
@@ -87,47 +86,56 @@ final class PropertyInfoVisitor<T, C extends T> implements MPropertyInfoVisitor<
 			final JSObjectLiteral options) {
 		final MTypeInfo<T, C> typeInfo = info.getTypeInfo();
 
-		typeInfo.acceptTypeInfoVisitor(new DefaultTypeInfoVisitor<T, C, Void>() {
+		typeInfo.acceptTypeInfoVisitor(new DefaultTypeInfoVisitor<T, C, TypeInfoCompiler<T, C>>() {
+
 			@Override
-			public Void visitTypeInfo(MTypeInfo<T, C> typeInfo) {
+			public TypeInfoCompiler<T, C> visitTypeInfo(MTypeInfo<T, C> typeInfo) {
 				final TypeInfoCompiler<T, C> typeInfoCompiler = PropertyInfoVisitor.this.mappingCompiler
 						.getTypeInfoCompiler(info, typeInfo);
-				final JSAssignmentExpression typeInfoDeclaration = typeInfoCompiler.createTypeInfoDeclaration(PropertyInfoVisitor.this.mappingCompiler);
+				final JSAssignmentExpression typeInfoDeclaration = typeInfoCompiler
+						.createTypeInfoDeclaration(PropertyInfoVisitor.this.mappingCompiler);
 				if (!typeInfoDeclaration
-						.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor("String"))) {
+						.acceptExpressionVisitor(new IsLiteralEquals("String"))) {
 					options.append(naming.typeInfo(), typeInfoDeclaration);
 				}
-				
-				if (info instanceof MOriginated)
-				{
+				return typeInfoCompiler;
+			}
+
+			@Override
+			public TypeInfoCompiler<T, C> visitBuiltinLeafInfo(MBuiltinLeafInfo<T, C> typeInfo) {
+				final TypeInfoCompiler<T, C> typeInfoCompiler = visitTypeInfo(typeInfo);
+
+				if (info instanceof MOriginated) {
 					MOriginated<?> originated = (MOriginated<?>) info;
 					Object origin = originated.getOrigin();
 					if (origin instanceof SchemaComponentAware) {
 						final XSComponent component = ((SchemaComponentAware) origin).getSchemaComponent();
 						if (component != null) {
-							
+
 							final CollectEnumerationValuesVisitor collectEnumerationValuesVisitor = new CollectEnumerationValuesVisitor();
 							component.visit(collectEnumerationValuesVisitor);
 							final List<XmlString> enumerationValues = collectEnumerationValuesVisitor.getValues();
-							if (!enumerationValues.isEmpty())
-							{
+							if (enumerationValues != null && !enumerationValues.isEmpty()) {
 								final JSArrayLiteral values = PropertyInfoVisitor.this.codeModel.array();
-								for (XmlString enumerationValue : enumerationValues)
-								{
-									values.append(typeInfoCompiler.createValue(codeModel, enumerationValue));
+								boolean valueSupported = true;
+								for (XmlString enumerationValue : enumerationValues) {
+									final JSAssignmentExpression value = typeInfoCompiler.createValue(PropertyInfoVisitor.this.mappingCompiler,
+											enumerationValue);
+									if (value == null) {
+										valueSupported = false;
+										break;
+									} else {
+										values.append(value);
+									}
 								}
-								options.append(naming.values(), values);
+								if (valueSupported) {
+									options.append(naming.values(), values);
+								}
 							}
 						}
 					}
 				}
-				
-				return null;
-			}
-
-			@Override
-			public Void visitBuiltinLeafInfo(MBuiltinLeafInfo<T, C> info) {
-				return super.visitBuiltinLeafInfo(info);
+				return typeInfoCompiler;
 			}
 		});
 	}
@@ -142,7 +150,7 @@ final class PropertyInfoVisitor<T, C extends T> implements MPropertyInfoVisitor<
 						.getTypeInfoCompiler(propertyInfo, typeInfo)
 						.createTypeInfoDeclaration(PropertyInfoVisitor.this.mappingCompiler);
 				if (!typeInfoDeclaration
-						.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor("String"))) {
+						.acceptExpressionVisitor(new IsLiteralEquals("String"))) {
 					options.append(naming.typeInfo(), typeInfoDeclaration);
 				}
 				return null;
@@ -173,7 +181,7 @@ final class PropertyInfoVisitor<T, C extends T> implements MPropertyInfoVisitor<
 	private <M extends MElementTypeInfo<T, C, O>, O> void createElementTypeInfoOptions(M info, String privateName,
 			QName elementName, JSObjectLiteral options) {
 		JSMemberExpression elementNameExpression = mappingCompiler.createElementNameExpression(elementName);
-		if (!elementNameExpression.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor(privateName))) {
+		if (!elementNameExpression.acceptExpressionVisitor(new IsLiteralEquals(privateName))) {
 			options.append(naming.elementName(), elementNameExpression);
 		}
 		createTypedOptions(info, options);
@@ -243,7 +251,7 @@ final class PropertyInfoVisitor<T, C extends T> implements MPropertyInfoVisitor<
 		final JSMemberExpression attributeNameExpression = mappingCompiler
 				.createAttributeNameExpression(info.getAttributeName());
 		if (!attributeNameExpression
-				.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor(info.getPrivateName()))) {
+				.acceptExpressionVisitor(new IsLiteralEquals(info.getPrivateName()))) {
 			options.append(naming.attributeName(), attributeNameExpression);
 		}
 		options.append(naming.type(), this.codeModel.string(naming.attribute()));

@@ -1,11 +1,13 @@
-package org.hisrc.jsonix.compilation.typeinfo;
+package org.hisrc.jsonix.compilation.mapping.typeinfo;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
+import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.Validate;
-import org.hisrc.jscm.codemodel.JSCodeModel;
 import org.hisrc.jscm.codemodel.expression.JSAssignmentExpression;
+import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
+import org.hisrc.jsonix.compilation.jsonschema.typeinfo.TypeInfoProducer;
 import org.hisrc.jsonix.compilation.mapping.MappingCompiler;
 
 import com.sun.xml.xsom.XmlString;
@@ -16,8 +18,12 @@ public class BuiltinLeafInfoCompiler<T, C extends T, O> implements TypeInfoCompi
 
 	protected final DatatypeFactory datatypeFactory;
 
-	public BuiltinLeafInfoCompiler(String name) {
+	private QName qualifiedName;
+
+	public BuiltinLeafInfoCompiler(String name, QName qualifiedName) {
 		Validate.notNull(name);
+		Validate.notNull(qualifiedName);
+		this.qualifiedName = qualifiedName;
 		this.name = name;
 		try {
 			this.datatypeFactory = DatatypeFactory.newInstance();
@@ -33,12 +39,17 @@ public class BuiltinLeafInfoCompiler<T, C extends T, O> implements TypeInfoCompi
 	}
 
 	@Override
-	public JSAssignmentExpression createValue(JSCodeModel codeModel, XmlString item) {
-		return createValue(codeModel, item.value);
+	public JSAssignmentExpression createValue(MappingCompiler<T, C> mappingCompiler, XmlString item) {
+		return createValue(mappingCompiler, item.value);
 	}
 
 	@Override
-	public JSAssignmentExpression createValue(JSCodeModel codeModel, String item) {
-		return codeModel.string(item);
+	public JSAssignmentExpression createValue(MappingCompiler<T, C> mappingCompiler, String item) {
+		return null;
+	}
+
+	@Override
+	public JSObjectLiteral compile(MappingCompiler<T, C> mappingCompiler) {
+		throw new UnsupportedOperationException();
 	}
 }

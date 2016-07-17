@@ -60,7 +60,7 @@ public class JsonixPluginZeroTest {
 				"-xmlschema",
 				getClass().getResource("/basic/zero/schema.xsd")
 						.toExternalForm(), "-d",
-				"target/generated-sources/basic/zero", "-extension", "-Xjsonix"
+				"target/generated-sources/basic/zero", "-extension", "-Xjsonix", "-Xjsonix-generateJsonSchema"
 
 		};
 

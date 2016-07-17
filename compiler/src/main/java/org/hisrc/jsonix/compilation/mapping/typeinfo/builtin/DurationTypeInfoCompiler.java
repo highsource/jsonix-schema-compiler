@@ -1,20 +1,23 @@
-package org.hisrc.jsonix.compilation.typeinfo.builtin;
+package org.hisrc.jsonix.compilation.mapping.typeinfo.builtin;
 
 import javax.xml.datatype.Duration;
 
 import org.hisrc.jscm.codemodel.JSCodeModel;
 import org.hisrc.jscm.codemodel.expression.JSAssignmentExpression;
 import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
-import org.hisrc.jsonix.compilation.typeinfo.BuiltinLeafInfoCompiler;
+import org.hisrc.jsonix.compilation.mapping.MappingCompiler;
+import org.hisrc.jsonix.compilation.mapping.typeinfo.BuiltinLeafInfoCompiler;
+import org.jvnet.jaxb2_commons.xmlschema.XmlSchemaConstants;
 
 public class DurationTypeInfoCompiler<T, C extends T, O> extends BuiltinLeafInfoCompiler<T, C, O> {
 
 	public DurationTypeInfoCompiler() {
-		super("Duration");
+		super("Duration", XmlSchemaConstants.DURATION);
 	}
 
 	@Override
-	public JSAssignmentExpression createValue(JSCodeModel codeModel, String item) {
+	public JSAssignmentExpression createValue(MappingCompiler<T, C> mappingCompiler, String item) {
+		final JSCodeModel codeModel = mappingCompiler.getCodeModel();
 		final JSObjectLiteral result = codeModel.object();
 		final Duration duration = datatypeFactory.newDuration(item);
 		if (duration.getSign() <= 0) {

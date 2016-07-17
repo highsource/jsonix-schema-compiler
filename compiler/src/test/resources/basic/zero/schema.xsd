@@ -7,7 +7,7 @@
 	
 	<xs:annotation>
 		<xs:appinfo>
-			<jaxb:globalBindings typesafeEnumBase="xs:decimal"/>
+			<jaxb:globalBindings typesafeEnumBase="xs:string"/>
 			<jaxb:schemaBindings>
 				<jaxb:package name="org.hisrc.jsonix.tests.zero"/>
 			</jaxb:schemaBindings>

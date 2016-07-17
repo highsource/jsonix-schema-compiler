@@ -25,19 +25,15 @@ public class JsonSchemaModulesGenerator<T, C extends T> {
 
 	public void generate(JsonStructureWriter<T, C> writer) {
 		final JsonProvider provider = JsonProvider.provider();
-		final JsonBuilderFactory builderFactory = provider
-				.createBuilderFactory(null);
+		final JsonBuilderFactory builderFactory = provider.createBuilderFactory(null);
 		for (final Module<T, C> module : this.modules.getModules()) {
 			if (!module.isEmpty()) {
 				for (JsonSchema jsonSchema : module.getJsonSchemas()) {
 					final JsonSchemaModuleCompiler<T, C> moduleCompiler = new JsonSchemaModuleCompiler<T, C>(
-							this, module, jsonSchema);
-					final JsonSchemaBuilder moduleSchema = moduleCompiler
-							.compile();
-					final JsonObject moduleSchemaJsonObject = moduleSchema
-							.build(builderFactory);
-					writer.writeJsonStructure(module, moduleSchemaJsonObject,
-							jsonSchema.getFileName());
+							builderFactory, modules, module, jsonSchema);
+					final JsonSchemaBuilder moduleSchema = moduleCompiler.compile();
+					final JsonObject moduleSchemaJsonObject = moduleSchema.build(builderFactory);
+					writer.writeJsonStructure(module, moduleSchemaJsonObject, jsonSchema.getFileName());
 				}
 			}
 		}

@@ -1,4 +1,4 @@
-package org.hisrc.jsonix.compilation.typeinfo.builtin;
+package org.hisrc.jsonix.compilation.mapping.typeinfo.builtin;
 
 import java.util.Iterator;
 
@@ -10,7 +10,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.hisrc.jscm.codemodel.JSCodeModel;
 import org.hisrc.jscm.codemodel.expression.JSAssignmentExpression;
 import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
-import org.hisrc.jsonix.compilation.typeinfo.BuiltinLeafInfoCompiler;
+import org.hisrc.jsonix.compilation.mapping.MappingCompiler;
+import org.hisrc.jsonix.compilation.mapping.typeinfo.BuiltinLeafInfoCompiler;
+import org.jvnet.jaxb2_commons.xmlschema.XmlSchemaConstants;
 import org.relaxng.datatype.ValidationContext;
 
 import com.sun.xml.xsom.XmlString;
@@ -18,14 +20,16 @@ import com.sun.xml.xsom.XmlString;
 public class QNameTypeInfoCompiler<T, C extends T, O> extends BuiltinLeafInfoCompiler<T, C, O> {
 
 	public QNameTypeInfoCompiler() {
-		super("QName");
+		super("QName", XmlSchemaConstants.QNAME);
 	}
 
 	@Override
-	public JSAssignmentExpression createValue(JSCodeModel codeModel, XmlString item) {
+	public JSAssignmentExpression createValue(MappingCompiler<T, C> mappingCompiler, XmlString item) {
+		final JSCodeModel codeModel = mappingCompiler.getCodeModel();
 		final ValidationContext context = item.context;
 		final QName value = DatatypeConverter.parseQName(item.value, new NamespaceContext() {
 
+			@SuppressWarnings("rawtypes")
 			@Override
 			public Iterator getPrefixes(String namespaceURI) {
 				throw new UnsupportedOperationException();

@@ -37,7 +37,6 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -48,7 +47,10 @@ import org.hisrc.jscm.codemodel.expression.JSArrayLiteral;
 import org.hisrc.jscm.codemodel.expression.JSAssignmentExpression;
 import org.hisrc.jscm.codemodel.expression.JSMemberExpression;
 import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
-import org.hisrc.jsonix.compilation.typeinfo.TypeInfoCompiler;
+import org.hisrc.jsonix.compilation.mapping.typeinfo.ClassInfoCompiler;
+import org.hisrc.jsonix.compilation.mapping.typeinfo.CreateTypeInfoCompiler;
+import org.hisrc.jsonix.compilation.mapping.typeinfo.EnumLeafInfoCompiler;
+import org.hisrc.jsonix.compilation.mapping.typeinfo.TypeInfoCompiler;
 import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.definition.MappingDependency;
 import org.hisrc.jsonix.definition.Module;
@@ -56,10 +58,8 @@ import org.hisrc.jsonix.definition.Modules;
 import org.hisrc.jsonix.definition.Output;
 import org.hisrc.jsonix.naming.Naming;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MClassTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementTypeInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MEnumConstantInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
@@ -188,76 +188,11 @@ public class MappingCompiler<T, C extends T> {
 	}
 
 	private JSObjectLiteral compileClassInfo(MClassInfo<T, C> classInfo) {
-		final JSObjectLiteral classInfoMapping = this.codeModel.object();
-		final String localName = classInfo.getContainerLocalName(DEFAULT_SCOPED_NAME_DELIMITER);
-		classInfoMapping.append(naming.localName(), this.codeModel.string(localName));
-		final String targetNamespace = mapping.getTargetNamespaceURI();
-		final QName defaultTypeName = new QName(targetNamespace, localName);
-		final QName typeName = classInfo.getTypeName();
-
-		if (!defaultTypeName.equals(typeName)) {
-			final JSAssignmentExpression typeNameExpression;
-			if (typeName == null) {
-				typeNameExpression = getCodeModel()._null();
-			} else if (defaultTypeName.getNamespaceURI().equals(typeName.getNamespaceURI())) {
-				typeNameExpression = getCodeModel().string(typeName.getLocalPart());
-			} else {
-				final JSObjectLiteral typeNameObject = getCodeModel().object();
-				typeNameObject.append(naming.namespaceURI(), getCodeModel().string(typeName.getNamespaceURI()));
-				typeNameObject.append(naming.localPart(), getCodeModel().string(typeName.getLocalPart()));
-				if (!XMLConstants.DEFAULT_NS_PREFIX.equals(typeName.getPrefix())) {
-					typeNameObject.append(naming.prefix(), getCodeModel().string(typeName.getPrefix()));
-				}
-				typeNameExpression = typeNameObject;
-			}
-			classInfoMapping.append(naming.typeName(), typeNameExpression);
-
-		}
-
-		final MClassTypeInfo<T, C, ?> baseTypeInfo = classInfo.getBaseTypeInfo();
-		if (baseTypeInfo != null) {
-			classInfoMapping.append(naming.baseTypeInfo(),
-					getTypeInfoCompiler(classInfo, baseTypeInfo).createTypeInfoDeclaration(this));
-		}
-		final JSArrayLiteral ps = compilePropertyInfos(classInfo);
-		if (!ps.getElements().isEmpty()) {
-			classInfoMapping.append(naming.propertyInfos(), ps);
-		}
-		return classInfoMapping;
+		return new ClassInfoCompiler<T, C>(classInfo).compile(this);
 	}
 
 	private JSObjectLiteral compileEnumLeafInfo(MEnumLeafInfo<T, C> enumLeafInfo) {
-		final JSObjectLiteral mapping = this.codeModel.object();
-		mapping.append(naming.type(), this.codeModel.string(naming.enumInfo()));
-		mapping.append(naming.localName(),
-				this.codeModel.string(enumLeafInfo.getContainerLocalName(DEFAULT_SCOPED_NAME_DELIMITER)));
-
-		final MTypeInfo<T, C> baseTypeInfo = enumLeafInfo.getBaseTypeInfo();
-		if (baseTypeInfo != null) {
-			final TypeInfoCompiler<T, C> baseTypeInfoCompiler = getTypeInfoCompiler(enumLeafInfo, baseTypeInfo);
-			final JSAssignmentExpression baseTypeInfoDeclaration = baseTypeInfoCompiler.createTypeInfoDeclaration(this);
-			if (!baseTypeInfoDeclaration
-					.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor("String"))) {
-				mapping.append(naming.baseTypeInfo(), baseTypeInfoDeclaration);
-			}
-			final JSArrayLiteral values = this.codeModel.array();
-			for (MEnumConstantInfo<T, C> enumConstantInfo : enumLeafInfo.getConstants()) {
-				values.append(baseTypeInfoCompiler.createValue(this.codeModel, enumConstantInfo.getLexicalValue()));
-			}
-			mapping.append(naming.values(), values);
-		}
-		return mapping;
-	}
-
-	private JSArrayLiteral compilePropertyInfos(MClassInfo<T, C> classInfo) {
-		final JSArrayLiteral propertyInfoMappings = this.codeModel.array();
-		for (MPropertyInfo<T, C> propertyInfo : classInfo.getProperties()) {
-			if (mapping.getPropertyInfos().contains(propertyInfo)) {
-				propertyInfoMappings
-						.append(propertyInfo.acceptPropertyInfoVisitor(new PropertyInfoVisitor<T, C>(this)));
-			}
-		}
-		return propertyInfoMappings;
+		return new EnumLeafInfoCompiler<T, C>(enumLeafInfo).compile(this);
 	}
 
 	private void compileElementInfos(JSArrayLiteral eis) {
@@ -277,7 +212,7 @@ public class MappingCompiler<T, C extends T> {
 		QName elementName = elementInfo.getElementName();
 		value.append(naming.elementName(), createElementNameExpression(elementName));
 		if (typeInfoDeclaration != null) {
-			if (!typeInfoDeclaration.acceptExpressionVisitor(new CheckValueStringLiteralExpressionVisitor("String"))) {
+			if (!typeInfoDeclaration.acceptExpressionVisitor(new IsLiteralEquals("String"))) {
 				value.append(naming.typeInfo(), typeInfoDeclaration);
 			}
 		}
@@ -341,6 +276,6 @@ public class MappingCompiler<T, C extends T> {
 
 	public <O> TypeInfoCompiler<T, C> getTypeInfoCompiler(MOriginated<O> originated, MTypeInfo<T, C> typeInfo) {
 
-		return typeInfo.acceptTypeInfoVisitor(new CreateTypeInfoCompilerTypeInfoVisitor<T, C, O>(originated));
+		return typeInfo.acceptTypeInfoVisitor(new CreateTypeInfoCompiler<T, C, O>(originated));
 	}
 }
