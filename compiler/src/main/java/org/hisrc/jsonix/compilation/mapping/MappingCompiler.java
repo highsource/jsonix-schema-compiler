@@ -65,6 +65,7 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.origin.MClassInfoOrigin;
+import org.jvnet.jaxb2_commons.xml.bind.model.origin.MElementInfoOrigin;
 import org.jvnet.jaxb2_commons.xml.bind.model.origin.MEnumLeafInfoOrigin;
 import org.jvnet.jaxb2_commons.xml.bind.model.origin.MOriginated;
 import org.jvnet.jaxb2_commons.xml.bind.model.origin.MPropertyInfoOrigin;
@@ -207,15 +208,10 @@ public class MappingCompiler<T, C extends T> {
 		QName substitutionHead = elementInfo.getSubstitutionHead();
 
 		final JSObjectLiteral value = this.codeModel.object();
-		JSAssignmentExpression typeInfoDeclaration = getTypeInfoCompiler(elementInfo, typeInfo)
-				.createTypeInfoDeclaration(this);
+		typeInfo.acceptTypeInfoVisitor(
+				new CreateTypeInfoDelaration<T, C, MElementInfo<T, C>, MElementInfoOrigin>(this, elementInfo, value));
 		QName elementName = elementInfo.getElementName();
 		value.append(naming.elementName(), createElementNameExpression(elementName));
-		if (typeInfoDeclaration != null) {
-			if (!typeInfoDeclaration.acceptExpressionVisitor(new IsLiteralEquals("String"))) {
-				value.append(naming.typeInfo(), typeInfoDeclaration);
-			}
-		}
 
 		if (scope != null) {
 			value.append(naming.scope(), getTypeInfoCompiler(elementInfo, scope).createTypeInfoDeclaration(this));

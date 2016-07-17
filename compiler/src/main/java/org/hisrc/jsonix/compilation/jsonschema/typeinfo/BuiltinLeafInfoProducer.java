@@ -1,6 +1,8 @@
 package org.hisrc.jsonix.compilation.jsonschema.typeinfo;
 
 import javax.json.JsonValue;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.Validate;
@@ -15,6 +17,7 @@ public class BuiltinLeafInfoProducer<T, C extends T, O> implements TypeInfoProdu
 
 	private final String jsonSchemaId;
 	private final QName qualifiedName;
+	protected final DatatypeFactory datatypeFactory;
 
 	public BuiltinLeafInfoProducer(QName qualifiedName) {
 		this(XmlSchemaJsonSchemaConstants.SCHEMA_ID, Validate.notNull(qualifiedName));
@@ -25,6 +28,11 @@ public class BuiltinLeafInfoProducer<T, C extends T, O> implements TypeInfoProdu
 		Validate.notNull(jsonShemaId);
 		this.jsonSchemaId = jsonShemaId;
 		this.qualifiedName = qualifiedName;
+		try {
+			this.datatypeFactory = DatatypeFactory.newInstance();
+		} catch (DatatypeConfigurationException dcex) {
+			throw new ExceptionInInitializerError(dcex);
+		}
 	}
 
 	@Override
@@ -42,7 +50,7 @@ public class BuiltinLeafInfoProducer<T, C extends T, O> implements TypeInfoProdu
 	public JsonValue createValue(JsonSchemaMappingCompiler<T, C> mappingCompiler, XmlString item) {
 		return createValue(mappingCompiler, item.value);
 	}
-	
+
 	@Override
 	public JsonValue createValue(JsonSchemaMappingCompiler<T, C> mappingCompiler, String item) {
 		return null;

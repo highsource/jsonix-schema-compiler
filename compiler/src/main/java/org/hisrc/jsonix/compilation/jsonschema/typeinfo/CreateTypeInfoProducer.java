@@ -42,7 +42,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.compilation.jsonschema.JsonixJsonSchemaConstants;
-import org.hisrc.jsonix.compilation.jsonschema.XmlSchemaJsonSchemaConstants;
 import org.hisrc.jsonix.compilation.jsonschema.typeinfo.builtin.Base64BinaryTypeInfoProducer;
 import org.hisrc.jsonix.compilation.jsonschema.typeinfo.builtin.BooleanTypeInfoProducer;
 import org.hisrc.jsonix.compilation.jsonschema.typeinfo.builtin.DecimalTypeInfoProducer;
@@ -72,10 +71,6 @@ import com.sun.xml.xsom.XSComponent;
 
 public class CreateTypeInfoProducer<T, C extends T, O> implements MTypeInfoVisitor<T, C, TypeInfoProducer<T, C>> {
 
-	private static final String IDREFS_TYPE_INFO_NAME = "IDREFS";
-	private static final String IDREF_TYPE_INFO_NAME = "IDREF";
-	private static final String ID_TYPE_INFO_NAME = "ID";
-
 	private Map<QName, TypeInfoProducer<T, C>> XSD_TYPE_MAPPING = new HashMap<QName, TypeInfoProducer<T, C>>();
 	{
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ANYTYPE,
@@ -101,51 +96,46 @@ public class CreateTypeInfoProducer<T, C extends T, O> implements MTypeInfoVisit
 				new BuiltinLeafInfoProducer<T, C, O>(XmlSchemaConstants.IDREFS));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.IDREFS,
 				new BuiltinLeafInfoProducer<T, C, O>(XmlSchemaConstants.IDREFS));
-		 XSD_TYPE_MAPPING.put(XmlSchemaConstants.ENTITY, new
-				 NormalizedStringTypeInfoProducer<T, C, O>(XmlSchemaConstants.ENTITY));
-		 XSD_TYPE_MAPPING.put(XmlSchemaConstants.ENTITIES, new
-				 NormalizedStringTypeInfoProducer<T, C, O>(XmlSchemaConstants.ENTITIES));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ENTITY,
+				new NormalizedStringTypeInfoProducer<T, C, O>(XmlSchemaConstants.ENTITY));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ENTITIES,
+				new NormalizedStringTypeInfoProducer<T, C, O>(XmlSchemaConstants.ENTITIES));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.NMTOKEN,
-				new NormalizedStringTypeInfoProducer<T, C, O>( XmlSchemaConstants.NMTOKEN));
+				new NormalizedStringTypeInfoProducer<T, C, O>(XmlSchemaConstants.NMTOKEN));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.NMTOKENS,
 				new NormalizedStringTypeInfoProducer<T, C, O>(XmlSchemaConstants.NMTOKENS));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.BOOLEAN, new BooleanTypeInfoProducer<T, C, O>());
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.BASE64BINARY, new Base64BinaryTypeInfoProducer<T, C, O>());
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.HEXBINARY, new HexBinaryTypeInfoProducer<T, C, O>());
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.FLOAT,
-				new DecimalTypeInfoProducer<T, C, O>( XmlSchemaConstants.FLOAT));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.FLOAT, new DecimalTypeInfoProducer<T, C, O>(XmlSchemaConstants.FLOAT));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.DECIMAL,
-				new DecimalTypeInfoProducer<T, C, O>( XmlSchemaConstants.DECIMAL));
+				new DecimalTypeInfoProducer<T, C, O>(XmlSchemaConstants.DECIMAL));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.INTEGER,
 				new IntegerTypeInfoProducer<T, C, O>(XmlSchemaConstants.INTEGER));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.NONPOSITIVEINTEGER,
-				new IntegerTypeInfoProducer<T, C, O>( XmlSchemaConstants.NONPOSITIVEINTEGER));
+				new IntegerTypeInfoProducer<T, C, O>(XmlSchemaConstants.NONPOSITIVEINTEGER));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.NEGATIVEINTEGER,
-				new IntegerTypeInfoProducer<T, C, O>( XmlSchemaConstants.NEGATIVEINTEGER));
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.LONG,
-				new IntegerTypeInfoProducer<T, C, O>( XmlSchemaConstants.LONG));
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.INT,
-				new IntegerTypeInfoProducer<T, C, O>( XmlSchemaConstants.INT));
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.SHORT,
-				new IntegerTypeInfoProducer<T, C, O>( XmlSchemaConstants.SHORT));
-		XSD_TYPE_MAPPING.put(XmlSchemaConstants.BYTE,
-				new IntegerTypeInfoProducer<T, C, O>( XmlSchemaConstants.BYTE));
+				new IntegerTypeInfoProducer<T, C, O>(XmlSchemaConstants.NEGATIVEINTEGER));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.LONG, new IntegerTypeInfoProducer<T, C, O>(XmlSchemaConstants.LONG));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.INT, new IntegerTypeInfoProducer<T, C, O>(XmlSchemaConstants.INT));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.SHORT, new IntegerTypeInfoProducer<T, C, O>(XmlSchemaConstants.SHORT));
+		XSD_TYPE_MAPPING.put(XmlSchemaConstants.BYTE, new IntegerTypeInfoProducer<T, C, O>(XmlSchemaConstants.BYTE));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.NONNEGATIVEINTEGER,
 				new IntegerTypeInfoProducer<T, C, O>(XmlSchemaConstants.NONNEGATIVEINTEGER));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.UNSIGNEDLONG,
-				new IntegerTypeInfoProducer<T, C, O>( XmlSchemaConstants.UNSIGNEDLONG));
+				new IntegerTypeInfoProducer<T, C, O>(XmlSchemaConstants.UNSIGNEDLONG));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.UNSIGNEDINT,
-				new IntegerTypeInfoProducer<T, C, O>( XmlSchemaConstants.UNSIGNEDINT));
+				new IntegerTypeInfoProducer<T, C, O>(XmlSchemaConstants.UNSIGNEDINT));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.UNSIGNEDSHORT,
-				new IntegerTypeInfoProducer<T, C, O>( XmlSchemaConstants.UNSIGNEDSHORT));
+				new IntegerTypeInfoProducer<T, C, O>(XmlSchemaConstants.UNSIGNEDSHORT));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.UNSIGNEDBYTE,
-				new IntegerTypeInfoProducer<T, C, O>( XmlSchemaConstants.UNSIGNEDBYTE));
+				new IntegerTypeInfoProducer<T, C, O>(XmlSchemaConstants.UNSIGNEDBYTE));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.POSITIVEINTEGER,
-				new IntegerTypeInfoProducer<T, C, O>( XmlSchemaConstants.POSITIVEINTEGER));
+				new IntegerTypeInfoProducer<T, C, O>(XmlSchemaConstants.POSITIVEINTEGER));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.DOUBLE,
 				new DecimalTypeInfoProducer<T, C, O>(XmlSchemaConstants.DOUBLE));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ANYURI,
-				new NormalizedStringTypeInfoProducer<T, C, O>( XmlSchemaConstants.ANYURI));
+				new NormalizedStringTypeInfoProducer<T, C, O>(XmlSchemaConstants.ANYURI));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ANYURI,
 				new NormalizedStringTypeInfoProducer<T, C, O>(XmlSchemaConstants.ANYURI));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.QNAME, new QNameTypeInfoProducer<T, C, O>());
@@ -153,13 +143,13 @@ public class CreateTypeInfoProducer<T, C extends T, O> implements MTypeInfoVisit
 		// BuiltinLeafInfoProducer<T, C, O>("Notation"));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.DURATION, new DurationTypeInfoProducer<T, C, O>());
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.DATETIME,
-				new XMLGregorianCalendarTypeInfoProducer<T, C, O>( XmlSchemaConstants.DATETIME));
+				new XMLGregorianCalendarTypeInfoProducer<T, C, O>(XmlSchemaConstants.DATETIME));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.TIME,
 				new XMLGregorianCalendarTypeInfoProducer<T, C, O>(XmlSchemaConstants.TIME));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.DATE,
-				new XMLGregorianCalendarTypeInfoProducer<T, C, O>( XmlSchemaConstants.DATE));
+				new XMLGregorianCalendarTypeInfoProducer<T, C, O>(XmlSchemaConstants.DATE));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.GYEARMONTH,
-				new XMLGregorianCalendarTypeInfoProducer<T, C, O>( XmlSchemaConstants.GYEARMONTH));
+				new XMLGregorianCalendarTypeInfoProducer<T, C, O>(XmlSchemaConstants.GYEARMONTH));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.GYEAR,
 				new XMLGregorianCalendarTypeInfoProducer<T, C, O>(XmlSchemaConstants.GYEAR));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.GMONTHDAY,

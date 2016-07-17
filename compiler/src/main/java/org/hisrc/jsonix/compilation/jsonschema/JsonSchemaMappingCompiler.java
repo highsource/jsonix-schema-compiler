@@ -8,6 +8,7 @@ import org.hisrc.jsonix.JsonixConstants;
 import org.hisrc.jsonix.compilation.jsonschema.typeinfo.ClassInfoProducer;
 import org.hisrc.jsonix.compilation.jsonschema.typeinfo.CreateTypeInfoProducer;
 import org.hisrc.jsonix.compilation.jsonschema.typeinfo.EnumLeafInfoProducer;
+import org.hisrc.jsonix.compilation.jsonschema.typeinfo.TypeInfoProducer;
 import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Modules;
@@ -120,7 +121,11 @@ public class JsonSchemaMappingCompiler<T, C extends T> {
 
 	public <M extends MOriginated<O>, O> JsonSchemaBuilder createTypeInfoSchemaRef(M originated,
 			MTypeInfo<T, C> typeInfo) {
-		return typeInfo.acceptTypeInfoVisitor(new CreateTypeInfoProducer<T, C, O>(originated))
-				.createTypeInfoSchemaRef(this);
+		return getTypeInfoProducer(originated, typeInfo).createTypeInfoSchemaRef(this);
+	}
+
+	public <M extends MOriginated<O>, O> TypeInfoProducer<T, C> getTypeInfoProducer(M originated,
+			MTypeInfo<T, C> typeInfo) {
+		return typeInfo.acceptTypeInfoVisitor(new CreateTypeInfoProducer<T, C, O>(originated));
 	}
 }

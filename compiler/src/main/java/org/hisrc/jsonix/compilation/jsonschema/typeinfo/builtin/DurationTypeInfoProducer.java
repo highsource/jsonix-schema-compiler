@@ -1,12 +1,11 @@
 package org.hisrc.jsonix.compilation.jsonschema.typeinfo.builtin;
 
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonValue;
 import javax.xml.datatype.Duration;
 
-import org.hisrc.jscm.codemodel.JSCodeModel;
-import org.hisrc.jscm.codemodel.expression.JSAssignmentExpression;
-import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
+import org.hisrc.jsonix.compilation.jsonschema.JsonSchemaMappingCompiler;
 import org.hisrc.jsonix.compilation.jsonschema.typeinfo.BuiltinLeafInfoProducer;
-import org.hisrc.jsonix.compilation.mapping.MappingCompiler;
 import org.jvnet.jaxb2_commons.xmlschema.XmlSchemaConstants;
 
 public class DurationTypeInfoProducer<T, C extends T, O> extends BuiltinLeafInfoProducer<T, C, O> {
@@ -14,35 +13,32 @@ public class DurationTypeInfoProducer<T, C extends T, O> extends BuiltinLeafInfo
 	public DurationTypeInfoProducer() {
 		super(XmlSchemaConstants.DURATION);
 	}
-/*
+
 	@Override
-	public JSAssignmentExpression createValue(MappingCompiler<T, C> mappingCompiler, String item) {
-		final JSCodeModel codeModel = mappingCompiler.getCodeModel();
-		final JSObjectLiteral result = codeModel.object();
+	public JsonValue createValue(JsonSchemaMappingCompiler<T, C> mappingCompiler, String item) {
+		final JsonObjectBuilder objectBuilder = mappingCompiler.getJsonBuilderFactory().createObjectBuilder();
 		final Duration duration = datatypeFactory.newDuration(item);
 		if (duration.getSign() <= 0) {
-			result.append("sign", codeModel.integer(duration.getSign()));
+			objectBuilder.add("sign", duration.getSign());
 		}
 		if (duration.getYears() > 0) {
-			result.append("years", codeModel.integer(duration.getYears()));
+			objectBuilder.add("years", duration.getYears());
 		}
 		if (duration.getMonths() > 0) {
-			result.append("months", codeModel.integer(duration.getMonths()));
+			objectBuilder.add("months", duration.getMonths());
 		}
 		if (duration.getDays() > 0) {
-			result.append("days", codeModel.integer(duration.getDays()));
+			objectBuilder.add("days", duration.getDays());
 		}
 		if (duration.getHours() > 0) {
-			result.append("hours", codeModel.integer(duration.getHours()));
+			objectBuilder.add("hours", duration.getHours());
 		}
 		if (duration.getMinutes() > 0) {
-			result.append("minutes", codeModel.integer(duration.getMinutes()));
+			objectBuilder.add("minutes", duration.getMinutes());
 		}
 		if (duration.getSeconds() > 0) {
-			result.append("seconds", codeModel.integer(duration.getSeconds()));
+			objectBuilder.add("seconds", duration.getSeconds());
 		}
-		return result;
+		return objectBuilder.build();
 	}
-	
-	*/
 }

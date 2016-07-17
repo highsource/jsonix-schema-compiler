@@ -2,16 +2,15 @@ package org.hisrc.jsonix.compilation.jsonschema.typeinfo.builtin;
 
 import java.util.Iterator;
 
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonValue;
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hisrc.jscm.codemodel.JSCodeModel;
-import org.hisrc.jscm.codemodel.expression.JSAssignmentExpression;
-import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
+import org.hisrc.jsonix.compilation.jsonschema.JsonSchemaMappingCompiler;
 import org.hisrc.jsonix.compilation.jsonschema.typeinfo.BuiltinLeafInfoProducer;
-import org.hisrc.jsonix.compilation.mapping.MappingCompiler;
 import org.jvnet.jaxb2_commons.xmlschema.XmlSchemaConstants;
 import org.relaxng.datatype.ValidationContext;
 
@@ -22,10 +21,10 @@ public class QNameTypeInfoProducer<T, C extends T, O> extends BuiltinLeafInfoPro
 	public QNameTypeInfoProducer() {
 		super(XmlSchemaConstants.QNAME);
 	}
-/*
+
 	@Override
-	public JSAssignmentExpression createValue(MappingCompiler<T, C> mappingCompiler, XmlString item) {
-		final JSCodeModel codeModel = mappingCompiler.getCodeModel();
+	public JsonValue createValue(JsonSchemaMappingCompiler<T, C> mappingCompiler, XmlString item) {
+		final JsonObjectBuilder objectBuilder = mappingCompiler.getJsonBuilderFactory().createObjectBuilder();
 		final ValidationContext context = item.context;
 		final QName value = DatatypeConverter.parseQName(item.value, new NamespaceContext() {
 
@@ -45,15 +44,13 @@ public class QNameTypeInfoProducer<T, C extends T, O> extends BuiltinLeafInfoPro
 				return context.resolveNamespacePrefix(prefix);
 			}
 		});
-		final JSObjectLiteral result = codeModel.object();
 		if (!StringUtils.isEmpty(value.getPrefix())) {
-			result.append("prefix", codeModel.string(value.getPrefix()));
+			objectBuilder.add("prefix", value.getPrefix());
 		}
 		if (!StringUtils.isEmpty(value.getNamespaceURI())) {
-			result.append("namespaceURI", codeModel.string(value.getNamespaceURI()));
+			objectBuilder.add("namespaceURI", value.getNamespaceURI());
 		}
-		result.append("localPart", codeModel.string(value.getLocalPart()));
-		return result;
+		objectBuilder.add("localPart", value.getLocalPart());
+		return objectBuilder.build();
 	}
-	*/
 }

@@ -1,5 +1,9 @@
 package org.hisrc.jsonix.compilation.jsonschema.typeinfo;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.json.JsonValue;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.Validate;
@@ -28,17 +32,27 @@ public class EnumLeafInfoProducer<T, C extends T> extends PackagedTypeInfoProduc
 		enumLeafInfoSchema.addTitle(localName);
 		final MTypeInfo<T, C> baseTypeInfo = enumLeafInfo.getBaseTypeInfo();
 		final JsonSchemaBuilder typeInfoSchema;
-		final JsonSchemaBuilder baseTypeInfoSchema = mappingCompiler.createTypeInfoSchemaRef(enumLeafInfo,
-				baseTypeInfo);
+		TypeInfoProducer<T, C> baseTypeInfoProducer = mappingCompiler.getTypeInfoProducer(enumLeafInfo, baseTypeInfo);
+		final JsonSchemaBuilder baseTypeInfoSchema = baseTypeInfoProducer.createTypeInfoSchemaRef(mappingCompiler);
 		typeInfoSchema = new JsonSchemaBuilder();
 		typeInfoSchema.addAllOf(baseTypeInfoSchema);
+		
+		
+		final JsonSchemaBuilder enumsTypeInfoSchema = new JsonSchemaBuilder();
 
-		for (MEnumConstantInfo<T, C> enumConstant : enumLeafInfo.getConstants()) {
-			final JsonSchemaBuilder enumConstantSchema = createEnumConstant(enumLeafInfo, enumConstant);
-			// TODO generate enums
-			if (enumConstantSchema != null) {
-				typeInfoSchema.addEnum(enumConstantSchema);
+		boolean valuesSupported = true;
+		for (MEnumConstantInfo<T, C> enumConstantInfo : enumLeafInfo.getConstants()) {
+			final JsonValue value = baseTypeInfoProducer.createValue(mappingCompiler,
+					enumConstantInfo.getLexicalValue());
+			if (value == null) {
+				valuesSupported = false;
+				break;
+			} else {
+				enumsTypeInfoSchema.addEnum(value);
 			}
+		}
+		if (valuesSupported) {
+			typeInfoSchema.addAllOf(enumsTypeInfoSchema);
 		}
 
 		typeInfoSchema.add(JsonixJsonSchemaConstants.TYPE_TYPE_PROPERTY_NAME, StandardNaming.ENUM_INFO);
@@ -51,10 +65,5 @@ public class EnumLeafInfoProducer<T, C extends T> extends PackagedTypeInfoProduc
 		}
 
 		return typeInfoSchema;
-	}
-
-	private JsonSchemaBuilder createEnumConstant(MEnumLeafInfo<T, C> enumLeafInfo,
-			MEnumConstantInfo<T, C> enumConstant) {
-		return null;
 	}
 }
