@@ -45,8 +45,8 @@ public class ClassInfoProducer<T, C extends T> extends PackagedTypeInfoProducer<
 		final MClassTypeInfo<T, C, ?> baseTypeInfo = classInfo.getBaseTypeInfo();
 		final JsonSchemaBuilder typeInfoSchema;
 		if (baseTypeInfo != null) {
-			final JsonSchemaBuilder baseTypeInfoSchema = mappingCompiler.createTypeInfoSchemaRef(baseTypeInfo,
-					baseTypeInfo);
+			final JsonSchemaBuilder baseTypeInfoSchema = mappingCompiler.getTypeInfoProducer(baseTypeInfo, baseTypeInfo)
+					.createTypeInfoSchemaRef(mappingCompiler);
 			typeInfoSchema = new JsonSchemaBuilder();
 			typeInfoSchema.addAllOf(baseTypeInfoSchema);
 			typeInfoSchema.addAllOf(classInfoSchema);

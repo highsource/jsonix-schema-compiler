@@ -86,7 +86,7 @@ public class JsonSchemaMappingCompiler<T, C extends T> {
 					new JsonSchemaBuilder().addAllOf(qNameRef).addAllOf(nameConstant));
 
 			elementInfoSchema.addProperty(JsonixConstants.VALUE_PROPERTY_NAME,
-					createTypeInfoSchemaRef(elementInfo, typeInfo));
+					getTypeInfoProducer(elementInfo, typeInfo).createTypeInfoSchemaRef(this));
 
 			elementInfoSchema.add(JsonixJsonSchemaConstants.ELEMENT_NAME_PROPERTY_NAME,
 					new JsonSchemaBuilder()
@@ -95,7 +95,7 @@ public class JsonSchemaMappingCompiler<T, C extends T> {
 									elementName.getNamespaceURI()));
 			if (scope != null) {
 				elementInfoSchema.add(JsonixJsonSchemaConstants.SCOPE_PROPERTY_NAME,
-						createTypeInfoSchemaRef(scope, scope));
+						getTypeInfoProducer(elementInfo, typeInfo).createTypeInfoSchemaRef(this));
 			}
 			schema.addAnyOf(elementInfoSchema);
 		}
