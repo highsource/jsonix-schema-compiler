@@ -11,6 +11,8 @@ import org.hisrc.jsonix.naming.Naming;
 import org.jvnet.jaxb2_commons.xml.bind.model.MEnumConstantInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.origin.MEnumLeafInfoOrigin;
+import org.jvnet.jaxb2_commons.xml.bind.model.origin.MOriginated;
 
 import com.sun.xml.xsom.XmlString;
 
@@ -59,7 +61,8 @@ public class EnumLeafInfoCompiler<T, C extends T> extends PackagedTypeInfoCompil
 		final JSArrayLiteral values = codeModel.array();
 		boolean valuesSupported = true;
 		for (MEnumConstantInfo<T, C> enumConstantInfo : enumLeafInfo.getConstants()) {
-			final JSAssignmentExpression value = baseTypeInfoCompiler.createValue(mappingCompiler, enumConstantInfo.getLexicalValue());
+			final JSAssignmentExpression value = baseTypeInfoCompiler.createValue(mappingCompiler,
+					enumConstantInfo.getLexicalValue());
 			if (value == null) {
 				valuesSupported = false;
 				break;

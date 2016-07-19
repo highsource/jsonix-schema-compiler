@@ -253,23 +253,6 @@ public class MappingCompiler<T, C extends T> {
 		}
 	}
 
-	public TypeInfoCompiler<T, C> getTypeInfoCompiler(MClassInfo<T, C> classInfo, MTypeInfo<T, C> typeInfo) {
-		return getTypeInfoCompiler((MOriginated<MClassInfoOrigin>) classInfo, typeInfo);
-	}
-
-	public TypeInfoCompiler<T, C> getTypeInfoCompiler(MEnumLeafInfo<T, C> enumLeafInfo, MTypeInfo<T, C> typeInfo) {
-		return getTypeInfoCompiler((MOriginated<MEnumLeafInfoOrigin>) enumLeafInfo, typeInfo);
-	}
-
-	public TypeInfoCompiler<T, C> getTypeInfoCompiler(MPropertyInfo<T, C> propertyInfo, MTypeInfo<T, C> typeInfo) {
-		return getTypeInfoCompiler((MOriginated<MPropertyInfoOrigin>) propertyInfo, typeInfo);
-	}
-
-	public <M extends MElementTypeInfo<T, C, O>, O> TypeInfoCompiler<T, C> getTypeInfoCompiler(M elementInfo,
-			MTypeInfo<T, C> typeInfo) {
-		return getTypeInfoCompiler((MOriginated<O>) elementInfo, typeInfo);
-	}
-
 	public <O> TypeInfoCompiler<T, C> getTypeInfoCompiler(MOriginated<O> originated, MTypeInfo<T, C> typeInfo) {
 
 		return typeInfo.acceptTypeInfoVisitor(new CreateTypeInfoCompiler<T, C, O>(originated));

@@ -15,6 +15,8 @@ import org.hisrc.jsonix.naming.Naming;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.origin.MClassInfoOrigin;
+import org.jvnet.jaxb2_commons.xml.bind.model.origin.MOriginated;
 
 public class ClassInfoCompiler<T, C extends T> extends PackagedTypeInfoCompiler<T, C> {
 

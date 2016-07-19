@@ -16,6 +16,8 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MEnumConstantInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 
+import com.sun.xml.xsom.XmlString;
+
 public class EnumLeafInfoProducer<T, C extends T> extends PackagedTypeInfoProducer<T, C> {
 
 	private MEnumLeafInfo<T, C> enumLeafInfo;
@@ -36,8 +38,7 @@ public class EnumLeafInfoProducer<T, C extends T> extends PackagedTypeInfoProduc
 		final JsonSchemaBuilder baseTypeInfoSchema = baseTypeInfoProducer.createTypeInfoSchemaRef(mappingCompiler);
 		typeInfoSchema = new JsonSchemaBuilder();
 		typeInfoSchema.addAllOf(baseTypeInfoSchema);
-		
-		
+
 		final JsonSchemaBuilder enumsTypeInfoSchema = new JsonSchemaBuilder();
 
 		boolean valuesSupported = true;
@@ -65,5 +66,21 @@ public class EnumLeafInfoProducer<T, C extends T> extends PackagedTypeInfoProduc
 		}
 
 		return typeInfoSchema;
+	}
+
+	@Override
+	public JsonValue createValue(JsonSchemaMappingCompiler<T, C> mappingCompiler, String item) {
+		final MTypeInfo<T, C> baseTypeInfo = enumLeafInfo.getBaseTypeInfo();
+		final TypeInfoProducer<T, C> baseTypeInfoProducer = mappingCompiler.getTypeInfoProducer(enumLeafInfo,
+				baseTypeInfo);
+		return baseTypeInfoProducer.createValue(mappingCompiler, item);
+	}
+
+	@Override
+	public JsonValue createValue(JsonSchemaMappingCompiler<T, C> mappingCompiler, XmlString item) {
+		final MTypeInfo<T, C> baseTypeInfo = enumLeafInfo.getBaseTypeInfo();
+		final TypeInfoProducer<T, C> baseTypeInfoProducer = mappingCompiler.getTypeInfoProducer(enumLeafInfo,
+				baseTypeInfo);
+		return baseTypeInfoProducer.createValue(mappingCompiler, item);
 	}
 }

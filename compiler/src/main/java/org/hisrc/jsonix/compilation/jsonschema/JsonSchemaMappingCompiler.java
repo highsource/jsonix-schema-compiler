@@ -18,6 +18,7 @@ import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.origin.MElementInfoOrigin;
 import org.jvnet.jaxb2_commons.xml.bind.model.origin.MOriginated;
 
 public class JsonSchemaMappingCompiler<T, C extends T> {
@@ -86,7 +87,7 @@ public class JsonSchemaMappingCompiler<T, C extends T> {
 					new JsonSchemaBuilder().addAllOf(qNameRef).addAllOf(nameConstant));
 
 			elementInfoSchema.addProperty(JsonixConstants.VALUE_PROPERTY_NAME,
-					getTypeInfoProducer(elementInfo, typeInfo).createTypeInfoSchemaRef(this));
+					typeInfo.acceptTypeInfoVisitor(new CreateTypeInfoSchema<T, C, MElementInfo<T, C>, MElementInfoOrigin>(this, elementInfo)));
 
 			elementInfoSchema.add(JsonixJsonSchemaConstants.ELEMENT_NAME_PROPERTY_NAME,
 					new JsonSchemaBuilder()
@@ -117,11 +118,6 @@ public class JsonSchemaMappingCompiler<T, C extends T> {
 			schema.addDefinition(classInfo.getContainerLocalName(JsonixConstants.DEFAULT_SCOPED_NAME_DELIMITER),
 					classInfoSchema);
 		}
-	}
-
-	public <M extends MOriginated<O>, O> JsonSchemaBuilder createTypeInfoSchemaRef(M originated,
-			MTypeInfo<T, C> typeInfo) {
-		return getTypeInfoProducer(originated, typeInfo).createTypeInfoSchemaRef(this);
 	}
 
 	public <M extends MOriginated<O>, O> TypeInfoProducer<T, C> getTypeInfoProducer(M originated,

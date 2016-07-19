@@ -305,6 +305,6 @@ public class JsonSchemaPropertyInfoProducerVisitor<T, C extends T>
 	}
 
 	private <M extends MOriginated<O>, O> JsonSchemaBuilder createTypeSchema(M originated, MTypeInfo<T, C> typeInfo) {
-		return mappingCompiler.getTypeInfoProducer(originated, typeInfo).createTypeInfoSchemaRef(mappingCompiler);
+		return typeInfo.acceptTypeInfoVisitor(new CreateTypeInfoSchema<T, C, MOriginated<O>, O>(mappingCompiler, originated));
 	}
 }
