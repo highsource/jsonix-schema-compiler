@@ -94,4 +94,54 @@
 		</xs:simpleContent>
 	</xs:complexType>
 
+	<xs:complexType name="issueGHC32Type">
+		<xs:attribute name="base64Binary" type="xs:base64Binary" use="optional" default="QUJD"/>
+		<xs:attribute name="hexBinary" type="xs:hexBinary" use="optional" default="0FB8"/>
+		<xs:attribute name="duration" type="xs:duration" use="optional" default="PT5M"/>
+		<xs:attribute name="dateTime" type="xs:dateTime" use="optional" default="2018-01-14T05:20:38"/>
+		<xs:attribute name="date" type="xs:date" use="optional" default="2018-01-14"/>
+		<xs:attribute name="time" type="xs:time" use="optional" default="05:20:38"/>
+		<xs:attribute name="gYearMonth" type="xs:gYearMonth" use="optional" default="2018-01"/>
+		<xs:attribute name="gYear" type="xs:gYear" use="optional" default="2018"/>
+		<xs:attribute name="gMonthDay" type="xs:gMonthDay" use="optional" default="--11-22"/>
+		<xs:attribute name="gDay" type="xs:gDay" use="optional" default="---22"/>
+		<xs:attribute name="gMonth" type="xs:gMonth" use="optional" default="--11"/>
+		<xs:attribute name="float" type="xs:float" use="optional" default="0.123"/>
+		<xs:attribute name="double" type="xs:double" use="optional" default="0.123"/>
+		<xs:attribute name="decimal" type="xs:decimal" use="optional" default="0.123"/>
+		<xs:attribute name="integer" type="xs:integer" use="optional" default="123"/>
+		<xs:attribute name="long" type="xs:long" use="optional" default="123"/>
+		<xs:attribute name="int" type="xs:int" use="optional" default="123"/>
+		<xs:attribute name="short" type="xs:short" use="optional" default="123"/>
+		<xs:attribute name="byte" type="xs:byte" use="optional" default="123"/>
+		<xs:attribute name="unsignedLong" type="xs:unsignedLong" use="optional" default="123"/>
+		<xs:attribute name="unsignedInt" type="xs:unsignedInt" use="optional" default="123"/>
+		<xs:attribute name="unsignedShort" type="xs:unsignedShort" use="optional" default="123"/>
+		<xs:attribute name="unsignedByte" type="xs:unsignedByte" use="optional" default="123"/>
+		<xs:attribute name="nonNegativeInteger" type="xs:nonNegativeInteger" use="optional" default="123"/>
+		<xs:attribute name="nonPositiveInteger" type="xs:nonPositiveInteger" use="optional" default="-123"/>
+		<xs:attribute name="positiveInteger" type="xs:positiveInteger" use="optional" default="123"/>
+		<xs:attribute name="negativeInteger" type="xs:negativeInteger" use="optional" default="-123"/>
+		<xs:attribute name="boolean" type="xs:boolean" use="optional" default="true"/>
+		<xs:attribute name="anyURI" type="xs:anyURI" use="optional" default="http://github.com"/>
+		<xs:attribute name="QName" type="xs:QName" use="optional" default="xs:QName"/>
+		<!-- 
+		<xs:attribute name="NOTATION" type="xs:NOTATION" use="optional"/>
+		 -->
+		<xs:attribute name="string" type="xs:string" use="optional" default="test"/>
+		<xs:attribute name="normalizedString" type="xs:normalizedString" use="optional" default="test"/>
+		<xs:attribute name="token" type="xs:token" use="optional" default="test"/>
+		<xs:attribute name="language" type="xs:language" use="optional" default="de"/>
+		<xs:attribute name="Name" type="xs:Name" use="optional" default="test"/>
+		<xs:attribute name="NCName" type="xs:NCName" use="optional" default="test"/>
+		<xs:attribute name="ID" type="xs:ID" use="optional"/>
+		<xs:attribute name="IDREF" type="xs:IDREF" use="optional" default="test"/>
+		<xs:attribute name="IDREFS" type="xs:IDREFS" default="test"/>
+		<xs:attribute name="ENTITY" type="xs:ENTITY" use="optional"/>
+		<xs:attribute name="ENTITIES" type="xs:ENTITIES" use="optional"/>
+		<xs:attribute name="NMTOKEN" type="xs:NMTOKEN" use="optional" default="test"/>
+		<xs:attribute name="NMTOKENS" type="xs:NMTOKENS" use="optional" default="test1 test2"/>
+	</xs:complexType>
+
+
 </xs:schema>
