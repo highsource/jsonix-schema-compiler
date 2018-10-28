@@ -44,7 +44,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jscm.codemodel.JSCodeModel;
 import org.hisrc.jscm.codemodel.expression.JSArrayLiteral;
-import org.hisrc.jscm.codemodel.expression.JSAssignmentExpression;
 import org.hisrc.jscm.codemodel.expression.JSMemberExpression;
 import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
 import org.hisrc.jsonix.compilation.mapping.typeinfo.ClassInfoCompiler;
@@ -59,16 +58,11 @@ import org.hisrc.jsonix.definition.Output;
 import org.hisrc.jsonix.naming.Naming;
 import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MElementTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.origin.MClassInfoOrigin;
 import org.jvnet.jaxb2_commons.xml.bind.model.origin.MElementInfoOrigin;
-import org.jvnet.jaxb2_commons.xml.bind.model.origin.MEnumLeafInfoOrigin;
 import org.jvnet.jaxb2_commons.xml.bind.model.origin.MOriginated;
-import org.jvnet.jaxb2_commons.xml.bind.model.origin.MPropertyInfoOrigin;
 
 public class MappingCompiler<T, C extends T> {
 	public static final String DEFAULT_SCOPED_NAME_DELIMITER = ".";
@@ -189,7 +183,9 @@ public class MappingCompiler<T, C extends T> {
 	}
 
 	private JSObjectLiteral compileClassInfo(MClassInfo<T, C> classInfo) {
-		return new ClassInfoCompiler<T, C>(classInfo).compile(this);
+		final ClassInfoCompiler<T, C> classInfoCompiler = new ClassInfoCompiler<T, C>(classInfo);
+		System.out.println("Compiling " + classInfo.getName());
+		return classInfoCompiler.compile(this);
 	}
 
 	private JSObjectLiteral compileEnumLeafInfo(MEnumLeafInfo<T, C> enumLeafInfo) {

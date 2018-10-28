@@ -45,6 +45,7 @@ public class CompactNaming implements Naming {
 	public static final String ATTRIBUTE = "a";
 	public static final String ANY_ATTRIBUTE = "aa";
 	public static final String VALUE = "v";
+	public static final String DEFAULT_VALUE = "dv";
 	public static final String ELEMENT_REF = "er";
 	public static final String ELEMENT_REFS = "ers";
 
@@ -203,6 +204,11 @@ public class CompactNaming implements Naming {
 	@Override
 	public String value() {
 		return VALUE;
+	}
+	
+	@Override
+	public String defaultValue() {
+		return DEFAULT_VALUE;
 	}
 
 	@Override

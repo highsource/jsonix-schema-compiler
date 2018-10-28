@@ -2,6 +2,8 @@ package org.hisrc.jsonix.compilation.mapping;
 
 import java.util.List;
 
+import javax.xml.namespace.NamespaceContext;
+
 import org.hisrc.jscm.codemodel.expression.JSArrayLiteral;
 import org.hisrc.jscm.codemodel.expression.JSAssignmentExpression;
 import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
@@ -9,9 +11,11 @@ import org.hisrc.jsonix.compilation.mapping.typeinfo.TypeInfoCompiler;
 import org.hisrc.jsonix.xml.xsom.CollectEnumerationValuesVisitor;
 import org.hisrc.xml.xsom.SchemaComponentAware;
 import org.jvnet.jaxb2_commons.xml.bind.model.MBuiltinLeafInfo;
+import org.jvnet.jaxb2_commons.xml.bind.model.MDefaultValue;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.origin.MOriginated;
 import org.jvnet.jaxb2_commons.xml.bind.model.util.DefaultTypeInfoVisitor;
+import org.relaxng.datatype.ValidationContext;
 
 import com.sun.xml.xsom.XSComponent;
 import com.sun.xml.xsom.XmlString;
@@ -31,8 +35,7 @@ public final class CreateTypeInfoDelaration<T, C extends T, M extends MOriginate
 	@Override
 	public TypeInfoCompiler<T, C> visitTypeInfo(MTypeInfo<T, C> typeInfo) {
 		final TypeInfoCompiler<T, C> typeInfoCompiler = mappingCompiler.getTypeInfoCompiler(info, typeInfo);
-		final JSAssignmentExpression typeInfoDeclaration = typeInfoCompiler
-				.createTypeInfoDeclaration(mappingCompiler);
+		final JSAssignmentExpression typeInfoDeclaration = typeInfoCompiler.createTypeInfoDeclaration(mappingCompiler);
 		if (!typeInfoDeclaration.acceptExpressionVisitor(new IsLiteralEquals("String"))) {
 			options.append(mappingCompiler.getNaming().typeInfo(), typeInfoDeclaration);
 		}
@@ -70,6 +73,46 @@ public final class CreateTypeInfoDelaration<T, C extends T, M extends MOriginate
 							options.append(mappingCompiler.getNaming().values(), values);
 						}
 					}
+				}
+			}
+		}
+		if (info instanceof MDefaultValue) {
+			MDefaultValue defaultValue = (MDefaultValue) info;
+
+			String defaultValueString = defaultValue.getDefaultValue();
+			final NamespaceContext defaultValueNamespaceContext = defaultValue.getDefaultValueNamespaceContext();
+			if (defaultValueString != null) {
+				final XmlString defaultValueXmlString;
+				if (defaultValueNamespaceContext == null) {
+					defaultValueXmlString = new XmlString(defaultValueString);
+				} else {
+					defaultValueXmlString = new XmlString(defaultValueString, new ValidationContext() {
+
+						@Override
+						public String resolveNamespacePrefix(String prefix) {
+							return defaultValueNamespaceContext.getNamespaceURI(prefix);
+						}
+
+						@Override
+						public boolean isUnparsedEntity(String entityName) {
+							throw new UnsupportedOperationException();
+						}
+
+						@Override
+						public boolean isNotation(String notationName) {
+							throw new UnsupportedOperationException();
+						}
+
+						@Override
+						public String getBaseUri() {
+							throw new UnsupportedOperationException();
+						}
+					});
+				}
+				JSAssignmentExpression defaultValueExpression = typeInfoCompiler.createValue(mappingCompiler,
+						defaultValueXmlString);
+				if (defaultValueExpression != null) {
+					options.append(mappingCompiler.getNaming().defaultValue(), defaultValueExpression);
 				}
 			}
 		}

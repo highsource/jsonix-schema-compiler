@@ -39,6 +39,7 @@ public class StandardNaming implements Naming {
 	public static final String ATTRIBUTE = "attribute"; // a
 	public static final String ANY_ATTRIBUTE = "anyAttribute"; // aa
 	public static final String VALUE = "value"; // v
+	public static final String DEFAULT_VALUE = "defaultValue"; // dv
 	public static final String ELEMENT_REF = "elementRef";// rf
 	public static final String ELEMENT_REFS = "elementRefs";// rfs
 	public static final String COLLECTION = "collection";// col
@@ -199,6 +200,11 @@ public class StandardNaming implements Naming {
 	@Override
 	public String value() {
 		return VALUE;
+	}
+	
+	@Override
+	public String defaultValue() {
+		return DEFAULT_VALUE;
 	}
 
 	@Override

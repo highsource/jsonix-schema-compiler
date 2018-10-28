@@ -62,7 +62,7 @@ public interface Naming {
 	String attributeName();
 
 	String elementTypeInfos();
-
+	
 	// types of property Infos
 	String element();
 
@@ -79,6 +79,8 @@ public interface Naming {
 	String anyAttribute();
 
 	String value();
+
+	String defaultValue();
 
 	String namespaceURI();
 
