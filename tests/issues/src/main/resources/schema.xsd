@@ -141,7 +141,39 @@
 		<xs:attribute name="ENTITIES" type="xs:ENTITIES" use="optional"/>
 		<xs:attribute name="NMTOKEN" type="xs:NMTOKEN" use="optional" default="test"/>
 		<xs:attribute name="NMTOKENS" type="xs:NMTOKENS" use="optional" default="test1 test2"/>
+		
+		<xs:attribute name="typeless" use="optional" default="test"/>
+		<xs:attribute name="internalEnum" use="optional" default="test1">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="test1"/>
+					<xs:enumeration value="test2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="externalEnum" type="test:issueGHC32TypeExternalSimpleTypeEnum" use="optional" default="test1"/>
+		<xs:attribute name="internalPattern" use="optional" default="123">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:pattern value="\d+"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="externalPattern" type="test:issueGHC32TypeExternalSimpleTypePattern" use="optional" default="123"/>
 	</xs:complexType>
+	
+	<xs:simpleType name="issueGHC32TypeExternalSimpleTypeEnum">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="test1"/>
+			<xs:enumeration value="test2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="issueGHC32TypeExternalSimpleTypePattern">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\d+"/>
+		</xs:restriction>
+	</xs:simpleType>
 
 
 </xs:schema>
