@@ -125,7 +125,7 @@
 		<xs:attribute name="boolean" type="xs:boolean" use="optional" default="true"/>
 		<xs:attribute name="anyURI" type="xs:anyURI" use="optional" default="http://github.com"/>
 		<xs:attribute name="QName" type="xs:QName" use="optional" default="xs:QName"/>
-		<!-- 
+		<!--
 		<xs:attribute name="NOTATION" type="xs:NOTATION" use="optional"/>
 		 -->
 		<xs:attribute name="string" type="xs:string" use="optional" default="test"/>
@@ -141,7 +141,13 @@
 		<xs:attribute name="ENTITIES" type="xs:ENTITIES" use="optional"/>
 		<xs:attribute name="NMTOKEN" type="xs:NMTOKEN" use="optional" default="test"/>
 		<xs:attribute name="NMTOKENS" type="xs:NMTOKENS" use="optional" default="test1 test2"/>
-		
+	</xs:complexType>
+
+	<xs:complexType name="issueGHC86Type">
+		<xs:attribute name="typeless" use="optional" default="test"/>
+	</xs:complexType>
+
+	<xs:complexType name="issueGHC87Type">
 		<xs:attribute name="internalEnum" use="optional" default="test1">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
@@ -150,7 +156,7 @@
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute name="externalEnum" type="test:issueGHC32TypeExternalSimpleTypeEnum" use="optional" default="test1"/>
+		<xs:attribute name="externalEnum" type="test:issueGHC87ExternalEnumType" use="optional" default="test1"/>
 		<xs:attribute name="internalPattern" use="optional" default="123">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
@@ -158,26 +164,20 @@
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute name="externalPattern" type="test:issueGHC32TypeExternalSimpleTypePattern" use="optional" default="123"/>
+		<xs:attribute name="externalPattern" type="test:issueGHC87ExternalPatternType" use="optional" default="123"/>
 	</xs:complexType>
 
-	<xs:complexType name="issueGHC86Type">
-		<xs:attribute name="typeless" use="optional" default="test"/>
-	</xs:complexType>
-
-	
-	<xs:simpleType name="issueGHC32TypeExternalSimpleTypeEnum">
+	<xs:simpleType name="issueGHC87ExternalEnumType">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="test1"/>
 			<xs:enumeration value="test2"/>
 		</xs:restriction>
 	</xs:simpleType>
 	
-	<xs:simpleType name="issueGHC32TypeExternalSimpleTypePattern">
+	<xs:simpleType name="issueGHC87ExternalPatternType">
 		<xs:restriction base="xs:string">
 			<xs:pattern value="\d+"/>
 		</xs:restriction>
 	</xs:simpleType>
-
 
 </xs:schema>
