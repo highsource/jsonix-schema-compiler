@@ -142,7 +142,6 @@
 		<xs:attribute name="NMTOKEN" type="xs:NMTOKEN" use="optional" default="test"/>
 		<xs:attribute name="NMTOKENS" type="xs:NMTOKENS" use="optional" default="test1 test2"/>
 		
-		<xs:attribute name="typeless" use="optional" default="test"/>
 		<xs:attribute name="internalEnum" use="optional" default="test1">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
@@ -161,6 +160,11 @@
 		</xs:attribute>
 		<xs:attribute name="externalPattern" type="test:issueGHC32TypeExternalSimpleTypePattern" use="optional" default="123"/>
 	</xs:complexType>
+
+	<xs:complexType name="issueGHC86Type">
+		<xs:attribute name="typeless" use="optional" default="test"/>
+	</xs:complexType>
+
 	
 	<xs:simpleType name="issueGHC32TypeExternalSimpleTypeEnum">
 		<xs:restriction base="xs:string">
