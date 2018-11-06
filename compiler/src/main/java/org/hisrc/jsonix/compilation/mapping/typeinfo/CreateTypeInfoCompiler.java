@@ -41,6 +41,7 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.Validate;
+import org.hisrc.jsonix.compilation.mapping.typeinfo.builtin.AnySimpleTypeTypeInfoCompiler;
 import org.hisrc.jsonix.compilation.mapping.typeinfo.builtin.Base64BinaryTypeInfoCompiler;
 import org.hisrc.jsonix.compilation.mapping.typeinfo.builtin.BooleanTypeInfoCompiler;
 import org.hisrc.jsonix.compilation.mapping.typeinfo.builtin.DecimalTypeInfoCompiler;
@@ -79,7 +80,7 @@ public class CreateTypeInfoCompiler<T, C extends T, O> implements MTypeInfoVisit
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ANYTYPE,
 				new BuiltinLeafInfoCompiler<T, C, O>("AnyType", XmlSchemaConstants.ANYTYPE));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.ANYSIMPLETYPE,
-				new BuiltinLeafInfoCompiler<T, C, O>("AnySimpleType", XmlSchemaConstants.ANYSIMPLETYPE));
+				new AnySimpleTypeTypeInfoCompiler<T, C, O>("AnySimpleType", XmlSchemaConstants.ANYSIMPLETYPE));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.STRING,
 				new StringTypeInfoCompiler<T, C, O>("String", XmlSchemaConstants.STRING));
 		XSD_TYPE_MAPPING.put(XmlSchemaConstants.NORMALIZEDSTRING,
