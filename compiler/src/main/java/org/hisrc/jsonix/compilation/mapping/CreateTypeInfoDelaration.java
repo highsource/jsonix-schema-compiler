@@ -12,6 +12,7 @@ import org.hisrc.jsonix.xml.xsom.CollectEnumerationValuesVisitor;
 import org.hisrc.xml.xsom.SchemaComponentAware;
 import org.jvnet.jaxb2_commons.xml.bind.model.MBuiltinLeafInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MDefaultValue;
+import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
 import org.jvnet.jaxb2_commons.xml.bind.model.origin.MOriginated;
 import org.jvnet.jaxb2_commons.xml.bind.model.util.DefaultTypeInfoVisitor;
@@ -41,11 +42,23 @@ public final class CreateTypeInfoDelaration<T, C extends T, M extends MOriginate
 		}
 		return typeInfoCompiler;
 	}
+	
+	@Override
+	public TypeInfoCompiler<T, C> visitEnumLeafInfo(MEnumLeafInfo<T, C> typeInfo) {
+		final TypeInfoCompiler<T, C> typeInfoCompiler = visitTypeInfo(typeInfo);
+		appendDefaultValue(typeInfoCompiler);
+		return typeInfoCompiler;
+	}
 
 	@Override
 	public TypeInfoCompiler<T, C> visitBuiltinLeafInfo(MBuiltinLeafInfo<T, C> typeInfo) {
 		final TypeInfoCompiler<T, C> typeInfoCompiler = visitTypeInfo(typeInfo);
+		appendEnumerationValues(typeInfoCompiler);
+		appendDefaultValue(typeInfoCompiler);
+		return typeInfoCompiler;
+	}
 
+	private void appendEnumerationValues(final TypeInfoCompiler<T, C> typeInfoCompiler) {
 		if (info instanceof MOriginated) {
 			MOriginated<?> originated = (MOriginated<?>) info;
 			Object origin = originated.getOrigin();
@@ -76,6 +89,9 @@ public final class CreateTypeInfoDelaration<T, C extends T, M extends MOriginate
 				}
 			}
 		}
+	}
+
+	private void appendDefaultValue(final TypeInfoCompiler<T, C> typeInfoCompiler) {
 		if (info instanceof MDefaultValue) {
 			MDefaultValue defaultValue = (MDefaultValue) info;
 
@@ -116,6 +132,5 @@ public final class CreateTypeInfoDelaration<T, C extends T, M extends MOriginate
 				}
 			}
 		}
-		return typeInfoCompiler;
 	}
 }

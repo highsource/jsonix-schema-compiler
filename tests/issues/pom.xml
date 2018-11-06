@@ -9,20 +9,6 @@
 		<version>2.3.10-SNAPSHOT</version>
 	</parent>
 	<dependencies>
-		<!--dependency>
-			<groupId>org.hisrc.jsonix</groupId>
-			<artifactId>jsonix-scripts</artifactId>
-		</dependency-->
-		<!--dependency>
-			<groupId>org.glassfish.jaxb</groupId>
-			<artifactId>jaxb-runtime</artifactId>
-			<scope>provided</scope>
-		</dependency-->
-		<!--dependency>
-			<groupId>net.disy.legato</groupId>
-			<artifactId>legato-testing</artifactId>
-			<scope>test</scope>
-		</dependency-->
 		<dependency>
 			<groupId>org.jvnet.jaxb2.maven2</groupId>
 			<artifactId>maven-jaxb2-plugin-testing</artifactId>
@@ -34,29 +20,6 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<!--resources>
-			<resource>
-				<directory>src/main/resources</directory>
-			</resource>
-			<resource>
-				<directory>src/main/javascript</directory>
-			</resource>
-			<resource>
-				<directory>target/generated-sources/xjc</directory>
-				<includes>
-					<include>META-INF/**/*.*</include>
-					<include>**/*.js</include>
-				</includes>
-			</resource>
-		</resources>
-		<testResources>
-			<testResource>
-				<directory>src/test/resources</directory>
-			</testResource>
-			<testResource>
-				<directory>src/test/javascript</directory>
-			</testResource>
-		</testResources-->
 		<plugins>
 			<plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
