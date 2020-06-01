@@ -29,12 +29,14 @@ public class MappingConfiguration {
 	public static final String MAPPING_NAME_PROPERTY = "${mapping.name}";
 	public static final String MAPPING_TARGET_NAMESPACE_URI_PROPERTY = "${mapping.targetNamespace}";
 	public static final String LOCAL_ELEMENT_NAME = "mapping";
+	public static final String DEFAULT_MAPPING_STYLE = "default";
 
 	private ModuleConfiguration moduleConfiguration;
 	private String id;
 	private String name;
 	private String _package;
 	private String schemaId = MappingConfiguration.MAPPING_TARGET_NAMESPACE_URI_PROPERTY + "#";
+	private String mappingStyle;
 	private String targetNamespaceURI;
 	private String defaultElementNamespaceURI;
 	private String defaultAttributeNamespaceURI;
@@ -80,6 +82,15 @@ public class MappingConfiguration {
 
 	public void setSchemaId(String schemaId) {
 		this.schemaId = schemaId;
+	}
+
+	@XmlAttribute(name = "mappingStyle")
+	public String getMappingStyle() {
+		return mappingStyle;
+	}
+
+	public void setMappingStyle(String mappingStyle) {
+		this.mappingStyle = mappingStyle;
 	}
 
 	@XmlAttribute(name = "targetNamespace")
@@ -198,8 +209,18 @@ public class MappingConfiguration {
 				.replace(MappingConfiguration.MAPPING_NAME_PROPERTY, getName())
 				.replace(MappingConfiguration.MAPPING_TARGET_NAMESPACE_URI_PROPERTY, targetNamespaceURI);
 
+		final String mappingStyle;
+		if (this.mappingStyle != null) {
+			mappingStyle = this.mappingStyle;
+		} else {
+			logger.debug(MessageFormat
+					.format("Mapping [{0}] will use Standard Mapping Style in the package [{2}].",
+							mappingName, packageName));
+			mappingStyle = MappingConfiguration.DEFAULT_MAPPING_STYLE;
+		}
+
 		final Mapping<T, C> mapping = new Mapping<T, C>(context, analyzer,
-				packageInfo, mappingName, mappingSchemaId, targetNamespaceURI,
+				packageInfo, mappingName, mappingSchemaId, mappingStyle, targetNamespaceURI,
 				defaultElementNamespaceURI, defaultAttributeNamespaceURI);
 
 		if (getExcludesConfiguration() != null) {

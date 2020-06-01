@@ -155,10 +155,15 @@ public class JsonSchemaPropertyInfoProducerVisitor<T, C extends T>
 			itemTypeSchemas.add(new JsonSchemaBuilder().addRef(JsonixJsonSchemaConstants.DOM_TYPE_INFO_SCHEMA_REF));
 		}
 		if (info.isTypedObjectAllowed()) {
-			final JsonSchemaBuilder anyElementSchema = new JsonSchemaBuilder().addType(JsonSchemaConstants.OBJECT_TYPE)
-					.addProperty(JsonixConstants.NAME_PROPERTY_NAME,
-							new JsonSchemaBuilder().addRef(XmlSchemaJsonSchemaConstants.QNAME_TYPE_INFO_SCHEMA_REF))
-					.addProperty(JsonixConstants.VALUE_PROPERTY_NAME, new JsonSchemaBuilder());
+			final JsonSchemaBuilder anyElementSchema;
+            if (mappingCompiler.getMapping().getMappingStyle().equals("simplified")) {
+				anyElementSchema = new JsonSchemaBuilder();
+			} else {
+				anyElementSchema = new JsonSchemaBuilder().addType(JsonSchemaConstants.OBJECT_TYPE)
+						.addProperty(JsonixConstants.NAME_PROPERTY_NAME,
+								new JsonSchemaBuilder().addRef(XmlSchemaJsonSchemaConstants.QNAME_TYPE_INFO_SCHEMA_REF))
+						.addProperty(JsonixConstants.VALUE_PROPERTY_NAME, new JsonSchemaBuilder());
+			}
 			itemTypeSchemas.add(anyElementSchema);
 		}
 		final JsonSchemaBuilder typeSchema = createPossiblyCollectionTypeSchema(info,
@@ -259,13 +264,18 @@ public class JsonSchemaPropertyInfoProducerVisitor<T, C extends T>
 	}
 
 	private <M extends MElementTypeInfo<T, C, O>, O> JsonSchemaBuilder createElementRefSchema(M elementTypeInfo) {
-		final JsonSchemaBuilder schema = new JsonSchemaBuilder();
-		addElementNameSchema(elementTypeInfo.getElementName(), schema);
-		schema.addType(JsonSchemaConstants.OBJECT_TYPE);
-		schema.addProperty(JsonixConstants.NAME_PROPERTY_NAME,
-				new JsonSchemaBuilder().addRef(XmlSchemaJsonSchemaConstants.QNAME_TYPE_INFO_SCHEMA_REF));
-		schema.addProperty(JsonixConstants.VALUE_PROPERTY_NAME,
-				createTypeSchema(elementTypeInfo, elementTypeInfo.getTypeInfo()));
+		final JsonSchemaBuilder schema;
+		if (mappingCompiler.getMapping().getMappingStyle().equals("simplified")) {
+			schema = createTypeSchema(elementTypeInfo, elementTypeInfo.getTypeInfo());
+		} else {
+			schema = new JsonSchemaBuilder();
+			addElementNameSchema(elementTypeInfo.getElementName(), schema);
+			schema.addType(JsonSchemaConstants.OBJECT_TYPE);
+			schema.addProperty(JsonixConstants.NAME_PROPERTY_NAME,
+					new JsonSchemaBuilder().addRef(XmlSchemaJsonSchemaConstants.QNAME_TYPE_INFO_SCHEMA_REF));
+			schema.addProperty(JsonixConstants.VALUE_PROPERTY_NAME,
+					createTypeSchema(elementTypeInfo, elementTypeInfo.getTypeInfo()));
+		}
 		return schema;
 	}
 
