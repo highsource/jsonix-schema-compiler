@@ -47,6 +47,7 @@ public class Mapping<T, C extends T> {
 	private final String packageName;
 	private final String mappingName;
 	private final String schemaId;
+	private final String mappingStyle;
 	private final String targetNamespaceURI;
 	private final String defaultElementNamespaceURI;
 	private final String defaultAttributeNamespaceURI;
@@ -54,7 +55,7 @@ public class Mapping<T, C extends T> {
 
 	public Mapping(JsonixContext context,
 			ModelInfoGraphAnalyzer<T, C> analyzer, MPackageInfo packageInfo,
-			String mappingName, String schemaId, String targetNamespaceURI,
+			String mappingName, String schemaId, String mappingStyle, String targetNamespaceURI,
 			String defaultElementNamespaceURI,
 			String defaultAttributeNamespaceURI) {
 		this.logger = Validate.notNull(context).getLoggerFactory()
@@ -63,6 +64,7 @@ public class Mapping<T, C extends T> {
 		Validate.notNull(packageInfo);
 		Validate.notNull(mappingName);
 		Validate.notNull(schemaId);
+		Validate.notNull(mappingStyle);
 		Validate.notNull(defaultElementNamespaceURI);
 		Validate.notNull(defaultAttributeNamespaceURI);
 		this.analyzer = analyzer;
@@ -70,6 +72,7 @@ public class Mapping<T, C extends T> {
 		this.packageName = packageInfo.getPackageName();
 		this.mappingName = mappingName;
 		this.schemaId = schemaId;
+		this.mappingStyle = mappingStyle;
 		this.targetNamespaceURI = targetNamespaceURI;
 		this.defaultElementNamespaceURI = defaultElementNamespaceURI;
 		this.defaultAttributeNamespaceURI = defaultAttributeNamespaceURI;
@@ -450,6 +453,10 @@ public class Mapping<T, C extends T> {
 
 	public String getSchemaId() {
 		return this.schemaId;
+	}
+
+	public String getMappingStyle() {
+		return this.mappingStyle;
 	}
 
 	public String getTargetNamespaceURI() {
