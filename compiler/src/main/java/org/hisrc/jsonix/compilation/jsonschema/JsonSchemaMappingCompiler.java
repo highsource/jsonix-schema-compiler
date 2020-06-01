@@ -23,105 +23,111 @@ import org.jvnet.jaxb2_commons.xml.bind.model.origin.MOriginated;
 
 public class JsonSchemaMappingCompiler<T, C extends T> {
 
-	private final Modules<T, C> modules;
-	private final Module<T, C> module;
-	private final Mapping<T, C> mapping;
-	private final JsonBuilderFactory jsonBuilderFactory;
+    private final Modules<T, C> modules;
+    private final Module<T, C> module;
+    private final Mapping<T, C> mapping;
+    private final JsonBuilderFactory jsonBuilderFactory;
 
-	public JsonSchemaMappingCompiler(JsonBuilderFactory jsonBuilderFactory, Modules<T, C> modules, Module<T, C> module,
-			Mapping<T, C> mapping) {
-		Validate.notNull(jsonBuilderFactory);
-		Validate.notNull(modules);
-		Validate.notNull(module);
-		Validate.notNull(mapping);
-		this.jsonBuilderFactory = jsonBuilderFactory;
-		this.modules = modules;
-		this.module = module;
-		this.mapping = mapping;
-	}
+    public JsonSchemaMappingCompiler(JsonBuilderFactory jsonBuilderFactory, Modules<T, C> modules, Module<T, C> module,
+                                     Mapping<T, C> mapping) {
+        Validate.notNull(jsonBuilderFactory);
+        Validate.notNull(modules);
+        Validate.notNull(module);
+        Validate.notNull(mapping);
+        this.jsonBuilderFactory = jsonBuilderFactory;
+        this.modules = modules;
+        this.module = module;
+        this.mapping = mapping;
+    }
 
-	public Modules<T, C> getModules() {
-		return modules;
-	}
+    public Modules<T, C> getModules() {
+        return modules;
+    }
 
-	public Module<T, C> getModule() {
-		return module;
-	}
+    public Module<T, C> getModule() {
+        return module;
+    }
 
-	public Mapping<T, C> getMapping() {
-		return mapping;
-	}
+    public Mapping<T, C> getMapping() {
+        return mapping;
+    }
 
-	public JsonBuilderFactory getJsonBuilderFactory() {
-		return jsonBuilderFactory;
-	}
+    public JsonBuilderFactory getJsonBuilderFactory() {
+        return jsonBuilderFactory;
+    }
 
-	public JsonSchemaBuilder compile() {
-		final JsonSchemaBuilder schema = new JsonSchemaBuilder();
-		final String schemaId = mapping.getSchemaId();
-		schema.addId(schemaId);
-		addElementInfos(schema);
-		addClassInfoSchemas(schema);
-		addEnumLeafInfoSchemas(schema);
-		return schema;
-	}
+    public JsonSchemaBuilder compile() {
+        final JsonSchemaBuilder schema = new JsonSchemaBuilder();
+        final String schemaId = mapping.getSchemaId();
+        schema.addId(schemaId);
+        addElementInfos(schema);
+        addClassInfoSchemas(schema);
+        addEnumLeafInfoSchemas(schema);
+        return schema;
+    }
 
-	private void addElementInfos(final JsonSchemaBuilder schema) {
-		for (MElementInfo<T, C> elementInfo : mapping.getElementInfos()) {
-			final QName elementName = elementInfo.getElementName();
-			final MTypeInfo<T, C> typeInfo = elementInfo.getTypeInfo();
-			final MClassInfo<T, C> scope = elementInfo.getScope();
+    private void addElementInfos(final JsonSchemaBuilder schema) {
+        for (MElementInfo<T, C> elementInfo : mapping.getElementInfos()) {
+            final QName elementName = elementInfo.getElementName();
+            final MTypeInfo<T, C> typeInfo = elementInfo.getTypeInfo();
+            final MClassInfo<T, C> scope = elementInfo.getScope();
 
-			final JsonSchemaBuilder elementInfoSchema = new JsonSchemaBuilder();
-			elementInfoSchema.addType(JsonSchemaConstants.OBJECT_TYPE);
-			final JsonSchemaBuilder qNameRef = new JsonSchemaBuilder()
-					.addRef(XmlSchemaJsonSchemaConstants.QNAME_TYPE_INFO_SCHEMA_REF);
-			final JsonSchemaBuilder nameConstant = new JsonSchemaBuilder();
-			nameConstant.addType(JsonSchemaConstants.OBJECT_TYPE);
-			nameConstant.addProperty(JsonixJsonSchemaConstants.LOCAL_PART_PROPERTY_NAME,
-					new JsonSchemaBuilder().addEnum(elementName.getLocalPart()));
-			nameConstant.addProperty(JsonixJsonSchemaConstants.NAMESPACE_URI_PROPERTY_NAME,
-					new JsonSchemaBuilder().addEnum(elementName.getNamespaceURI()));
+            final JsonSchemaBuilder elementInfoSchema;
 
-			elementInfoSchema.addProperty(JsonixConstants.NAME_PROPERTY_NAME,
-					new JsonSchemaBuilder().addAllOf(qNameRef).addAllOf(nameConstant));
+            if (mapping.getMappingStyle().equals("simplified")) {
+                elementInfoSchema = typeInfo.acceptTypeInfoVisitor(new CreateTypeInfoSchema<T, C, MElementInfo<T, C>, MElementInfoOrigin>(this, elementInfo));
+            } else {
+                elementInfoSchema = new JsonSchemaBuilder();
+                elementInfoSchema.addType(JsonSchemaConstants.OBJECT_TYPE);
+                final JsonSchemaBuilder qNameRef = new JsonSchemaBuilder()
+                        .addRef(XmlSchemaJsonSchemaConstants.QNAME_TYPE_INFO_SCHEMA_REF);
+                final JsonSchemaBuilder nameConstant = new JsonSchemaBuilder();
+                nameConstant.addType(JsonSchemaConstants.OBJECT_TYPE);
+                nameConstant.addProperty(JsonixJsonSchemaConstants.LOCAL_PART_PROPERTY_NAME,
+                        new JsonSchemaBuilder().addEnum(elementName.getLocalPart()));
+                nameConstant.addProperty(JsonixJsonSchemaConstants.NAMESPACE_URI_PROPERTY_NAME,
+                        new JsonSchemaBuilder().addEnum(elementName.getNamespaceURI()));
 
-			elementInfoSchema.addProperty(JsonixConstants.VALUE_PROPERTY_NAME,
-					typeInfo.acceptTypeInfoVisitor(new CreateTypeInfoSchema<T, C, MElementInfo<T, C>, MElementInfoOrigin>(this, elementInfo)));
+                elementInfoSchema.addProperty(JsonixConstants.NAME_PROPERTY_NAME,
+                        new JsonSchemaBuilder().addAllOf(qNameRef).addAllOf(nameConstant));
 
-			elementInfoSchema.add(JsonixJsonSchemaConstants.ELEMENT_NAME_PROPERTY_NAME,
-					new JsonSchemaBuilder()
-							.add(JsonixJsonSchemaConstants.LOCAL_PART_PROPERTY_NAME, elementName.getLocalPart()).add(
-									JsonixJsonSchemaConstants.NAMESPACE_URI_PROPERTY_NAME,
-									elementName.getNamespaceURI()));
-			if (scope != null) {
-				elementInfoSchema.add(JsonixJsonSchemaConstants.SCOPE_PROPERTY_NAME,
-						getTypeInfoProducer(elementInfo, typeInfo).createTypeInfoSchemaRef(this));
-			}
-			schema.addAnyOf(elementInfoSchema);
-		}
-	}
+                elementInfoSchema.addProperty(JsonixConstants.VALUE_PROPERTY_NAME,
+                        typeInfo.acceptTypeInfoVisitor(new CreateTypeInfoSchema<T, C, MElementInfo<T, C>, MElementInfoOrigin>(this, elementInfo)));
 
-	private void addEnumLeafInfoSchemas(final JsonSchemaBuilder schema) {
-		for (MEnumLeafInfo<T, C> enumLeafInfo : mapping.getEnumLeafInfos()) {
-			final EnumLeafInfoProducer<T, C> enumLeafInfoCompiler = new EnumLeafInfoProducer<T, C>(enumLeafInfo);
-			final JsonSchemaBuilder enumLeafInfoSchema = enumLeafInfoCompiler.compile(this);
-			schema.addDefinition(enumLeafInfo.getContainerLocalName(JsonixConstants.DEFAULT_SCOPED_NAME_DELIMITER),
-					enumLeafInfoSchema);
-		}
-	}
+                elementInfoSchema.add(JsonixJsonSchemaConstants.ELEMENT_NAME_PROPERTY_NAME,
+                        new JsonSchemaBuilder()
+                                .add(JsonixJsonSchemaConstants.LOCAL_PART_PROPERTY_NAME, elementName.getLocalPart()).add(
+                                JsonixJsonSchemaConstants.NAMESPACE_URI_PROPERTY_NAME,
+                                elementName.getNamespaceURI()));
+                if (scope != null) {
+                    elementInfoSchema.add(JsonixJsonSchemaConstants.SCOPE_PROPERTY_NAME,
+                            getTypeInfoProducer(elementInfo, typeInfo).createTypeInfoSchemaRef(this));
+                }
+            }
+            schema.addAnyOf(elementInfoSchema);
+        }
+    }
 
-	private void addClassInfoSchemas(final JsonSchemaBuilder schema) {
-		for (MClassInfo<T, C> classInfo : mapping.getClassInfos()) {
-			final ClassInfoProducer<T, C> classInfoCompiler = new ClassInfoProducer<T, C>(classInfo);
-			final JsonSchemaBuilder classInfoSchema = classInfoCompiler.compile(this);
-			schema.addDefinition(classInfo.getContainerLocalName(JsonixConstants.DEFAULT_SCOPED_NAME_DELIMITER),
-					classInfoSchema);
-		}
-	}
+    private void addEnumLeafInfoSchemas(final JsonSchemaBuilder schema) {
+        for (MEnumLeafInfo<T, C> enumLeafInfo : mapping.getEnumLeafInfos()) {
+            final EnumLeafInfoProducer<T, C> enumLeafInfoCompiler = new EnumLeafInfoProducer<T, C>(enumLeafInfo);
+            final JsonSchemaBuilder enumLeafInfoSchema = enumLeafInfoCompiler.compile(this);
+            schema.addDefinition(enumLeafInfo.getContainerLocalName(JsonixConstants.DEFAULT_SCOPED_NAME_DELIMITER),
+                    enumLeafInfoSchema);
+        }
+    }
 
-	public <M extends MOriginated<O>, O> TypeInfoProducer<T, C> getTypeInfoProducer(M originated,
-			MTypeInfo<T, C> typeInfo) {
-		return typeInfo.acceptTypeInfoVisitor(new CreateTypeInfoProducer<T, C, O>(originated));
-	}
+    private void addClassInfoSchemas(final JsonSchemaBuilder schema) {
+        for (MClassInfo<T, C> classInfo : mapping.getClassInfos()) {
+            final ClassInfoProducer<T, C> classInfoCompiler = new ClassInfoProducer<T, C>(classInfo);
+            final JsonSchemaBuilder classInfoSchema = classInfoCompiler.compile(this);
+            schema.addDefinition(classInfo.getContainerLocalName(JsonixConstants.DEFAULT_SCOPED_NAME_DELIMITER),
+                    classInfoSchema);
+        }
+    }
+
+    public <M extends MOriginated<O>, O> TypeInfoProducer<T, C> getTypeInfoProducer(M originated,
+                                                                                    MTypeInfo<T, C> typeInfo) {
+        return typeInfo.acceptTypeInfoVisitor(new CreateTypeInfoProducer<T, C, O>(originated));
+    }
 }
